@@ -1,32 +1,42 @@
 const BlockchainService = require('../blockchain/BlockchainService');
 
 // Mock Web3
+// Mock Web3
 jest.mock('web3', () => {
-    return jest.fn().mockImplementation(() => ({
-        eth: {
-            getBalance: jest.fn(),
-            getBlockNumber: jest.fn(),
-            getGasPrice: jest.fn(),
-            getTransaction: jest.fn(),
-            estimateGas: jest.fn(),
-            getTransactionReceipt: jest.fn(),
-            accounts: {
-                privateKeyToAccount: jest.fn(() => ({
-                    address: '0x1234567890123456789012345678901234567890',
-                    privateKey: '0x0123456789012345678901234567890123456789012345678901234567890123'
-                })),
-                wallet: {
-                    add: jest.fn()
+    return {
+        Web3: jest.fn().mockImplementation(() => ({
+            eth: {
+                getBalance: jest.fn(),
+                getBlockNumber: jest.fn(),
+                getGasPrice: jest.fn(),
+                getTransaction: jest.fn(),
+                estimateGas: jest.fn(),
+                getTransactionReceipt: jest.fn(),
+                getChainId: jest.fn(),
+                net: {
+                    getPeerCount: jest.fn()
+                },
+                accounts: {
+                    privateKeyToAccount: jest.fn(() => ({
+                        address: '0x1234567890123456789012345678901234567890',
+                        privateKey: '0x0123456789012345678901234567890123456789012345678901234567890123'
+                    })),
+                    wallet: {
+                        add: jest.fn()
+                    }
                 }
+            },
+            utils: {
+                toWei: jest.fn((value, unit) => (parseFloat(value) * 1e18).toString()),
+                fromWei: jest.fn((value, unit) => {
+                    if (unit === 'gwei') return (parseFloat(value) / 1e9).toString();
+                    return (parseFloat(value) / 1e18).toString();
+                }),
+                isAddress: jest.fn((address) => /^0x[a-fA-F0-9]{40}$/.test(address)),
+                keccak256: jest.fn((data) => '0x' + '0'.repeat(64))
             }
-        },
-        utils: {
-            toWei: jest.fn((value, unit) => (parseFloat(value) * 1e18).toString()),
-            fromWei: jest.fn((value, unit) => (parseFloat(value) / 1e18).toString()),
-            isAddress: jest.fn((address) => /^0x[a-fA-F0-9]{40}$/.test(address)),
-            keccak256: jest.fn((data) => '0x' + '0'.repeat(64))
-        }
-    }));
+        }))
+    };
 });
 
 describe('Blockchain Service', () => {
@@ -41,6 +51,7 @@ describe('Blockchain Service', () => {
         it('should get wallet balance', async () => {
             const mockBalance = '1000000000000000000'; // 1 BNB in Wei
             web3Mock.eth.getBalance.mockResolvedValue(mockBalance);
+            web3Mock.utils.isAddress.mockReturnValue(true);
 
             const result = await BlockchainService.getBalance('0x1234567890123456789012345678901234567890');
 
@@ -54,14 +65,15 @@ describe('Blockchain Service', () => {
             web3Mock.utils.isAddress.mockReturnValue(false);
 
             await expect(BlockchainService.getBalance('invalid-address'))
-                .rejects.toThrow('Invalid address format');
+                .rejects.toThrow('Failed to get balance: Invalid wallet address format');
         });
 
         it('should handle network errors', async () => {
+            web3Mock.utils.isAddress.mockReturnValue(true);
             web3Mock.eth.getBalance.mockRejectedValue(new Error('Network error'));
 
             await expect(BlockchainService.getBalance('0x1234567890123456789012345678901234567890'))
-                .rejects.toThrow();
+                .rejects.toThrow('Failed to get balance: Network error');
         });
     });
 
@@ -99,7 +111,7 @@ describe('Blockchain Service', () => {
             expect(result).toHaveProperty('gas_price_gwei');
             expect(result).toHaveProperty('estimated_cost_wei');
             expect(result).toHaveProperty('estimated_cost_bnb');
-            expect(result.gas_limit).toBe(mockGasEstimate);
+            expect(result.gas_limit).toBe(mockGasEstimate.toString());
         });
 
         it('should handle gas estimation errors', async () => {
@@ -167,17 +179,28 @@ describe('Blockchain Service', () => {
         it('should get network information', async () => {
             web3Mock.eth.getBlockNumber.mockResolvedValue(12345678);
             web3Mock.eth.getGasPrice.mockResolvedValue('5000000000');
+            web3Mock.eth.getChainId.mockResolvedValue(97n);
+            web3Mock.eth.net.getPeerCount.mockResolvedValue(10);
 
             const result = await BlockchainService.getNetworkInfo();
 
             expect(result).toHaveProperty('chain_id');
             expect(result).toHaveProperty('block_number');
-            expect(result).toHaveProperty('gas_price');
+            expect(result).toHaveProperty('gas_price_gwei');
             expect(result.chain_id).toBe(97);
         });
     });
 
     describe('waitForConfirmation', () => {
+        beforeEach(() => {
+            // Mock sleep to resolve immediately to avoid timeouts
+            jest.spyOn(BlockchainService, 'sleep').mockResolvedValue();
+        });
+
+        afterEach(() => {
+            jest.restoreAllMocks();
+        });
+
         it('should wait for transaction confirmation', async () => {
             const mockReceipt = {
                 transactionHash: '0xabc123',
@@ -190,16 +213,23 @@ describe('Blockchain Service', () => {
                 .mockResolvedValueOnce(null)
                 .mockResolvedValueOnce(mockReceipt);
 
+            web3Mock.eth.getBlockNumber.mockResolvedValue(12350);
+
             const result = await BlockchainService.waitForConfirmation('0xabc123', 1, 5000);
 
-            expect(result).toHaveProperty('transactionHash');
-            expect(result.status).toBe(true);
+            expect(result).toHaveProperty('tx_hash');
+            expect(result.status).toBe('success');
         });
 
         it('should timeout if confirmation takes too long', async () => {
             web3Mock.eth.getTransactionReceipt.mockResolvedValue(null);
 
-            await expect(BlockchainService.waitForConfirmation('0xabc123', 1, 100))
+            // We need to ensure the loop terminates. 
+            // Since sleep is mocked, the loop will run very fast.
+            // BlockchainService has a maxAttempts of 60.
+            // So it should throw timeout eventually.
+
+            await expect(BlockchainService.waitForConfirmation('0xabc123', 1))
                 .rejects.toThrow('Transaction confirmation timeout');
         });
     });

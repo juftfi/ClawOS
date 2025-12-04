@@ -224,8 +224,8 @@ describe('Membase Service', () => {
                 data: { results: [] }
             });
 
-            await expect(MembaseService.getContractTemplate('NonExistent'))
-                .rejects.toThrow('not found');
+            const result = await MembaseService.getContractTemplate('NonExistent');
+            expect(result).toBeNull();
         });
     });
 

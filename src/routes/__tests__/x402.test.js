@@ -8,7 +8,14 @@ jest.mock('../../services/x402/SignatureService');
 
 const app = express();
 app.use(express.json());
-app.use('/api', x402Router);
+// Mount routes exactly as they are in index.js but relative to the test app
+// In index.js: app.use('/api/payment', x402Router);
+// But x402.js defines routes like /prepare, so full path is /api/payment/prepare
+// However, x402.js also defines /policy routes.
+// To match index.js structure where x402Router is used for multiple paths:
+app.use('/api/payment', x402Router);
+app.use('/api/policy', x402Router);
+app.use('/api/signature', x402Router);
 
 app.use((err, req, res, next) => {
     res.status(err.status || 500).json({
@@ -47,15 +54,18 @@ describe('x402 Payment Routes', () => {
 
     describe('POST /api/policy/set-limit', () => {
         it('should set spending limit', async () => {
-            const PolicyService = require('../../services/x402/PolicyService');
+            const PaymentService = require('../../services/x402/PaymentService');
 
-            PolicyService.setSpendingLimit = jest.fn().mockResolvedValue({
+            PaymentService.createPaymentPolicy = jest.fn().mockResolvedValue({
                 success: true,
-                max_daily_spend_bnb: '10'
+                user_id: 'user123',
+                policy: {
+                    max_daily_spend: '10'
+                }
             });
 
             const response = await request(app)
-                .post('/api/policy/set-limit')
+                .post('/api/policy/policy/set-limit')
                 .send({
                     userId: 'user123',
                     limitBNB: '10'

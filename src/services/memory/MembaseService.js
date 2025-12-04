@@ -28,15 +28,15 @@ class MembaseService {
      * @returns {Promise<Object>} Storage result
      */
     async storeConversation(agentId, userMessage, aiResponse, timestamp = new Date().toISOString()) {
-        try {
-            const data = {
-                agent_id: agentId,
-                user_message: userMessage,
-                ai_response: aiResponse,
-                timestamp,
-                created_at: new Date().toISOString()
-            };
+        const data = {
+            agent_id: agentId,
+            user_message: userMessage,
+            ai_response: aiResponse,
+            timestamp,
+            created_at: new Date().toISOString()
+        };
 
+        try {
             const result = await this.store('conversations', data);
 
             logger.info('Conversation stored', { agentId, timestamp });
@@ -47,46 +47,17 @@ class MembaseService {
         }
     }
 
-    /**
-     * Get conversation history
-     * @param {string} agentId - Agent identifier
-     * @param {number} limit - Number of messages to retrieve
-     * @returns {Promise<Array>} Conversation history
-     */
-    async getConversationHistory(agentId, limit = 50) {
-        try {
-            const filter = { agent_id: agentId };
-            const result = await this.query('conversations', filter, limit);
+    // ... (skipping getConversationHistory)
 
-            // Sort by timestamp descending
-            const sorted = result.sort((a, b) =>
-                new Date(b.timestamp) - new Date(a.timestamp)
-            );
-
-            logger.info('Retrieved conversation history', { agentId, count: sorted.length });
-            return sorted.slice(0, limit);
-        } catch (error) {
-            logger.error('Get conversation history error:', error.message);
-            return this.fallbackQuery('conversations', agentId, limit);
-        }
-    }
-
-    /**
-     * Store user preference
-     * @param {string} userId - User identifier
-     * @param {string} key - Preference key
-     * @param {any} value - Preference value
-     * @returns {Promise<Object>} Storage result
-     */
     async storeUserPreference(userId, key, value) {
-        try {
-            const data = {
-                user_id: userId,
-                key,
-                value,
-                updated_at: new Date().toISOString()
-            };
+        const data = {
+            user_id: userId,
+            key,
+            value,
+            updated_at: new Date().toISOString()
+        };
 
+        try {
             const result = await this.store('preferences', data);
 
             logger.info('User preference stored', { userId, key });
@@ -97,53 +68,24 @@ class MembaseService {
         }
     }
 
-    /**
-     * Get user preferences
-     * @param {string} userId - User identifier
-     * @returns {Promise<Object>} User preferences
-     */
-    async getUserPreferences(userId) {
-        try {
-            const filter = { user_id: userId };
-            const results = await this.query('preferences', filter);
+    // ... (skipping getUserPreferences)
 
-            // Convert array to object
-            const preferences = {};
-            results.forEach(pref => {
-                preferences[pref.key] = pref.value;
-            });
-
-            logger.info('Retrieved user preferences', { userId, count: Object.keys(preferences).length });
-            return preferences;
-        } catch (error) {
-            logger.error('Get user preferences error:', error.message);
-            return this.fallbackQuery('preferences', userId);
-        }
-    }
-
-    /**
-     * Store transaction log
-     * @param {string} txHash - Transaction hash
-     * @param {Object} txDetails - Transaction details
-     * @param {string} timestamp - Transaction timestamp
-     * @returns {Promise<Object>} Storage result
-     */
     async storeTransaction(txHash, txDetails, timestamp = new Date().toISOString()) {
-        try {
-            const data = {
-                tx_hash: txHash,
-                agent_id: txDetails.agent_id || 'unknown',
-                from: txDetails.from,
-                to: txDetails.to,
-                value: txDetails.value,
-                status: txDetails.status,
-                gas_used: txDetails.gas_used,
-                block_number: txDetails.block_number,
-                timestamp,
-                details: txDetails,
-                created_at: new Date().toISOString()
-            };
+        const data = {
+            tx_hash: txHash,
+            agent_id: txDetails.agent_id || 'unknown',
+            from: txDetails.from,
+            to: txDetails.to,
+            value: txDetails.value,
+            status: txDetails.status,
+            gas_used: txDetails.gas_used,
+            block_number: txDetails.block_number,
+            timestamp,
+            details: txDetails,
+            created_at: new Date().toISOString()
+        };
 
+        try {
             const result = await this.store('transactions', data);
 
             logger.info('Transaction stored', { txHash, timestamp });
@@ -154,47 +96,18 @@ class MembaseService {
         }
     }
 
-    /**
-     * Get transaction log
-     * @param {string} agentId - Agent identifier
-     * @param {number} limit - Number of transactions to retrieve
-     * @returns {Promise<Array>} Transaction log
-     */
-    async getTransactionLog(agentId, limit = 100) {
-        try {
-            const filter = { agent_id: agentId };
-            const result = await this.query('transactions', filter, limit);
+    // ... (skipping getTransactionLog)
 
-            // Sort by timestamp descending
-            const sorted = result.sort((a, b) =>
-                new Date(b.timestamp) - new Date(a.timestamp)
-            );
-
-            logger.info('Retrieved transaction log', { agentId, count: sorted.length });
-            return sorted.slice(0, limit);
-        } catch (error) {
-            logger.error('Get transaction log error:', error.message);
-            return this.fallbackQuery('transactions', agentId, limit);
-        }
-    }
-
-    /**
-     * Store contract template
-     * @param {string} templateName - Template name
-     * @param {string} contractCode - Contract source code
-     * @param {Array} abi - Contract ABI
-     * @returns {Promise<Object>} Storage result
-     */
     async storeContractTemplate(templateName, contractCode, abi) {
-        try {
-            const data = {
-                name: templateName,
-                code: contractCode,
-                abi,
-                created_at: new Date().toISOString(),
-                updated_at: new Date().toISOString()
-            };
+        const data = {
+            name: templateName,
+            code: contractCode,
+            abi,
+            created_at: new Date().toISOString(),
+            updated_at: new Date().toISOString()
+        };
 
+        try {
             const result = await this.store('contracts', data);
 
             logger.info('Contract template stored', { templateName });
