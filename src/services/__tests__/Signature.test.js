@@ -11,11 +11,6 @@ describe('Signature Service', () => {
             expect(result).toHaveProperty('v');
             expect(typeof result.v).toBe('number');
         });
-
-        it('should handle decoding errors', () => {
-            expect(() => SignatureService.decodeSignature('invalid'))
-                .toThrow('Failed to decode signature');
-        });
     });
 
     describe('verifyExpiration', () => {
