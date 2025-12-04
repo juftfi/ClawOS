@@ -23,9 +23,9 @@
         <div class='clearfix'>
             
             <div class='fl pad1y space-right2'>
-                <span class="strong">94.2% </span>
+                <span class="strong">82.6% </span>
                 <span class="quiet">Statements</span>
-                <span class='fraction'>65/69</span>
+                <span class='fraction'>57/69</span>
             </div>
         
             
@@ -44,9 +44,9 @@
         
             
             <div class='fl pad1y space-right2'>
-                <span class="strong">94.2% </span>
+                <span class="strong">82.6% </span>
                 <span class="quiet">Lines</span>
-                <span class='fraction'>65/69</span>
+                <span class='fraction'>57/69</span>
             </div>
         
             
@@ -451,8 +451,8 @@
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
-<span class="cline-any cline-yes">1x</span>
-<span class="cline-any cline-yes">1x</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
@@ -478,16 +478,16 @@
 <span class="cline-any cline-yes">2x</span>
 <span class="cline-any cline-yes">2x</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
-<span class="cline-any cline-yes">1x</span>
+<span class="cline-any cline-yes">2x</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
-<span class="cline-any cline-yes">1x</span>
+<span class="cline-any cline-yes">2x</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
-<span class="cline-any cline-yes">1x</span>
-<span class="cline-any cline-yes">1x</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
@@ -534,8 +534,8 @@
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
-<span class="cline-any cline-yes">1x</span>
-<span class="cline-any cline-yes">1x</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
@@ -581,8 +581,8 @@
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
-<span class="cline-any cline-yes">1x</span>
-<span class="cline-any cline-yes">1x</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
@@ -789,8 +789,8 @@ class SignatureService {
                 message_hash: messageHash
             };
         } catch (error) {
-            logger.error('Generate payment signature error:', error.message);
-            throw new Error(`Failed to generate payment signature: ${error.message}`);
+<span class="cstat-no" title="statement not covered" >            logger.error('Generate payment signature error:', error.message);</span>
+<span class="cstat-no" title="statement not covered" >            throw new Error(`Failed to generate payment signature: ${error.message}`);</span>
         }
     }
 &nbsp;
@@ -824,8 +824,8 @@ class SignatureService {
 &nbsp;
             return isValid;
         } catch (error) {
-            logger.error('Verify signature error:', error.message);
-            return false;
+<span class="cstat-no" title="statement not covered" >            logger.error('Verify signature error:', error.message);</span>
+<span class="cstat-no" title="statement not covered" >            return false;</span>
         }
     }
 &nbsp;
@@ -872,8 +872,8 @@ class SignatureService {
                 message_hash: messageHash
             };
         } catch (error) {
-            logger.error('Create single tx signature error:', error.message);
-            throw new Error(`Failed to create multi-action signature: ${error.message}`);
+<span class="cstat-no" title="statement not covered" >            logger.error('Create single tx signature error:', error.message);</span>
+<span class="cstat-no" title="statement not covered" >            throw new Error(`Failed to create multi-action signature: ${error.message}`);</span>
         }
     }
 &nbsp;
@@ -919,8 +919,8 @@ class SignatureService {
                 message_hash: messageHash
             };
         } catch (error) {
-            logger.error('Sign contract call error:', error.message);
-            throw new Error(`Failed to sign contract call: ${error.message}`);
+<span class="cstat-no" title="statement not covered" >            logger.error('Sign contract call error:', error.message);</span>
+<span class="cstat-no" title="statement not covered" >            throw new Error(`Failed to sign contract call: ${error.message}`);</span>
         }
     }
 &nbsp;
@@ -1084,7 +1084,7 @@ module.exports = new SignatureService();
             <div class='footer quiet pad2 space-top1 center small'>
                 Code coverage generated by
                 <a href="https://istanbul.js.org/" target="_blank" rel="noopener noreferrer">istanbul</a>
-                at 2025-12-04T10:37:04.987Z
+                at 2025-12-04T11:23:13.782Z
             </div>
         <script src="../../prettify.js"></script>
         <script>

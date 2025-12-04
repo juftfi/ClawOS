@@ -294,7 +294,6 @@ class PolicyService {
 
             logger.info('Payment recorded', { userId, txCount: tracking.tx_count });
         } catch (error) {
-            process.stdout.write(`DEBUG: Record payment error: ${error.message}\n`);
             logger.error('Record payment error:', error.message);
         }
     }

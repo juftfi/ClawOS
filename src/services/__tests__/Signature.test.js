@@ -41,14 +41,6 @@ describe('Signature Service', () => {
 
     describe('generatePaymentSignature', () => {
         it('should generate payment signature', async () => {
-            // Debug check
-            if (!SignatureService.web3) {
-                throw new Error('SignatureService.web3 is undefined');
-            }
-            if (!SignatureService.web3.eth) {
-                throw new Error('SignatureService.web3.eth is undefined');
-            }
-
             const payment = {
                 user: 'user1',
                 amount: '1.0',
@@ -56,10 +48,6 @@ describe('Signature Service', () => {
                 action: 'transfer',
                 nonce: 1
             };
-
-            // Debug mock return
-            const mockSignResult = await mockWeb3.eth.accounts.sign('test', 'key');
-            process.stdout.write(`DEBUG: Mock sign result: ${JSON.stringify(mockSignResult)}\n`);
 
             const result = await SignatureService.generatePaymentSignature(payment);
 

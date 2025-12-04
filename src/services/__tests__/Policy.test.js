@@ -7,15 +7,18 @@ jest.mock('../memory/MembaseService');
 jest.mock('../blockchain/BlockchainService');
 
 describe('Policy Service', () => {
-    const mockWeb3 = {
-        utils: {
-            toWei: jest.fn((val) => (parseFloat(val) * 1e18).toString()),
-            fromWei: jest.fn((val) => (parseFloat(val) / 1e18).toString())
-        }
-    };
+    let mockWeb3;
 
     beforeEach(() => {
         jest.clearAllMocks();
+
+        mockWeb3 = {
+            utils: {
+                toWei: jest.fn((val) => (parseFloat(val) * 1e18).toString()),
+                fromWei: jest.fn((val) => (parseFloat(val) / 1e18).toString())
+            }
+        };
+
         BlockchainService.getWeb3.mockReturnValue(mockWeb3);
         PolicyService.dailyTracking = new Map();
         PolicyService.policies = new Map();
@@ -161,6 +164,149 @@ describe('Policy Service', () => {
 
             expect(tracking).toBeDefined();
             expect(tracking.tx_count).toBeGreaterThan(0);
+        });
+    });
+
+    describe('checkPolicyCompliance', () => {
+        it('should approve compliant payment', async () => {
+            const payment = {
+                amount: '0.05',
+                recipient: '0xrecipient',
+                action: 'transfer'
+            };
+
+            const result = await PolicyService.checkPolicyCompliance(payment, 'user1');
+
+            expect(result.compliant).toBe(true);
+            expect(result.violations).toHaveLength(0);
+        });
+
+        it('should reject payment exceeding single tx limit', async () => {
+            const payment = {
+                amount: '0.2', // Limit is 0.1
+                recipient: '0xrecipient',
+                action: 'transfer'
+            };
+
+            const result = await PolicyService.checkPolicyCompliance(payment, 'user1');
+
+            expect(result.compliant).toBe(false);
+            expect(result.violations).toContain(expect.stringContaining('exceeds single transaction limit'));
+        });
+
+        it('should reject payment exceeding daily limit', async () => {
+            // Mock daily spending to be near limit
+            const today = PolicyService.getTodayKey();
+            PolicyService.dailyTracking.set(`user1:${today}`, { spent_wei: '900000000000000000' }); // 0.9 BNB
+
+            const payment = {
+                amount: '0.2', // Total 1.1 > 1.0 limit
+                recipient: '0xrecipient',
+                action: 'transfer'
+            };
+
+            const result = await PolicyService.checkPolicyCompliance(payment, 'user1');
+
+            expect(result.compliant).toBe(false);
+            expect(result.violations).toContain(expect.stringContaining('exceeds daily spending limit'));
+        });
+
+        it('should warn when approaching daily limit', async () => {
+            // Mock daily spending
+            const today = PolicyService.getTodayKey();
+            PolicyService.dailyTracking.set(`user1:${today}`, { spent_wei: '700000000000000000' }); // 0.7 BNB
+
+            const payment = {
+                amount: '0.15', // Total 0.85 > 0.8 (80%)
+                recipient: '0xrecipient',
+                action: 'transfer'
+            };
+
+            const result = await PolicyService.checkPolicyCompliance(payment, 'user1');
+
+            expect(result.compliant).toBe(true);
+            expect(result.warnings).toHaveLength(1);
+            expect(result.warnings[0]).toContain('Approaching daily spending limit');
+        });
+
+        it('should reject payment exceeding daily tx count', async () => {
+            const today = PolicyService.getTodayKey();
+            PolicyService.dailyTracking.set(`user1:${today}`, { tx_count: 100 }); // Limit is 100
+
+            const payment = {
+                amount: '0.01',
+                recipient: '0xrecipient',
+                action: 'transfer'
+            };
+
+            const result = await PolicyService.checkPolicyCompliance(payment, 'user1');
+
+            expect(result.compliant).toBe(false);
+            expect(result.violations).toContain(expect.stringContaining('Daily transaction limit'));
+        });
+    });
+
+    describe('Address Lists', () => {
+        it('should set allowed addresses', async () => {
+            BlockchainService.validateAddress = jest.fn().mockReturnValue(true);
+
+            const result = await PolicyService.setAllowedAddresses('user1', ['0xallowed']);
+
+            expect(result.success).toBe(true);
+            expect(result.allowed_addresses).toContain('0xallowed');
+
+            const policy = await PolicyService.getPolicy('user1');
+            expect(policy.allowed_addresses).toContain('0xallowed');
+        });
+
+        it('should enforce allowed addresses', async () => {
+            BlockchainService.validateAddress = jest.fn().mockReturnValue(true);
+            await PolicyService.setAllowedAddresses('user1', ['0xallowed']);
+
+            const payment = {
+                amount: '0.01',
+                recipient: '0xother',
+                action: 'transfer'
+            };
+
+            const result = await PolicyService.checkPolicyCompliance(payment, 'user1');
+
+            expect(result.compliant).toBe(false);
+            expect(result.violations).toContain('Recipient not in allowlist');
+        });
+
+        it('should set denied addresses', async () => {
+            BlockchainService.validateAddress = jest.fn().mockReturnValue(true);
+            const result = await PolicyService.setDeniedAddresses('user1', ['0xdenied']);
+
+            expect(result.success).toBe(true);
+            expect(result.denied_addresses).toContain('0xdenied');
+        });
+
+        it('should enforce denied addresses', async () => {
+            BlockchainService.validateAddress = jest.fn().mockReturnValue(true);
+            await PolicyService.setDeniedAddresses('user1', ['0xdenied']);
+
+            const payment = {
+                amount: '0.01',
+                recipient: '0xdenied',
+                action: 'transfer'
+            };
+
+            const result = await PolicyService.checkPolicyCompliance(payment, 'user1');
+
+            expect(result.compliant).toBe(false);
+            expect(result.violations).toContain('Recipient is in denylist');
+        });
+    });
+
+    describe('getPolicySummary', () => {
+        it('should return policy summary', async () => {
+            const summary = await PolicyService.getPolicySummary('user1');
+
+            expect(summary).toHaveProperty('limits');
+            expect(summary).toHaveProperty('today');
+            expect(summary.limits.max_daily_spend_bnb).toBe('1');
         });
     });
 });
