@@ -114,7 +114,7 @@ router.get('/gas-prices', asyncHandler(async (req, res) => {
                 is_low: parseFloat(gasPrice.gwei) < averageGasPrice * 0.8
             },
             estimated_costs: costs,
-            recommendation: this.getGasRecommendation(parseFloat(gasPrice.gwei), averageGasPrice)
+            recommendation: getGasRecommendation(parseFloat(gasPrice.gwei), averageGasPrice)
         },
         timestamp: new Date().toISOString()
     });
@@ -230,7 +230,7 @@ router.post('/batch', asyncHandler(async (req, res) => {
 
         totalCost += parseFloat(preview.costs.total_cost_bnb);
 
-        if (this.compareRiskLevels(preview.risk_level, highestRisk) > 0) {
+        if (compareRiskLevels(preview.risk_level, highestRisk) > 0) {
             highestRisk = preview.risk_level;
         }
     }
