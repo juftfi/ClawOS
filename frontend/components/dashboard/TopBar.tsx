@@ -3,6 +3,7 @@
 import { Bell, Menu } from 'lucide-react';
 import { ConnectButton } from '@rainbow-me/rainbowkit';
 import { ThemeToggle } from './ThemeToggle';
+import { NetworkToggle } from '../NetworkToggle';
 import { usePathname } from 'next/navigation';
 
 export function TopBar() {
@@ -22,14 +23,17 @@ export function TopBar() {
                 </h2>
             </div>
 
-            {/* Right: Wallet, Notifications, Theme */}
+            {/* Right: Network, Wallet, Notifications, Theme */}
             <div className="flex items-center gap-3">
+                {/* Network Toggle */}
+                <div className="hidden md:block">
+                    <NetworkToggle />
+                </div>
+
                 {/* Wallet Connect */}
                 <div className="hidden md:block">
                     <ConnectButton showBalance={false} accountStatus="address" chainStatus="icon" />
                 </div>
-
-                {/* Mobile Wallet (Icon only) - handled by RainbowKit responsive but customized here if needed */}
 
                 <ThemeToggle />
 
