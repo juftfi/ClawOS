@@ -1,59 +1,72 @@
-# AgentOS Web3 Project
+# 🤖 AgentOS Web3
+**The Gateway to Decentralized AI Agents**
 
-A Node.js backend service integrating ChainGPT, Unibase, X402, and blockchain services.
+[![Live Demo](https://img.shields.io/badge/Live-Demo-brightgreen)](https://agent-os-web3.vercel.app/)
+[![Backend API](https://img.shields.io/badge/API-Live-blue)](https://agentos-web3-production.up.railway.app/api/health)
+[![Network](https://img.shields.io/badge/Network-Base%20Sepolia-blue)](https://sepolia.basescan.org/address/0xfba199c705761D98aD1cD98c34C0d544e39c1984)
 
-## Quick Links
+An autonomous agent platform verifying identity on **Base**, orchestrating actions on **BNB Chain**, and persisting memory via **Unibase**.
 
-- 📚 **[Features Documentation](FEATURES.md)** - Comprehensive guide to all features and capabilities
-- 🧪 **[Test Coverage Report](FEATURES.md#coverage-metrics)** - Current testing status and metrics
+---
 
-## Project Structure
+## 🚀 Live Deployment
+- **Frontend Dashboard:** [agent-os-web3.vercel.app](https://agent-os-web3.vercel.app/)
+- **Backend API:** `https://agentos-web3-production.up.railway.app`
+- **Smart Contract (ERC-8004):** `0xfba199c705761D98aD1cD98c34C0d544e39c1984` (Base Sepolia)
 
-```
+---
+
+## 🏆 Bounty Implementations (100% Live)
+
+### 🔵 1. AWE Network (Base)
+- **Feature:** ERC-8004 Agent Identity & x402 Service Payments.
+- **Integration:** Agents connect to Base Sepolia via Alchemy. Payment logic verified on-chain.
+- **Code:** `contracts/ERC8004AgentIdentity.sol`, `src/services/awe/`
+
+### 🟡 2. Quack × ChainGPT (BNB Chain)
+- **Feature:** AI Research & Smart Contract Factory.
+- **Integration:** Uses ChainGPT API for LLM reasoning and solidity generation. Deploys to BNB Testnet.
+- **Code:** `src/services/chainGPT/`, `src/services/blockchain/MultiNetworkService.js`
+
+### 🧠 3. Unibase / Membase
+- **Feature:** Decentralized Persistent Memory.
+- **Integration:** Agent conversations and context stored on Membase Hub (`testnet.hub.membase.io`).
+- **Code:** `src/services/memory/MembaseService.js`
+
+---
+
+## 📚 Documentation
+- **[Installation & Setup](docs/setup/API_KEYS_GUIDE.md)**
+- **[Deployment Guide](docs/deployment/DEPLOYMENT_GUIDE.md)**
+- **[Testing & Verification](docs/testing/TESTING_GUIDE.md)**
+- **[Final Sign-Off](docs/FINAL_SIGNOFF.md)**
+
+## 🛠 Project Structure
+```bash
 AgentOS-web3/
-├── src/
-│   ├── services/
-│   │   ├── chainGPT/
-│   │   ├── unibase/
-│   │   ├── x402/
-│   │   └── blockchain/
-│   ├── routes/
-│   ├── controllers/
-│   ├── models/
-│   ├── utils/
-│   └── tests/
-├── config/
-├── .env
-├── .gitignore
-└── package.json
+├── frontend/           # Next.js 14 Dashboard (Vercel)
+├── src/               # Express Backend (Railway)
+├── contracts/         # Solidity Smart Contracts (Hardhat)
+└── docs/              # Detailed Guides
 ```
 
-## Setup
+## ⚡ Quick Start (Local)
+1. **Clone & Install:**
+   ```bash
+   git clone https://github.com/RicheySon/AgentOS-web3.git
+   npm install      # Backend
+   cd frontend && npm install # Frontend
+   ```
+2. **Environment:**
+   - Copy `.env.example` -> `.env`
+   - Add keys (see [Setup Guide](docs/setup/API_KEYS_GUIDE.md))
+3. **Run:**
+   ```bash
+   # Backend
+   npm run dev
+   # Frontend
+   cd frontend && npm run dev
+   ```
 
-1. Install dependencies:
-```bash
-npm install
-```
-
-2. Configure environment variables in `.env`
-
-3. Run development server:
-```bash
-npm run dev
-```
-
-## Available Scripts
-
-- `npm start` - Start production server
-- `npm run dev` - Start development server with nodemon
-- `npm test` - Run tests
-- `npm run test:watch` - Run tests in watch mode
-- `npm run test:coverage` - Generate coverage report
-
-## Environment Variables
-
-See `.env` file for required configuration.
-
-## Documentation
-
-For detailed information about features, API endpoints, and usage examples, see [FEATURES.md](FEATURES.md).
+---
+*Built for the 2024 Agentic AI Hackathon.*

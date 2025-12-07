@@ -3,6 +3,7 @@
 import { useEffect, useState } from 'react';
 import { Users, DollarSign, MessageSquare, Activity, TrendingUp, Shield, Brain, Database } from 'lucide-react';
 import axios from 'axios';
+import { useRouter } from 'next/navigation';
 
 interface Stats {
     agents: number;
@@ -12,6 +13,7 @@ interface Stats {
 }
 
 export default function DashboardOverview() {
+    const router = useRouter();
     const [stats, setStats] = useState<Stats>({
         agents: 0,
         usdcSpent: '0.00',
@@ -186,7 +188,10 @@ export default function DashboardOverview() {
             <div>
                 <h2 className="text-2xl font-bold text-white mb-6">Quick Actions</h2>
                 <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-                    <button className="bg-slate-900 border border-slate-800 rounded-xl p-6 hover:border-purple-600 hover:bg-slate-800 transition-all text-left group">
+                    <button
+                        onClick={() => router.push('/dashboard/agents')}
+                        className="bg-slate-900 border border-slate-800 rounded-xl p-6 hover:border-purple-600 hover:bg-slate-800 transition-all text-left group"
+                    >
                         <div className="flex items-center gap-4">
                             <div className="p-3 rounded-lg bg-purple-500/10 group-hover:bg-purple-500/20 transition-colors">
                                 <Users className="w-6 h-6 text-purple-400" />
@@ -198,7 +203,10 @@ export default function DashboardOverview() {
                         </div>
                     </button>
 
-                    <button className="bg-slate-900 border border-slate-800 rounded-xl p-6 hover:border-blue-600 hover:bg-slate-800 transition-all text-left group">
+                    <button
+                        onClick={() => router.push('/dashboard/chat')}
+                        className="bg-slate-900 border border-slate-800 rounded-xl p-6 hover:border-blue-600 hover:bg-slate-800 transition-all text-left group"
+                    >
                         <div className="flex items-center gap-4">
                             <div className="p-3 rounded-lg bg-blue-500/10 group-hover:bg-blue-500/20 transition-colors">
                                 <MessageSquare className="w-6 h-6 text-blue-400" />
@@ -210,7 +218,10 @@ export default function DashboardOverview() {
                         </div>
                     </button>
 
-                    <button className="bg-slate-900 border border-slate-800 rounded-xl p-6 hover:border-emerald-600 hover:bg-slate-800 transition-all text-left group">
+                    <button
+                        onClick={() => router.push('/dashboard/analytics')}
+                        className="bg-slate-900 border border-slate-800 rounded-xl p-6 hover:border-emerald-600 hover:bg-slate-800 transition-all text-left group"
+                    >
                         <div className="flex items-center gap-4">
                             <div className="p-3 rounded-lg bg-emerald-500/10 group-hover:bg-emerald-500/20 transition-colors">
                                 <TrendingUp className="w-6 h-6 text-emerald-400" />

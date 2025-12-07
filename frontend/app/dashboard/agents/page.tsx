@@ -1,9 +1,10 @@
 'use client';
 
 import { useEffect, useState } from 'react';
-import { Plus, Bot, ExternalLink, MessageSquare, Wallet, Globe } from 'lucide-react';
+import { Plus, Bot, ExternalLink, MessageSquare, Wallet, Globe, X, Loader2 } from 'lucide-react';
 import axios from 'axios';
 import Link from 'next/link';
+import { useAccount } from 'wagmi';
 
 interface Agent {
     id: string;
@@ -15,12 +16,21 @@ interface Agent {
 }
 
 export default function AgentsPage() {
+    const { address, isConnected } = useAccount();
     const [agents, setAgents] = useState<Agent[]>([]);
     const [loading, setLoading] = useState(true);
+    const [showCreateModal, setShowCreateModal] = useState(false);
+    const [creating, setCreating] = useState(false);
+    const [formData, setFormData] = useState({
+        name: '',
+        description: ''
+    });
 
     useEffect(() => {
-        fetchAgents();
-    }, []);
+        if (isConnected && address) {
+            fetchAgents();
+        }
+    }, [address, isConnected]);
 
     const fetchAgents = async () => {
         try {
@@ -28,14 +38,42 @@ export default function AgentsPage() {
             const response = await axios.get(`${API_URL}/api/awe/agents`);
 
             if (response.data && response.data.agents) {
+                // Filter agents by wallet owner if needed
                 setAgents(response.data.agents);
             }
         } catch (error) {
             console.error('Error fetching agents:', error);
-            // Fallback for demo if API fails or is empty
             setAgents([]);
         } finally {
             setLoading(false);
+        }
+    };
+
+    const handleCreateAgent = async () => {
+        if (!formData.name.trim() || !address) return;
+
+        setCreating(true);
+        try {
+            const API_URL = process.env.NEXT_PUBLIC_API_URL || 'http://localhost:3000';
+
+            const response = await axios.post(`${API_URL}/api/awe/create-agent`, {
+                name: formData.name,
+                description: formData.description || `AI agent owned by ${address}`,
+                owner: address
+            });
+
+            if (response.data.success) {
+                // Refresh agents list
+                await fetchAgents();
+                // Reset form and close modal
+                setFormData({ name: '', description: '' });
+                setShowCreateModal(false);
+            }
+        } catch (error) {
+            console.error('Error creating agent:', error);
+            alert('Failed to create agent. Please try again.');
+        } finally {
+            setCreating(false);
         }
     };
 
@@ -47,11 +85,78 @@ export default function AgentsPage() {
                     <h1 className="text-3xl font-bold text-white mb-2">My Agents</h1>
                     <p className="text-slate-400">Manage your autonomous agents participating in the AWE Network.</p>
                 </div>
-                <button className="flex items-center gap-2 px-6 py-3 bg-purple-600 hover:bg-purple-700 text-white rounded-xl font-semibold transition-all shadow-lg shadow-purple-900/20">
+                <button
+                    onClick={() => setShowCreateModal(true)}
+                    className="flex items-center gap-2 px-6 py-3 bg-purple-600 hover:bg-purple-700 text-white rounded-xl font-semibold transition-all shadow-lg shadow-purple-900/20"
+                >
                     <Plus className="w-5 h-5" />
                     <span>Create New Agent</span>
                 </button>
             </div>
+
+            {/* Create Agent Modal */}
+            {showCreateModal && (
+                <div className="fixed inset-0 bg-black/80 flex items-center justify-center z-50 p-4">
+                    <div className="bg-slate-900 border border-slate-800 rounded-2xl p-8 max-w-md w-full">
+                        <div className="flex items-center justify-between mb-6">
+                            <h2 className="text-2xl font-bold text-white">Create New Agent</h2>
+                            <button
+                                onClick={() => setShowCreateModal(false)}
+                                className="p-2 hover:bg-slate-800 rounded-lg transition-colors"
+                            >
+                                <X className="w-5 h-5 text-slate-400" />
+                            </button>
+                        </div>
+
+                        <div className="space-y-4">
+                            <div>
+                                <label className="block text-sm font-medium text-slate-300 mb-2">Agent Name</label>
+                                <input
+                                    type="text"
+                                    value={formData.name}
+                                    onChange={(e) => setFormData({ ...formData, name: e.target.value })}
+                                    placeholder="e.g., Research Agent Alpha"
+                                    className="w-full px-4 py-3 bg-slate-800 border border-slate-700 rounded-lg text-white placeholder-slate-500 focus:outline-none focus:ring-2 focus:ring-purple-500"
+                                />
+                            </div>
+
+                            <div>
+                                <label className="block text-sm font-medium text-slate-300 mb-2">Description (Optional)</label>
+                                <textarea
+                                    value={formData.description}
+                                    onChange={(e) => setFormData({ ...formData, description: e.target.value })}
+                                    placeholder="Describe your agent's purpose..."
+                                    rows={3}
+                                    className="w-full px-4 py-3 bg-slate-800 border border-slate-700 rounded-lg text-white placeholder-slate-500 focus:outline-none focus:ring-2 focus:ring-purple-500 resize-none"
+                                />
+                            </div>
+
+                            <div className="flex gap-3 pt-4">
+                                <button
+                                    onClick={() => setShowCreateModal(false)}
+                                    className="flex-1 px-4 py-3 border border-slate-700 hover:bg-slate-800 text-white rounded-lg transition-colors"
+                                >
+                                    Cancel
+                                </button>
+                                <button
+                                    onClick={handleCreateAgent}
+                                    disabled={!formData.name.trim() || creating}
+                                    className="flex-1 px-4 py-3 bg-purple-600 hover:bg-purple-700 disabled:opacity-50 disabled:cursor-not-allowed text-white rounded-lg transition-colors flex items-center justify-center gap-2"
+                                >
+                                    {creating ? (
+                                        <>
+                                            <Loader2 className="w-4 h-4 animate-spin" />
+                                            Creating...
+                                        </>
+                                    ) : (
+                                        'Create Agent'
+                                    )}
+                                </button>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            )}
 
             {/* Agents Grid */}
             {loading ? (
@@ -69,7 +174,10 @@ export default function AgentsPage() {
                     <p className="text-slate-400 mb-6 max-w-md mx-auto">
                         You haven't deployed any agents to the AWE Network yet. Create your first agent to get started.
                     </p>
-                    <button className="px-6 py-2 border border-slate-700 hover:bg-slate-800 text-white rounded-lg transition-all">
+                    <button
+                        onClick={() => setShowCreateModal(true)}
+                        className="px-6 py-2 border border-slate-700 hover:bg-slate-800 text-white rounded-lg transition-all"
+                    >
                         Deploy on Base Sepolia
                     </button>
                 </div>

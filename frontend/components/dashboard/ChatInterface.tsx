@@ -4,6 +4,7 @@ import { useState, useRef, useEffect } from 'react';
 import { Send, Bot, User, Sparkles, Loader2, RefreshCw } from 'lucide-react';
 import ReactMarkdown from 'react-markdown';
 import axios from 'axios';
+import { useAccount } from 'wagmi';
 
 interface Message {
     role: 'user' | 'assistant';
@@ -12,15 +13,11 @@ interface Message {
 }
 
 export function ChatInterface() {
-    const [messages, setMessages] = useState<Message[]>([
-        {
-            role: 'assistant',
-            content: "Hello! I'm your AgentOS AI assistant. I can help you research Web3 topics, analyze tokens, or explain complex protocols using ChainGPT. What's on your mind?",
-            timestamp: new Date()
-        }
-    ]);
+    const { address, isConnected } = useAccount();
+    const [messages, setMessages] = useState<Message[]>([]);
     const [input, setInput] = useState('');
     const [loading, setLoading] = useState(false);
+    const [loadingHistory, setLoadingHistory] = useState(true);
     const messagesEndRef = useRef<HTMLDivElement>(null);
 
     const scrollToBottom = () => {
@@ -31,8 +28,57 @@ export function ChatInterface() {
         scrollToBottom();
     }, [messages]);
 
+    // Load conversation history when wallet connects
+    useEffect(() => {
+        const loadHistory = async () => {
+            if (!address || !isConnected) {
+                setMessages([{
+                    role: 'assistant',
+                    content: "Hello! I'm your AgentOS AI assistant. Connect your wallet to access your conversation history and start chatting!",
+                    timestamp: new Date()
+                }]);
+                setLoadingHistory(false);
+                return;
+            }
+
+            try {
+                const API_URL = process.env.NEXT_PUBLIC_API_URL || 'http://localhost:3000';
+                const agentId = `user-${address}`;
+
+                const response = await axios.get(`${API_URL}/api/memory/conversation/${agentId}?limit=50`);
+
+                if (response.data.success && response.data.data.messages.length > 0) {
+                    const loadedMessages = response.data.data.messages.map((msg: any) => ({
+                        role: msg.role,
+                        content: msg.content,
+                        timestamp: new Date(msg.timestamp)
+                    }));
+                    setMessages(loadedMessages);
+                } else {
+                    // No history, show welcome message
+                    setMessages([{
+                        role: 'assistant',
+                        content: `Hello! I'm your AgentOS AI assistant. I can help you research Web3 topics, analyze tokens, or explain complex protocols using ChainGPT. What's on your mind?`,
+                        timestamp: new Date()
+                    }]);
+                }
+            } catch (error) {
+                console.error('Failed to load conversation history:', error);
+                setMessages([{
+                    role: 'assistant',
+                    content: "Hello! I'm your AgentOS AI assistant. I can help you research Web3 topics, analyze tokens, or explain complex protocols using ChainGPT. What's on your mind?",
+                    timestamp: new Date()
+                }]);
+            } finally {
+                setLoadingHistory(false);
+            }
+        };
+
+        loadHistory();
+    }, [address, isConnected]);
+
     const handleSend = async () => {
-        if (!input.trim() || loading) return;
+        if (!input.trim() || loading || !address) return;
 
         const userMessage: Message = {
             role: 'user',
@@ -48,7 +94,6 @@ export function ChatInterface() {
             const API_URL = process.env.NEXT_PUBLIC_API_URL || 'http://localhost:3000';
 
             // Call ChainGPT Research Endpoint
-            // Note: In a real app we might select a specific agent. Here we use the general research endpoint.
             const response = await axios.post(`${API_URL}/api/agent/research`, {
                 query: userMessage.content
             });
@@ -63,9 +108,10 @@ export function ChatInterface() {
 
             setMessages(prev => [...prev, aiMessage]);
 
-            // Optional: Store in memory (fire and forget)
+            // Store in memory with wallet address as agentId
+            const agentId = `user-${address}`;
             axios.post(`${API_URL}/api/memory/conversation`, {
-                agentId: 'default-researcher',
+                agentId,
                 userMessage: userMessage.content,
                 aiResponse: aiContent
             }).catch(err => console.error("Failed to save memory:", err));
