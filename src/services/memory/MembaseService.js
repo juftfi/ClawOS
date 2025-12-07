@@ -36,7 +36,7 @@ class MembaseService {
         // Check blockchain connection
         if (membaseChain) {
             logger.info('Membase chain connected', {
-                wallet: membaseChain.wallet Address,
+                wallet: membaseChain.walletAddress,
                 rpc: membaseChain.currentRpc
             });
         } else {

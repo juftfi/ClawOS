@@ -27,11 +27,13 @@
     "body-parser": "^2.2.1",
     "cors": "^2.8.5",
     "dotenv": "^17.2.3",
+    "ethers": "^6.16.0",
     "express": "^5.2.1",
     "helmet": "^8.1.0",
     "membase": "github:unibaseio/membase-js",
     "morgan": "^1.10.1",
     "uuid": "^13.0.0",
+    "viem": "^2.41.2",
     "web3": "^4.16.0"
   },
   "devDependencies": {
