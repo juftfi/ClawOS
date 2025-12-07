@@ -3,7 +3,7 @@
 import { useState } from 'react';
 import { useAccount } from 'wagmi';
 import { Send, ArrowRightLeft, Rocket, Phone, Shield, DollarSign, AlertTriangle } from 'lucide-react';
-import { X402PaymentFlow } from '@/components/x402/PaymentFlow';
+// import { X402PaymentFlow } from '@/components/x402/PaymentFlow';
 import axios from 'axios';
 
 type ActionType = 'transfer' | 'swap' | 'deploy' | 'call';
@@ -71,7 +71,7 @@ export default function ActionsPage() {
 
         // Prepare action data for x402 payment
         const data = {
-            type: selectedAction,
+            actionType: selectedAction,
             ...formData,
             executor: address
         };
@@ -319,7 +319,7 @@ export default function ActionsPage() {
             )}
 
             {/* x402 Payment Flow */}
-            {showPayment && (
+            {/* {showPayment && (
                 <X402PaymentFlow
                     serviceType={selectedAction as any}
                     agentId={address}
@@ -327,7 +327,7 @@ export default function ActionsPage() {
                     onSuccess={handlePaymentSuccess}
                     onCancel={() => setShowPayment(false)}
                 />
-            )}
+            )} */}
 
             {/* Transaction History */}
             {txHistory.length > 0 && (

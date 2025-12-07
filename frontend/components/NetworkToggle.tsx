@@ -1,12 +1,12 @@
 'use client';
 
-import { useNetwork, useSwitchNetwork } from 'wagmi';
+import { useAccount, useSwitchChain } from 'wagmi';
 import { baseSepolia, bscTestnet } from 'wagmi/chains';
 import { Globe, AlertTriangle } from 'lucide-react';
 
 export function NetworkToggle() {
-    const { chain } = useNetwork();
-    const { switchNetwork, isLoading } = useSwitchNetwork();
+    const { chain } = useAccount();
+    const { switchChain, isPending } = useSwitchChain();
 
     const networks = [
         {
@@ -39,15 +39,15 @@ export function NetworkToggle() {
                     return (
                         <button
                             key={network.chain.id}
-                            onClick={() => switchNetwork?.(network.chain.id)}
-                            disabled={isLoading || isActive}
+                            onClick={() => switchChain?.({ chainId: network.chain.id })}
+                            disabled={isPending || isActive}
                             className={`
                                 p-3 rounded-lg border-2 transition-all text-left
                                 ${isActive
                                     ? `border-${network.color}-500 bg-${network.color}-500/10`
                                     : 'border-slate-700 hover:border-slate-600 bg-slate-800/50'
                                 }
-                                ${isLoading ? 'opacity-50 cursor-not-allowed' : 'cursor-pointer'}
+                                ${isPending ? 'opacity-50 cursor-not-allowed' : 'cursor-pointer'}
                             `}
                         >
                             <div className="flex items-center justify-between mb-1">
