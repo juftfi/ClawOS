@@ -21,19 +21,24 @@ export function ChatInterface() {
     const [loadingHistory, setLoadingHistory] = useState(true);
     const messagesEndRef = useRef<HTMLDivElement>(null);
 
+    const [hasMounted, setHasMounted] = useState(false);
+
+    useEffect(() => {
+        setHasMounted(true);
+        scrollToBottom();
+    }, [messages]);
+
     const scrollToBottom = () => {
         messagesEndRef.current?.scrollIntoView({ behavior: 'smooth' });
     };
-
-    useEffect(() => {
-        scrollToBottom();
-    }, [messages]);
 
     const searchParams = useSearchParams();
     const agentIdParam = searchParams.get('agentId');
 
     // Load conversation history when wallet connects
     useEffect(() => {
+        if (!hasMounted) return;
+
         const loadHistory = async () => {
             if (!address || !isConnected) {
                 setMessages([{

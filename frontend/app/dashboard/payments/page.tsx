@@ -57,9 +57,16 @@ export default function PaymentsPage() {
         }
     };
 
+    // Fix hydration mismatch
+    const [hasMounted, setHasMounted] = useState(false);
+
     useEffect(() => {
+        setHasMounted(true);
         fetchHistory();
     }, []);
+
+    // Show loading or connect prompt only after mount
+    if (!hasMounted) return <div className="p-8 text-center text-slate-500">Loading...</div>;
 
     // Wallet check
     if (!isConnected) {

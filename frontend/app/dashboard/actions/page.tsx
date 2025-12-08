@@ -1,6 +1,6 @@
 'use client';
 
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import { useAccount } from 'wagmi';
 import { Send, ArrowRightLeft, Rocket, Phone, Shield, DollarSign, AlertTriangle } from 'lucide-react';
 import { X402PaymentFlow } from '@/components/x402/PaymentFlow';
@@ -37,6 +37,16 @@ export default function ActionsPage() {
 
     const isBaseSepolia = chain?.id === 84532;
     const isBNBTestnet = chain?.id === 97;
+
+    const [hasMounted, setHasMounted] = useState(false);
+
+    // Fix hydration mismatch
+    useEffect(() => {
+        setHasMounted(true);
+    }, []);
+
+    // Show loading until mounted
+    if (!hasMounted) return <div className="p-8 text-center text-slate-500">Loading...</div>;
 
     const actions = [
         {
@@ -134,8 +144,8 @@ export default function ActionsPage() {
                 </div>
                 {/* Network Badge */}
                 <div className={`px-4 py-2 rounded-lg border ${isBaseSepolia ? 'bg-blue-500/10 border-blue-500/20 text-blue-400' :
-                        isBNBTestnet ? 'bg-yellow-500/10 border-yellow-500/20 text-yellow-400' :
-                            'bg-red-500/10 border-red-500/20 text-red-400'
+                    isBNBTestnet ? 'bg-yellow-500/10 border-yellow-500/20 text-yellow-400' :
+                        'bg-red-500/10 border-red-500/20 text-red-400'
                     }`}>
                     {chain?.name || 'Unsupported Network'}
                 </div>

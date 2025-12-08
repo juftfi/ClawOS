@@ -24,9 +24,16 @@ export default function DashboardOverview() {
         transactions: 0
     });
     const [loading, setLoading] = useState(true);
+    const [hasMounted, setHasMounted] = useState(false);
+
+    useEffect(() => {
+        setHasMounted(true);
+    }, []);
 
     // Fetch stats from backend
     const fetchStats = async () => {
+        if (!hasMounted) return;
+
         try {
             setLoading(true);
             const API_URL = process.env.NEXT_PUBLIC_API_URL || 'http://localhost:3000';

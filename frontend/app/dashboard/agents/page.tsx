@@ -79,6 +79,16 @@ export default function AgentsPage() {
 
     const isBaseSepolia = chain?.id === 84532;
 
+    const [hasMounted, setHasMounted] = useState(false);
+
+    // Fix hydration mismatch
+    useEffect(() => {
+        setHasMounted(true);
+    }, []);
+
+    // Show loading until mounted
+    if (!hasMounted) return <div className="p-8 text-center text-slate-500">Loading...</div>;
+
     return (
         <div className="space-y-6">
             {/* Network Warning */}

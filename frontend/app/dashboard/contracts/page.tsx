@@ -1,6 +1,6 @@
 'use client';
 
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import { useAccount } from 'wagmi';
 import { FileCode, Shield, Rocket, Loader2, AlertTriangle, CheckCircle, XCircle } from 'lucide-react';
 import { X402PaymentFlow } from '@/components/x402/PaymentFlow';
@@ -25,6 +25,16 @@ export default function ContractsPage() {
     const [deployData, setDeployData] = useState<any>(null);
 
     const networkName = chain?.id === 84532 ? 'base-sepolia' : 'bsc-testnet';
+
+    const [hasMounted, setHasMounted] = useState(false);
+
+    // Fix hydration mismatch
+    useEffect(() => {
+        setHasMounted(true);
+    }, []);
+
+    // Show loading until mounted
+    if (!hasMounted) return <div className="p-8 text-center text-slate-500">Loading...</div>;
 
     const handleGenerate = async () => {
         if (!description.trim()) return;
