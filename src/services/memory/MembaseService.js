@@ -578,14 +578,53 @@ class MembaseService {
         return stats;
     }
 
-/**
- * Wait for upload queue to complete
- * @returns {Promise<void>}
-            results.push(value);
+    /**
+     * Wait for upload queue to complete
+     * @returns {Promise<void>}
+     */
+    async waitForUploadQueue() {
+        if (this.isConnected && this.storage) {
+            await this.storage.waitForUploadQueue();
+            logger.info('Upload queue completed');
         }
     }
-    return results.slice(-limit);
-}
+
+    /**
+     * Close storage connections
+     */
+    close() {
+        if (this.storage) {
+            this.storage.close();
+            logger.info('Membase storage closed');
+        }
+    }
+
+    /**
+     * Fallback storage operations
+     */
+    fallbackStore(collection, key, data) {
+        if (!this.fallbackStorage[collection]) {
+            this.fallbackStorage[collection] = new Map();
+        }
+        this.fallbackStorage[collection].set(key, data);
+        this.saveToDisk();
+        this.usesFallback = true;
+        logger.debug('Data stored in fallback', { collection, key });
+        return { success: true, stored: true, fallback: true };
+    }
+
+    fallbackQuery(collection, agentId, limit) {
+        const results = [];
+        // Handle case where collection might not exist in fallbackStorage yet
+        if (this.fallbackStorage[collection]) {
+            for (const [key, value] of this.fallbackStorage[collection].entries()) {
+                if (!agentId || key.includes(agentId) || (value && value.agent_id === agentId)) {
+                    results.push(value);
+                }
+            }
+        }
+        return results.slice(-limit);
+    }
 }
 
 module.exports = new MembaseService();
