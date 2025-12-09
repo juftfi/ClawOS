@@ -26,20 +26,21 @@ class LLMService {
                 return cached;
             }
 
-            // ChainGPT uses 'question' parameter, not 'messages'
-            const fullQuestion = systemMessage ? `${systemMessage}\n\n${prompt}` : prompt;
+            // Support both ChainGPT 'question' style and OpenAI-like 'messages' style.
+            const messages = [];
+            if (systemMessage) messages.push({ role: 'system', content: systemMessage });
+            messages.push({ role: 'user', content: prompt });
 
-            const response = await this.makeRequest('/chat/stream', {
+            const response = await this.makeRequest('/chat/completions', {
                 model,
-                question: fullQuestion,
-                chatHistory: "off"
+                messages
             });
 
             const result = {
-                response: response.answer || response,
-                tokens_used: response.creditsUsed || 1,
+                response: response.answer || (typeof response === 'string' ? response : JSON.stringify(response)),
+                tokens_used: response.creditsUsed || response.credits_used || 1,
                 model_used: model,
-                finish_reason: 'stop'
+                finish_reason: response.finish_reason || 'stop'
             };
 
             this.setCache(cacheKey, result);
@@ -148,23 +149,17 @@ class LLMService {
 
             // Convert messages array to single question with chat history enabled
             const question = messages[messages.length - 1].content;
-            const requestPayload = {
-                model,
-                question,
-                chatHistory: "on"
-            };
+            // Build messages payload for OpenAI-like API
+            const payload = { model, messages };
+            if (sdkUniqueId) payload.sdkUniqueId = sdkUniqueId;
 
-            if (sdkUniqueId) {
-                requestPayload.sdkUniqueId = sdkUniqueId;
-            }
-
-            const response = await this.makeRequest('/chat/stream', requestPayload);
+            const response = await this.makeRequest('/chat/completions', payload);
 
             return {
-                response: response.answer || response,
-                tokens_used: response.creditsUsed || 1,
+                response: response.answer || (typeof response === 'string' ? response : JSON.stringify(response)),
+                tokens_used: response.creditsUsed || response.credits_used || 1,
                 model_used: model,
-                finish_reason: 'stop',
+                finish_reason: response.finish_reason || 'stop',
                 conversation_length: messages.length
             };
         } catch (error) {
@@ -193,7 +188,43 @@ class LLMService {
                 timeout: 30000
             });
 
-            return response.data;
+            const d = response.data;
+
+            // Normalize various response shapes (ChainGPT, OpenAI-like, or raw strings)
+            try {
+                // If ChainGPT 'answer' shape
+                if (d && typeof d === 'object' && typeof d.answer === 'string') {
+                    return {
+                        answer: d.answer,
+                        creditsUsed: d.creditsUsed || d.usage?.total_tokens || 0,
+                        finish_reason: d.finish_reason || null,
+                        raw: d
+                    };
+                }
+
+                // OpenAI-like response
+                if (d && typeof d === 'object' && Array.isArray(d.choices) && d.choices.length > 0) {
+                    const first = d.choices[0];
+                    const text = first.text || (first.message && first.message.content) || '';
+                    return {
+                        answer: text,
+                        creditsUsed: d.usage?.total_tokens || d.creditsUsed || 0,
+                        finish_reason: first.finish_reason || d.finish_reason || null,
+                        raw: d
+                    };
+                }
+
+                // If the API returned a simple string
+                if (typeof d === 'string') {
+                    return { answer: d, creditsUsed: 0, finish_reason: null, raw: d };
+                }
+
+                // Unknown shape: return it under raw and provide a JSON string as answer
+                return { answer: JSON.stringify(d), creditsUsed: d.usage?.total_tokens || 0, finish_reason: null, raw: d };
+            } catch (normErr) {
+                logger.warn('Failed to normalize ChainGPT response', normErr.message);
+                return { answer: JSON.stringify(d), creditsUsed: 0, finish_reason: null, raw: d };
+            }
         } catch (error) {
             if (error.response?.status === 429) {
                 logger.warn('ChainGPT rate limit hit');

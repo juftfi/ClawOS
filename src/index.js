@@ -102,16 +102,23 @@ app.use(notFoundHandler);
 // Error handling middleware (must be last)
 app.use(errorHandler);
 
+let server = null;
+
 // Graceful shutdown
 const gracefulShutdown = (signal) => {
   logger.info(`${signal} received. Starting graceful shutdown...`);
 
-  server.close(() => {
-    logger.info('HTTP server closed');
+  if (server && server.close) {
+    server.close(() => {
+      logger.info('HTTP server closed');
 
-    // Close database connections, cleanup resources, etc.
+      // Close database connections, cleanup resources, etc.
+      process.exit(0);
+    });
+  } else {
+    logger.info('No HTTP server to close');
     process.exit(0);
-  });
+  }
 
   // Force shutdown after 30 seconds
   setTimeout(() => {
@@ -120,9 +127,10 @@ const gracefulShutdown = (signal) => {
   }, 30000);
 };
 
-// Start server
-const server = app.listen(PORT, async () => {
-  logger.info(`🚀 AgentOS Web3 API server running on port ${PORT}`);
+// Start server only when this file is run directly (avoid launching server during tests that `require` the app)
+if (require.main === module) {
+  server = app.listen(PORT, async () => {
+    logger.info(`🚀 AgentOS Web3 API server running on port ${PORT}`);
   logger.info(`Environment: ${process.env.NODE_ENV || 'development'}`);
   logger.info(`\n📡 Network Configuration:`);
   logger.info(`  - Base Sepolia: ${process.env.BASE_TESTNET_RPC}`);
@@ -152,7 +160,8 @@ const server = app.listen(PORT, async () => {
   } catch (error) {
     logger.error(`❌ Failed to connect to networks: ${error.message}`);
   }
-});
+  });
+}
 
 // Handle shutdown signals
 process.on('SIGTERM', () => gracefulShutdown('SIGTERM'));

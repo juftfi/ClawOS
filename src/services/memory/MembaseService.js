@@ -157,25 +157,32 @@ class MembaseService {
     async storeConversation(agentId, userMessage, aiResponse, timestamp = new Date().toISOString()) {
         try {
             if (this.isConnected && this.storage) {
-                // Create Message instances
-                const userMsg = new Message(agentId, userMessage, 'user');
-                const aiMsg = new Message(agentId, aiResponse, 'assistant');
+                // Create lightweight message objects (avoid dependency on undefined Message class)
+                const userMsg = { agentId, role: 'user', content: userMessage, timestamp };
+                const aiMsg = { agentId, role: 'assistant', content: aiResponse, timestamp };
 
-                // Get or create memory instance
+                // Get or create memory instance (best-effort). Don't require it for upload.
                 const memory = this.getMemory(agentId);
                 if (memory) {
                     memory.add(userMsg);
                     memory.add(aiMsg);
+                }
 
-                    // Upload to hub
-                    const data = {
-                        agent_id: agentId,
-                        messages: [
-                            { role: 'user', content: userMessage, timestamp },
-                            { role: 'assistant', content: aiResponse, timestamp }
-                        ],
-                        timestamp
-                    };
+                // Upload to hub (attempt regardless of memory instance)
+                const data = {
+                    agent_id: agentId,
+                    messages: [
+                        { role: 'user', content: userMessage, timestamp },
+                        { role: 'assistant', content: aiResponse, timestamp }
+                    ],
+                    timestamp
+                };
+
+                try {
+                    // Push a placeholder into the operation queue before attempting upload.
+                    // If upload succeeds, remove the placeholder; if it fails, leave it for retry.
+                    const queueEntry = { type: 'uploadHub', args: [this.account, `conversation_${agentId}_${Date.now()}`, JSON.stringify(data), null, false] };
+                    this.operationQueue.push(queueEntry);
 
                     await this.storage.uploadHub(
                         this.account,
@@ -185,8 +192,16 @@ class MembaseService {
                         false  // Queue for async upload
                     );
 
+                    // Upload succeeded — remove the placeholder entry we added
+                    const idx = this.operationQueue.indexOf(queueEntry);
+                    if (idx !== -1) this.operationQueue.splice(idx, 1);
+
                     logger.info('Conversation stored to hub', { agentId, timestamp });
                     return { success: true, stored: true, agent_id: agentId };
+                } catch (uploadErr) {
+                    // Leave queue entry for retry and log
+                    logger.warn('Upload failed - queued operation', { agentId, error: uploadErr.message });
+                    return { success: false, queued: true, agent_id: agentId };
                 }
             }
 
@@ -332,8 +347,10 @@ class MembaseService {
             // Fallback
             const fallbackPrefs = {};
             for (const [key, value] of this.fallbackStorage.preferences.entries()) {
-                if (key.startsWith(`${userId}:`)) {
-                    const prefKey = key.split(':')[1];
+                // Support both `user:key` and `user_key` separators
+                if (key.startsWith(`${userId}:`) || key.startsWith(`${userId}_`)) {
+                    const sep = key.includes(':') ? ':' : '_';
+                    const prefKey = key.split(sep)[1];
                     fallbackPrefs[prefKey] = value.value;
                 }
             }
@@ -480,13 +497,57 @@ class MembaseService {
             // Fallback
             const template = this.fallbackStorage.contracts.get(name);
             if (!template) {
-                throw new Error(`Contract template '${name}' not found`);
+                // Return null when template not found to make callers handle absence gracefully
+                logger.info(`Contract template '${name}' not found in fallback storage`);
+                return null;
             }
             return template;
 
         } catch (error) {
             logger.error('Get contract template error:', error.message);
             throw error;
+        }
+    }
+
+    /**
+     * Generic store wrapper to support simple storage calls like store(collection, data)
+     * or store(collection, key, data). This keeps compatibility with services that
+     * expect a simple `store` API (eg. AuditService).
+     */
+    async store(collection, keyOrData, data) {
+        let key;
+        let payload;
+        try {
+            if (data === undefined) {
+                // Called as store(collection, data)
+                payload = keyOrData;
+                key = (payload && (payload.id || payload.tx_hash || payload.name)) || `${collection}_${Date.now()}`;
+            } else {
+                // Called as store(collection, key, data)
+                key = keyOrData;
+                payload = data;
+            }
+
+            if (this.isConnected && this.storage) {
+                await this.storage.uploadHub(
+                    this.account,
+                    `${collection}_${key}`,
+                    JSON.stringify(payload),
+                    null,
+                    false
+                );
+
+                logger.info('Generic store uploaded to hub', { collection, key });
+                return { success: true, stored: true, key };
+            }
+
+            // Fallback
+            return this.fallbackStore(collection, key, payload);
+
+        } catch (error) {
+            logger.error('Generic store error:', error.message);
+            // Ensure fallback on error
+            return this.fallbackStore(collection, key || `${collection}_${Date.now()}`, payload || keyOrData);
         }
     }
 
@@ -601,6 +662,16 @@ class MembaseService {
             };
         }
 
+        // Add legacy/snake_case fields expected by tests and older callers
+        stats.uses_fallback = stats.usesFallback;
+        stats.queued_operations = this.operationQueue ? this.operationQueue.length : 0;
+        stats.fallback_storage = {
+            conversations: this.fallbackStorage.conversations.size,
+            preferences: this.fallbackStorage.preferences.size,
+            transactions: this.fallbackStorage.transactions.size,
+            contracts: this.fallbackStorage.contracts.size
+        };
+
         return stats;
     }
 
@@ -637,6 +708,46 @@ class MembaseService {
         this.usesFallback = true;
         logger.debug('Data stored in fallback', { collection, key });
         return { success: true, stored: true, fallback: true };
+    }
+
+    /**
+     * Generic store helper to support older callers like membaseService.store(collection, data)
+     * or store(collection, key, data)
+     */
+    async store(collection, keyOrData, data) {
+        try {
+            let key = null;
+            let payload = null;
+
+            if (data === undefined) {
+                // Called as store(collection, data)
+                payload = keyOrData;
+                key = `${collection}_${Date.now()}`;
+            } else {
+                // Called as store(collection, key, data)
+                key = keyOrData;
+                payload = data;
+            }
+
+            if (this.isConnected && this.storage) {
+                try {
+                    await this.storage.uploadHub(this.account, key, JSON.stringify(payload), null, false);
+                    return { success: true, stored: true, key };
+                } catch (err) {
+                    if (err.response && err.response.status === 429) {
+                        this.operationQueue.push({ type: 'uploadHub', args: [this.account, key, JSON.stringify(payload), null, false] });
+                        return { success: false, queued: true, key };
+                    }
+                    throw err;
+                }
+            }
+
+            // Fallback
+            return this.fallbackStore(collection, key, payload);
+        } catch (error) {
+            logger.error('Generic store error:', error.message);
+            return this.fallbackStore(collection, key || `${collection}_${Date.now()}`, data || keyOrData);
+        }
     }
 
     fallbackQuery(collection, agentId, limit) {
