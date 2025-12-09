@@ -254,12 +254,38 @@ class MembaseService {
                 }
             }
 
-            // Fallback to in-memory storage
-            return this.fallbackQuery('conversations', agentId, limit);
+            // Fallback to in-memory storage - query enough entries to account for 2 messages per entry
+            const fallbackConvos = this.fallbackQuery('conversations', agentId, limit * 2);
+            
+            // Transform fallback storage format to expected message format
+            const messages = [];
+            for (const convo of fallbackConvos) {
+                if (convo.user_message) {
+                    messages.push({
+                        role: 'user',
+                        content: convo.user_message,
+                        timestamp: convo.timestamp || new Date().toISOString()
+                    });
+                }
+                if (convo.ai_response) {
+                    messages.push({
+                        role: 'assistant',
+                        content: convo.ai_response,
+                        timestamp: convo.timestamp || new Date().toISOString()
+                    });
+                }
+            }
+            
+            // Apply limit to final message list
+            const limitedMessages = messages.slice(-limit);
+            
+            logger.info('Retrieved conversation from fallback storage', { agentId, messageCount: limitedMessages.length });
+            return limitedMessages;
 
         } catch (error) {
             logger.error('Get conversation history error:', error.message);
-            return this.fallbackQuery('conversations', agentId, limit);
+            // Return empty array instead of potentially undefined
+            return [];
         }
     }
 

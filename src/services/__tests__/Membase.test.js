@@ -55,19 +55,14 @@ describe('Membase Service (fallback local storage)', () => {
 
             expect(Array.isArray(result)).toBe(true);
             expect(result.length).toBeGreaterThan(0);
-            expect(result[0]).toHaveProperty('agent_id');
+            // Result should now be message format with role and content
+            expect(result[0]).toHaveProperty('role');
+            expect(result[0]).toHaveProperty('content');
         });
 
         it('should limit results to specified limit', async () => {
-            const mockHistory = Array(100).fill(null).map((_, i) => ({
-                agent_id: 'agent1',
-                user_message: `Message ${i}`,
-                ai_response: `Response ${i}`,
-                timestamp: new Date().toISOString()
-            }));
-
-            // Populate fallback with 100 entries
-            for (let i = 0; i < 100; i++) {
+            // Populate fallback with 20 entries (= 40 messages since each entry has user + assistant)
+            for (let i = 0; i < 20; i++) {
                 MembaseService.fallbackStore('conversations', `agent1_${i}`, {
                     agent_id: 'agent1',
                     user_message: `Message ${i}`,
@@ -78,6 +73,7 @@ describe('Membase Service (fallback local storage)', () => {
 
             const result = await MembaseService.getConversationHistory('agent1', 10);
 
+            // Should return at most 10 messages (not entries)
             expect(result.length).toBeLessThanOrEqual(10);
         });
     });
