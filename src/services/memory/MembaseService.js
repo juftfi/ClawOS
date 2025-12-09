@@ -1,8 +1,32 @@
-const { BufferedMemory, MultiMemory, Message, Storage, membaseChain, membaseId } = require('membase');
 const logger = require('../../utils/logger');
 
 const fs = require('fs');
 const path = require('path');
+
+// Lazy load membase to avoid initialization errors when env vars are missing
+let membaseChain = null;
+let membaseId = null;
+let membaseModuleLoaded = false;
+
+const loadMembaseModule = () => {
+    if (!membaseModuleLoaded) {
+        try {
+            const membaseModule = require('membase');
+            membaseChain = membaseModule.membaseChain;
+            membaseId = membaseModule.membaseId;
+            membaseModuleLoaded = true;
+        } catch (error) {
+            logger.warn('Failed to load membase module:', error.message);
+        }
+    }
+};
+
+// Try to load on startup, but don't fail if env vars are missing
+process.nextTick(() => {
+    if (process.env.MEMBASE_ACCOUNT && process.env.MEMBASE_SECRET_KEY) {
+        loadMembaseModule();
+    }
+});
 
 class MembaseService {
     constructor() {
@@ -22,6 +46,8 @@ class MembaseService {
 
         // Initialize storage hub
         try {
+            // Only try to use Storage if membase module was successfully loaded
+            const { Storage } = require('membase');
             this.storage = new Storage(this.hubUrl);
             this.isConnected = true;
             logger.info('Membase storage hub connected', { hub: this.hubUrl });
