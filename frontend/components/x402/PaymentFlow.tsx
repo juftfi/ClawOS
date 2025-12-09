@@ -120,10 +120,12 @@ export function X402PaymentFlow({ serviceType, agentId, onSuccess, onCancel, act
             setPaymentDetails(paymentRequest);
 
             // 2. Execute USDC transfer using viem
-            // Should match what backend returned, but enforce client-side safety too
-            const usdcAddress = paymentRequest.token || networkConfig.usdcAddress;
+            // Backend returns amount in wei already (as string)
+            const usdcAddress = (paymentRequest.token || networkConfig.usdcAddress) as `0x${string}`;
             const recipientAddress = paymentRequest.recipient as `0x${string}`;
-            const amountInWei = BigInt(paymentRequest.amount || parseUnits(pricing.amount, 6)); // Default 6 decimals for USDC?
+            
+            // Amount is already in wei from backend (string format)
+            const amountInWei = BigInt(paymentRequest.amount);
 
             // Encode transfer function
             const data = encodeFunctionData({
@@ -136,7 +138,7 @@ export function X402PaymentFlow({ serviceType, agentId, onSuccess, onCancel, act
 
             // 3. Send transaction
             const hash = await walletClient.sendTransaction({
-                to: usdcAddress as `0x${string}`,
+                to: usdcAddress,
                 data,
                 chain: walletClient.chain
             });

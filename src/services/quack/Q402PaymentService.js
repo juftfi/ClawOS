@@ -10,14 +10,15 @@ class QuackQ402Service {
         this.chainId = 97;
         this.paymentToken = 'USDC'; // BEP-20 USDC on BNB (user has this)
         this.tokenAddress = '0x64544969ed7EBf5f083679233325356EbE738930'; // USDC on BNB Testnet
+        this.recipientAddress = '0x2f914bcbad5bf4967bbb11e4372200b7c7594aeb'; // Recipient wallet
         this.payments = new Map();
         this.pricing = {
-            'agent-creation': '1.0',
-            'agent-query': '0.1',
-            'agent-action': '0.25',
-            'contract-deploy': '2.0',
-            'contract-call': '0.5',
-            'swap': '0.5'
+            'agent-creation': '1000000', // 1 USDC in wei (6 decimals)
+            'agent-query': '100000', // 0.1 USDC
+            'agent-action': '250000', // 0.25 USDC
+            'contract-deploy': '2000000', // 2 USDC
+            'contract-call': '500000', // 0.5 USDC
+            'swap': '500000' // 0.5 USDC
         };
     }
 
@@ -34,7 +35,8 @@ class QuackQ402Service {
             const paymentId = `q402_${Date.now()}_${Math.random().toString(36).substr(2, 9)}`;
 
             const paymentRequest = {
-                id: paymentId,
+                paymentId,
+                id: paymentId, // Q402 uses both for compatibility
                 network: this.network,
                 chainId: this.chainId,
                 serviceType,
@@ -42,9 +44,11 @@ class QuackQ402Service {
                 amount,
                 token: this.paymentToken,
                 tokenAddress: this.tokenAddress,
+                recipient: this.recipientAddress, // Add for consistency with x402
                 status: 'pending',
                 createdAt: new Date().toISOString(),
                 metadata,
+                expiresAt: new Date(Date.now() + 30 * 60 * 1000).toISOString(),
                 // Q402 specific fields
                 protocol: 'EIP-7702',
                 requiresGasSponsorship: true,
@@ -57,6 +61,7 @@ class QuackQ402Service {
 
             return {
                 success: true,
+                paymentRequest,
                 paymentId,
                 amount,
                 token: this.paymentToken,
