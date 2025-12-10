@@ -279,6 +279,11 @@ class LLMService {
                 throw new Error('Invalid API key');
             }
 
+            // If both primary and fallback endpoints returned 404, surface a clearer error
+            if (error.response?.status === 404) {
+                throw new Error('ChainGPT endpoint returned 404. Verify CHAINGPT_API_URL and that the upstream supports POST to /chat/completions or /v1/chat/completions');
+            }
+
             throw error;
         }
     }
