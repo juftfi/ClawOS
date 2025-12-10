@@ -152,7 +152,7 @@ class LLMService {
     async makeRequest(endpoint, data) {
         const url = `${this.apiUrl}${endpoint}`;
 
-        logger.debug(`ChainGPT API request to ${endpoint}`);
+        logger.info(`ChainGPT API request to ${url}`);
 
         try {
             const response = await axios.post(url, data, {
@@ -201,6 +201,18 @@ class LLMService {
                 return { answer: JSON.stringify(d), creditsUsed: 0, finish_reason: null, raw: d };
             }
         } catch (error) {
+            // Log upstream URL and response body/status for debugging
+            try {
+                logger.error('ChainGPT request failed', {
+                    url,
+                    status: error.response?.status,
+                    responseData: error.response?.data,
+                    message: error.message
+                });
+            } catch (logErr) {
+                logger.error('Failed to log ChainGPT error details', logErr.message);
+            }
+
             if (error.response?.status === 429) {
                 logger.warn('ChainGPT rate limit hit');
                 throw new Error('Rate limit exceeded. Please try again later.');
