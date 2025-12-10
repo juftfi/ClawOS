@@ -43,6 +43,38 @@ router.post('/agent/create', async (req, res) => {
 });
 
 /**
+ * @route   POST /api/awe/create-agent
+ * @desc    Create ERC-8004 compliant agent (frontend alias)
+ * @access  Public (testnet)
+ */
+router.post('/create-agent', async (req, res) => {
+    try {
+        const { name, description, capabilities } = req.body;
+
+        if (!name) {
+            return res.status(400).json({
+                success: false,
+                error: 'Agent name is required'
+            });
+        }
+
+        const result = await aweAgentService.createAgent({
+            name,
+            description: description || `AI Agent: ${name}`,
+            capabilities: capabilities || []
+        });
+
+        res.json(result);
+    } catch (error) {
+        logger.error('Create agent error:', error.message);
+        res.status(500).json({
+            success: false,
+            error: error.message
+        });
+    }
+});
+
+/**
  * @route   GET /api/awe/agent/:agentId
  * @desc    Get agent information
  * @access  Public

@@ -8,6 +8,16 @@ const { errorHandler, notFoundHandler } = require('./middleware/errorHandler');
 const healthRouter = require('./routes/health');
 const logger = require('./utils/logger');
 
+// Security: ensure TLS verification is not disabled accidentally.
+// Some environments mistakenly set NODE_TLS_REJECT_UNAUTHORIZED=0 which disables certificate validation.
+// Remove that setting at process startup to avoid insecure behavior.
+if (process.env.NODE_TLS_REJECT_UNAUTHORIZED === '0') {
+  // delete the var so Node uses default certificate verification
+  delete process.env.NODE_TLS_REJECT_UNAUTHORIZED;
+  // logger may not yet be initialized in some early error paths, but we have it now
+  logger.warn('NODE_TLS_REJECT_UNAUTHORIZED was set to 0. It has been removed to enforce TLS certificate validation.');
+}
+
 const app = express();
 const PORT = process.env.PORT || 3000;
 
@@ -15,12 +25,34 @@ const PORT = process.env.PORT || 3000;
 app.use(helmet());
 
 // CORS configuration
+const allowedOrigins = [
+  'http://localhost:3000',
+  'http://localhost:3001',
+  'http://127.0.0.1:3000',
+  'http://127.0.0.1:3001',
+  'https://agent-os-web3.vercel.app',
+  process.env.CORS_ORIGIN
+].filter(Boolean);
+
 app.use(cors({
-  origin: process.env.CORS_ORIGIN || '*',
+  origin: (origin, callback) => {
+    // Allow requests with no origin (like mobile apps or Postman)
+    if (!origin || allowedOrigins.includes(origin)) {
+      callback(null, true);
+    } else {
+      callback(new Error('Not allowed by CORS'));
+    }
+  },
   credentials: true,
   methods: ['GET', 'POST', 'PUT', 'DELETE', 'OPTIONS'],
   allowedHeaders: ['Content-Type', 'Authorization']
 }));
+
+// Body parser middleware (MUST come before routes)
+app.use(bodyParser.json({ limit: '10mb' }));
+app.use(bodyParser.urlencoded({ limit: '10mb', extended: true }));
+app.use(express.json());
+app.use(express.urlencoded({ extended: true }));
 
 // Logging middleware
 app.use(morgan('combined', {
@@ -40,11 +72,13 @@ const aweRouter = require('./routes/awe');
 const agentRouter = require('./routes/agent');
 const securityRouter = require('./routes/security');
 const quackRouter = require('./routes/quack');
+const debugRouter = require('./routes/debug');
 
 app.use('/api/health', healthRouter);
 app.use('/api/ai', chainGPTRouter);
 app.use('/api/blockchain', blockchainRouter);
 app.use('/api/memory', memoryRouter);
+app.use('/api/debug', debugRouter);
 app.use('/api/payment', x402Router);
 app.use('/api/policy', x402Router);
 app.use('/api/signature', x402Router);
@@ -80,16 +114,23 @@ app.use(notFoundHandler);
 // Error handling middleware (must be last)
 app.use(errorHandler);
 
+let server = null;
+
 // Graceful shutdown
 const gracefulShutdown = (signal) => {
   logger.info(`${signal} received. Starting graceful shutdown...`);
 
-  server.close(() => {
-    logger.info('HTTP server closed');
+  if (server && server.close) {
+    server.close(() => {
+      logger.info('HTTP server closed');
 
-    // Close database connections, cleanup resources, etc.
+      // Close database connections, cleanup resources, etc.
+      process.exit(0);
+    });
+  } else {
+    logger.info('No HTTP server to close');
     process.exit(0);
-  });
+  }
 
   // Force shutdown after 30 seconds
   setTimeout(() => {
@@ -98,9 +139,10 @@ const gracefulShutdown = (signal) => {
   }, 30000);
 };
 
-// Start server
-const server = app.listen(PORT, async () => {
-  logger.info(`🚀 AgentOS Web3 API server running on port ${PORT}`);
+// Start server only when this file is run directly (avoid launching server during tests that `require` the app)
+if (require.main === module) {
+  server = app.listen(PORT, async () => {
+    logger.info(`🚀 AgentOS Web3 API server running on port ${PORT}`);
   logger.info(`Environment: ${process.env.NODE_ENV || 'development'}`);
   logger.info(`\n📡 Network Configuration:`);
   logger.info(`  - Base Sepolia: ${process.env.BASE_TESTNET_RPC}`);
@@ -130,7 +172,8 @@ const server = app.listen(PORT, async () => {
   } catch (error) {
     logger.error(`❌ Failed to connect to networks: ${error.message}`);
   }
-});
+  });
+}
 
 // Handle shutdown signals
 process.on('SIGTERM', () => gracefulShutdown('SIGTERM'));

@@ -32,46 +32,41 @@ class AgentOrchestrator {
      * @returns {Promise<Object>} Research results
      */
     async researchAndExplain(query, userId) {
-        try {
-            const workflowId = this.createWorkflowId('research');
+        const workflowId = this.createWorkflowId('research');
 
-            this.updateWorkflowStatus(workflowId, 'running', {
-                step: 'research',
-                query
-            });
+        this.updateWorkflowStatus(workflowId, 'running', {
+            step: 'research',
+            query
+        });
 
-            // Use ChainGPT for Web3 research
-            const response = await chainGPTLLM.chat(
-                query,
-                'general_assistant',
-                'You are a Web3 expert. Provide clear, accurate explanations about blockchain, DeFi, and Web3 concepts.'
-            );
+        // Use ChainGPT for Web3 research - throws real errors, no fallbacks
+        const response = await chainGPTLLM.chat(
+            query,
+            'general_assistant',
+            'You are a Web3 expert. Provide clear, accurate explanations about blockchain, DeFi, and Web3 concepts.'
+        );
 
-            // Store in memory
-            await membaseService.storeConversation(
-                userId,
-                query,
-                response.response
-            );
+        // Store in memory
+        await membaseService.storeConversation(
+            userId,
+            query,
+            response.response
+        );
 
-            this.updateWorkflowStatus(workflowId, 'completed', {
-                step: 'research',
-                response: response.response
-            });
+        this.updateWorkflowStatus(workflowId, 'completed', {
+            step: 'research',
+            response: response.response
+        });
 
-            logger.info('Research workflow completed', { workflowId, userId });
+        logger.info('Research workflow completed', { workflowId, userId });
 
-            return {
-                success: true,
-                workflowId,
-                query,
-                response: response.response,
-                tokensUsed: response.tokens_used
-            };
-        } catch (error) {
-            logger.error('Research workflow error:', error.message);
-            throw new Error(`Research failed: ${error.message}`);
-        }
+        return {
+            success: true,
+            workflowId,
+            query,
+            response: response.response,
+            tokensUsed: response.tokens_used
+        };
     }
 
     /**

@@ -42,24 +42,15 @@ describe('ChainGPT LLM Service', () => {
         it('should handle API errors gracefully', async () => {
             axios.post.mockRejectedValue(new Error('API Error'));
 
-            const result = await LLMService.chat('Test prompt');
-
-            expect(result).toHaveProperty('error');
-            expect(result.response).toContain('unable to process your request');
+            await expect(LLMService.chat('Test prompt')).rejects.toThrow('API Error');
         });
 
         it('should handle rate limiting (429)', async () => {
-            const error = new Error('Rate limited');
+            const error = new Error('Rate limit exceeded');
             error.response = { status: 429 };
             axios.post.mockRejectedValue(error);
 
-            const result = await LLMService.chat('Test prompt');
-
-            expect(result).toHaveProperty('error');
-            // The service returns the standard fallback message even for rate limits
-            expect(result.response).toContain('unable to process your request');
-            // But the error property should contain the specific error
-            expect(result.error).toContain('Rate limit exceeded');
+            await expect(LLMService.chat('Test prompt')).rejects.toThrow('Rate limit exceeded');
         });
 
         it('should use cache for repeated requests', async () => {

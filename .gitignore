@@ -1,11 +1,13 @@
 # Dependencies
 node_modules/
 
-# Environment
+# Environment (ALL .env files - NEVER commit secrets)
 .env
 .env.local
 .env.*.local
 .env.test
+.env.production
+.env.development
 
 # Build
 dist/
