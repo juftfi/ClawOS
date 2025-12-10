@@ -257,6 +257,34 @@ router.post('/payment/execute-transfer', async (req, res) => {
 });
 
 /**
+ * @route   POST /api/awe/payment/verify
+ * @desc    Verify x402 payment (confirm on-chain)
+ * @access  Public
+ */
+router.post('/payment/verify', async (req, res) => {
+    try {
+        const { paymentId, txHash } = req.body;
+
+        if (!paymentId || !txHash) {
+            return res.status(400).json({
+                success: false,
+                error: 'paymentId and txHash are required'
+            });
+        }
+
+        const result = await x402PaymentService.verifyPayment(paymentId, txHash);
+
+        res.json(result);
+    } catch (error) {
+        logger.error('Verify payment error:', error.message);
+        res.status(500).json({
+            success: false,
+            error: error.message
+        });
+    }
+});
+
+/**
  * @route   GET /api/awe/payment/history
  * @desc    Get all payment history
  * @access  Public
