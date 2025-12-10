@@ -213,6 +213,62 @@ class LLMService {
                 logger.error('Failed to log ChainGPT error details', logErr.message);
             }
 
+            // If the upstream returned 404 for the simple endpoint, try the common /v1 prefix as a fallback.
+            // Some ChainGPT deployments require the /v1 prefix (e.g. /v1/chat/completions).
+            try {
+                const status = error.response?.status;
+                const respData = error.response?.data;
+                if (status === 404) {
+                    // Avoid duplicating /v1 if it's already present in the url
+                    if (!url.includes('/v1/')) {
+                        const altUrl = this.apiUrl.endsWith('/') ? `${this.apiUrl}v1${endpoint}` : `${this.apiUrl}/v1${endpoint}`;
+                        logger.info(`Attempting ChainGPT fallback API request to ${altUrl}`);
+                        try {
+                            const retryResp = await axios.post(altUrl, data, {
+                                headers: {
+                                    'Content-Type': 'application/json',
+                                    'Authorization': `Bearer ${this.apiKey}`
+                                },
+                                timeout: 30000
+                            });
+
+                            const d = retryResp.data;
+                            // reuse normalization logic from above
+                            if (d && typeof d === 'object' && typeof d.answer === 'string') {
+                                return {
+                                    answer: d.answer,
+                                    creditsUsed: d.creditsUsed || d.usage?.total_tokens || 0,
+                                    finish_reason: d.finish_reason || null,
+                                    raw: d
+                                };
+                            }
+
+                            if (d && typeof d === 'object' && Array.isArray(d.choices) && d.choices.length > 0) {
+                                const first = d.choices[0];
+                                const text = first.text || (first.message && first.message.content) || '';
+                                return {
+                                    answer: text,
+                                    creditsUsed: d.usage?.total_tokens || d.creditsUsed || 0,
+                                    finish_reason: first.finish_reason || d.finish_reason || null,
+                                    raw: d
+                                };
+                            }
+
+                            if (typeof d === 'string') {
+                                return { answer: d, creditsUsed: 0, finish_reason: null, raw: d };
+                            }
+
+                            return { answer: JSON.stringify(d), creditsUsed: d.usage?.total_tokens || 0, finish_reason: null, raw: d };
+                        } catch (retryErr) {
+                            logger.error('ChainGPT fallback request failed', { url: altUrl, status: retryErr.response?.status, responseData: retryErr.response?.data, message: retryErr.message });
+                            // fall through to rethrow original error below
+                        }
+                    }
+                }
+            } catch (fallbackErr) {
+                logger.error('Error while attempting ChainGPT fallback', fallbackErr.message);
+            }
+
             if (error.response?.status === 429) {
                 logger.warn('ChainGPT rate limit hit');
                 throw new Error('Rate limit exceeded. Please try again later.');
