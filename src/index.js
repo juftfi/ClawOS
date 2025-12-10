@@ -8,6 +8,16 @@ const { errorHandler, notFoundHandler } = require('./middleware/errorHandler');
 const healthRouter = require('./routes/health');
 const logger = require('./utils/logger');
 
+// Security: ensure TLS verification is not disabled accidentally.
+// Some environments mistakenly set NODE_TLS_REJECT_UNAUTHORIZED=0 which disables certificate validation.
+// Remove that setting at process startup to avoid insecure behavior.
+if (process.env.NODE_TLS_REJECT_UNAUTHORIZED === '0') {
+  // delete the var so Node uses default certificate verification
+  delete process.env.NODE_TLS_REJECT_UNAUTHORIZED;
+  // logger may not yet be initialized in some early error paths, but we have it now
+  logger.warn('NODE_TLS_REJECT_UNAUTHORIZED was set to 0. It has been removed to enforce TLS certificate validation.');
+}
+
 const app = express();
 const PORT = process.env.PORT || 3000;
 
