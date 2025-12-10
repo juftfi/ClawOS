@@ -120,12 +120,23 @@ export function X402PaymentFlow({ serviceType, agentId, onSuccess, onCancel, act
             setPaymentDetails(paymentRequest);
 
             // 2. Execute USDC transfer using viem
-            // Backend returns amount in wei already (as string)
+            // Backend returns amount in smallest units (as string integer)
             const usdcAddress = (paymentRequest.token || networkConfig.usdcAddress) as `0x${string}`;
             const recipientAddress = paymentRequest.recipient as `0x${string}`;
             
-            // Amount is already in wei from backend (string format)
-            const amountInWei = BigInt(paymentRequest.amount);
+            // Amount should be a string integer from backend (e.g., "250000")
+            // Ensure it's valid before converting to BigInt
+            let amountInWei: bigint;
+            try {
+                const amountStr = paymentRequest.amount?.toString() || '0';
+                // Verify it's an integer string, not a decimal
+                if (!Number.isInteger(Number(amountStr))) {
+                    throw new Error(`Amount must be an integer, got: ${amountStr}`);
+                }
+                amountInWei = BigInt(amountStr);
+            } catch (err: any) {
+                throw new Error(`Invalid amount format: ${err.message}`);
+            }
 
             // Encode transfer function
             const data = encodeFunctionData({

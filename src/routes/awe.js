@@ -151,7 +151,7 @@ router.get('/agent/:agentId/balance', async (req, res) => {
  */
 router.post('/payment/request', async (req, res) => {
     try {
-        const { agentId, serviceType, metadata, network } = req.body;
+        const { agentId, serviceType, metadata, network, customAmount } = req.body;
 
         if (!agentId || !serviceType) {
             return res.status(400).json({
@@ -167,6 +167,21 @@ router.post('/payment/request', async (req, res) => {
         } else {
             // Default to x402 Service for Base Sepolia
             result = x402PaymentService.createPaymentRequest(agentId, serviceType, metadata);
+        }
+
+        // If customAmount was provided (as decimal string), convert to smallest units and ensure it's a string
+        if (customAmount) {
+            try {
+                const { parseUnits } = require('viem');
+                // customAmount should be a decimal string like "0.1"
+                const amountInSmallestUnits = parseUnits(customAmount.toString(), 6).toString();
+                if (result.paymentRequest) {
+                    result.paymentRequest.amount = amountInSmallestUnits;
+                }
+            } catch (parseErr) {
+                logger.warn('Failed to parse custom amount:', parseErr.message);
+                // Keep original amount if parsing fails
+            }
         }
 
         res.json(result);
