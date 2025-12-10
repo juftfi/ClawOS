@@ -1,6 +1,34 @@
 const logger = require('../../utils/logger');
 
 const fs = require('fs');
+
+// Minimal in-memory BufferedMemory implementation used as a lightweight fallback
+class BufferedMemory {
+    constructor(agentId, owner = 'fallback-owner', enabled = false) {
+        this.agentId = agentId;
+        this.owner = owner;
+        this.enabled = !!enabled;
+        this.messages = [];
+    }
+
+    add(message) {
+        // message: { role, content, timestamp }
+        if (!message || !message.role || !message.content) return;
+        this.messages.push(message);
+        // keep size bounded to last 1000 messages
+        if (this.messages.length > 1000) this.messages.shift();
+    }
+
+    get(limit = 50) {
+        const l = Math.max(0, Math.min(limit, this.messages.length));
+        return this.messages.slice(-l).reverse(); // return newest-first to match callers
+    }
+
+    size() {
+        return this.messages.length;
+    }
+}
+
 const path = require('path');
 
 // Lazy load membase to avoid initialization errors when env vars are missing
