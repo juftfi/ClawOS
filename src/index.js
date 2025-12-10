@@ -72,11 +72,13 @@ const aweRouter = require('./routes/awe');
 const agentRouter = require('./routes/agent');
 const securityRouter = require('./routes/security');
 const quackRouter = require('./routes/quack');
+const debugRouter = require('./routes/debug');
 
 app.use('/api/health', healthRouter);
 app.use('/api/ai', chainGPTRouter);
 app.use('/api/blockchain', blockchainRouter);
 app.use('/api/memory', memoryRouter);
+app.use('/api/debug', debugRouter);
 app.use('/api/payment', x402Router);
 app.use('/api/policy', x402Router);
 app.use('/api/signature', x402Router);
