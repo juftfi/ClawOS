@@ -8,18 +8,18 @@ class QuackQ402Service {
     constructor() {
         this.network = 'bsc-testnet';
         this.chainId = 97;
-        this.paymentToken = 'USDC'; // BEP-20 USDC on BNB (user has this)
+        this.paymentToken = 'USDC'; // Symbol
         this.tokenAddress = '0x64544969ed7EBf5f083679233325356EbE738930'; // USDC on BNB Testnet
         this.recipientAddress = '0x2f914bcbad5bf4967bbb11e4372200b7c7594aeb'; // Recipient wallet
         this.payments = new Map();
         this.pricing = {
-            'agent-creation': '1000000', // 1 USDC in wei (6 decimals)
+            'agent-creation': '1000000', // 1 USDC in smallest units (6 decimals)
             'agent-query': '100000', // 0.1 USDC
             'agent-action': '250000', // 0.25 USDC
             'contract-deploy': '2000000', // 2 USDC
             'contract-call': '500000', // 0.5 USDC
             'swap': '500000' // 0.5 USDC
-        };
+        }; // amounts are integer strings in 6-decimal smallest units
     }
 
     /**
@@ -42,7 +42,8 @@ class QuackQ402Service {
                 serviceType,
                 agentId,
                 amount,
-                token: this.paymentToken,
+                token: this.tokenAddress, // Return token address here (frontend expects an address in `.token`)
+                tokenSymbol: this.paymentToken,
                 tokenAddress: this.tokenAddress,
                 recipient: this.recipientAddress, // Add for consistency with x402
                 status: 'pending',

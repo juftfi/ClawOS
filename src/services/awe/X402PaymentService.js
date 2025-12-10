@@ -32,7 +32,12 @@ class X402PaymentService {
         this.servicePricing = {
             'agent-creation': '1000000', // 1 USDC
             'agent-query': '100000',     // 0.1 USDC
-            'agent-action': '500000'     // 0.5 USDC
+            'agent-action': '500000',    // 0.5 USDC
+            // Common aliases and additional service types
+            'transfer': '250000',        // 0.25 USDC (alias)
+            'swap': '500000',            // 0.5 USDC
+            'contract-deploy': '2000000',// 2 USDC
+            'deploy': '2000000'          // alias for contract-deploy
         };
     }
 
