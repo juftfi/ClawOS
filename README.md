@@ -3,7 +3,6 @@
 
 [![Live Demo](https://img.shields.io/badge/Live-Demo-brightgreen)](https://agent-os-web3.vercel.app/)
 [![Backend API](https://img.shields.io/badge/API-Live-blue)](https://agentos-web3-production.up.railway.app/api/health)
-[![Network](https://img.shields.io/badge/Network-Base%20Sepolia-blue)](https://sepolia.basescan.org/address/0xfba199c705761D98aD1cD98c34C0d544e39c1984)
 
 An autonomous agent platform verifying identity on **Base**, orchestrating actions on **BNB Chain**, and persisting memory via **Unibase**.
 
@@ -68,5 +67,6 @@ AgentOS-web3/
    ```
 
 ---
+
 
 
