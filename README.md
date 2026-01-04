@@ -68,5 +68,5 @@ AgentOS-web3/
    ```
 
 ---
-*Built for the 2024 Agentic AI Hackathon.*
+
 
