@@ -10,7 +10,6 @@ An autonomous agent platform verifying identity on **Base**, orchestrating actio
 ---
 
 ## 🚀 Live Deployment
-- **Frontend Dashboard:** [agent-os-web3.vercel.app](https://agent-os-web3.vercel.app/)
 - **Backend API:** `https://agentos-web3-production.up.railway.app`
 - **Smart Contract (ERC-8004):** `0xfba199c705761D98aD1cD98c34C0d544e39c1984` (Base Sepolia)
 
@@ -70,3 +69,4 @@ AgentOS-web3/
 
 ---
 *Built for the 2024 Agentic AI Hackathon.*
+
