@@ -7,6 +7,13 @@ const transferService = require('../blockchain/TransferService');
 const contractCallService = require('../blockchain/ContractCallService');
 const multiNetworkService = require('../blockchain/MultiNetworkService');
 const membaseService = require('../memory/MembaseService');
+const serviceRegistry = require('./ServiceRegistry');
+const negotiationEngine = require('./NegotiationEngine');
+const subscriptionService = require('./SubscriptionService');
+const meteringService = require('./MeteringService');
+const pointsService = require('./PointsService');
+const leaderboardService = require('./LeaderboardService');
+const xBotService = require('./XBotService');
 const logger = require('../../utils/logger');
 
 /**
@@ -58,14 +65,89 @@ class AgentOrchestrator {
             response: response.response
         });
 
-        logger.info('Research workflow completed', { workflowId, userId });
+        // Record usage and award points
+        await meteringService.recordUsage(userId, 'research', 0.01);
+        await pointsService.awardPoints(userId, 'research', 10);
+
+        const xPost = await xBotService.draftPost({
+            type: 'research',
+            summary: `Researched: ${query.substring(0, 50)}...`,
+            userId
+        });
+
+        logger.info('Research workflow completed', { workflowId, userId, xPost });
 
         return {
             success: true,
             workflowId,
             query,
             response: response.response,
-            tokensUsed: response.tokens_used
+            tokensUsed: response.tokens_used,
+            socialDraft: xPost
+        };
+    }
+
+    /**
+     * Discover a service and negotiate terms autonomously
+     * @param {string} query - What the user wants to buy/hire
+     * @param {string} category - Service category
+     * @param {string} userId - User identifier
+     * @returns {Promise<Object>} Discovery and negotiation results
+     */
+    async discoverAndNegotiate(query, category, userId) {
+        const workflowId = this.createWorkflowId('discovery-negotiate');
+
+        this.updateWorkflowStatus(workflowId, 'running', {
+            step: 'discovery',
+            query
+        });
+
+        // Step 1: Discover relevant B2B agents
+        const services = serviceRegistry.searchServices(query, category);
+        if (services.length === 0) {
+            throw new Error('No compatible service agents found for your request.');
+        }
+
+        const topService = services[0]; // Take the highest reputation match
+
+        // Step 2: Negotiate terms autonomously
+        this.updateWorkflowStatus(workflowId, 'running', {
+            step: 'negotiation',
+            serviceId: topService.id
+        });
+
+        const negotiation = await negotiationEngine.negotiate(query, topService);
+
+        // Step 3: Store in memory
+        await membaseService.storeAIP(userId, `Discovered and negotiated with ${topService.name}. Agreed Price: ${negotiation.agreedPrice} ${negotiation.currency}.`, {
+            workflowId,
+            serviceId: topService.id,
+            type: 'negotiation_log'
+        });
+
+        this.updateWorkflowStatus(workflowId, 'completed', {
+            service: topService,
+            negotiation
+        });
+
+        // Record usage and award points
+        await meteringService.recordUsage(userId, 'discovery_negotiate', 0.02);
+        await pointsService.awardPoints(userId, 'negotiation', 30);
+
+        const xPost = await xBotService.draftPost({
+            type: 'negotiation',
+            summary: `Negotiated term for user: ${query.substring(0, 50)}...`,
+            userId
+        });
+
+        logger.info('Discovery and negotiation workflow completed', { workflowId, userId, xPost });
+
+        return {
+            success: true,
+            workflowId,
+            service: topService,
+            negotiation,
+            socialDraft: xPost
         };
     }
 
@@ -138,6 +220,10 @@ class AgentOrchestrator {
                 audited: true,
                 deployed: !!deployment
             });
+
+            // Record usage, points, and hype
+            await meteringService.recordUsage(userId, 'contract_audit', 0.05);
+            await pointsService.awardPoints(userId, 'audit', 50);
 
             logger.info('Generate-audit workflow completed', { workflowId, userId });
 
@@ -361,6 +447,13 @@ class AgentOrchestrator {
                 timestamp: new Date().toISOString()
             });
 
+            // 2026 AIP Protocol: Store verifiable memory log of the execution
+            await membaseService.storeAIP(userId, `Executed ${actionType} on BNB Testnet. Result: ${result.status || 'OK'}. Tx: ${result.txHash || result.hash}`, {
+                workflowId,
+                paymentTxHash,
+                type: 'action_execution'
+            });
+
             return {
                 success: true,
                 txHash: result.txHash || result.hash,
@@ -389,6 +482,9 @@ class AgentOrchestrator {
 
             case 'defi-action':
                 return await this.executeDeFiAction(params);
+
+            case 'discovery-negotiate':
+                return await this.discoverAndNegotiate(params.query, params.category, params.userId);
 
             default:
                 throw new Error(`Unknown workflow type: ${workflowType}`);
