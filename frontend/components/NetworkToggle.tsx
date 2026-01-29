@@ -10,13 +10,6 @@ export function NetworkToggle() {
 
     const networks = [
         {
-            chain: baseSepolia,
-            name: 'Base Sepolia',
-            description: 'AWE Network + ChainGPT',
-            token: 'USDC',
-            color: 'blue'
-        },
-        {
             chain: bscTestnet,
             name: 'BNB Testnet',
             description: 'Quack × ChainGPT',

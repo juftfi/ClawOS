@@ -120,4 +120,50 @@ router.get('/pricing', async (req, res) => {
     }
 });
 
+/**
+ * @route   POST /api/quack/execute
+ * @desc    Initialize Unified Execution Layer (Sign-to-Pay)
+ * @access  Public
+ */
+router.post('/execute', async (req, res) => {
+    try {
+        const { agentId, serviceType, params } = req.body;
+
+        if (!agentId || !serviceType) {
+            return res.status(400).json({
+                success: false,
+                error: 'Missing agentId or serviceType'
+            });
+        }
+
+        const result = await quackQ402Service.unifiedExecute(agentId, serviceType, params);
+        res.json(result);
+    } catch (error) {
+        res.status(500).json({ success: false, error: error.message });
+    }
+});
+
+/**
+ * @route   POST /api/quack/process-receipt
+ * @desc    Process Unified Execution receipt
+ * @access  Public
+ */
+router.post('/process-receipt', async (req, res) => {
+    try {
+        const { executionId, signature, txHash } = req.body;
+
+        if (!executionId || !signature || !txHash) {
+            return res.status(400).json({
+                success: false,
+                error: 'Missing execution data'
+            });
+        }
+
+        const result = await quackQ402Service.processUnifiedReceipt(executionId, signature, txHash);
+        res.json(result);
+    } catch (error) {
+        res.status(500).json({ success: false, error: error.message });
+    }
+});
+
 module.exports = router;

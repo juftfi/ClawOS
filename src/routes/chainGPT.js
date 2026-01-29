@@ -107,6 +107,27 @@ router.post('/find-vulnerabilities',
 );
 
 /**
+ * @route   POST /api/ai/narrative
+ * @desc    Get market narrative insights
+ * @access  Public
+ */
+router.post('/narrative', chainGPTController.getMarketNarrative);
+
+/**
+ * @route   POST /api/ai/trading-assistant
+ * @desc    Get AI trading assistant report
+ * @access  Public
+ */
+router.post('/trading-assistant', chainGPTController.getTradingAssistant);
+
+/**
+ * @route   POST /api/ai/news
+ * @desc    Get Web3 news feed
+ * @access  Public
+ */
+router.post('/news', chainGPTController.getWeb3News);
+
+/**
  * @route   POST /api/ai/cache/clear
  * @desc    Clear LLM response cache
  * @access  Public

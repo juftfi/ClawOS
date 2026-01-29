@@ -38,12 +38,11 @@ export default function DashboardOverview() {
             setLoading(true);
             const API_URL = process.env.NEXT_PUBLIC_API_URL || 'http://localhost:3000';
 
-            // Fetch agents
-            const agentsRes = await axios.get(`${API_URL}/api/awe/agents`);
-            const agentCount = agentsRes.data.agents?.length || 0;
+            // Fetch agents (simplified to primary)
+            setStats(prev => ({ ...prev, agents: 1 }));
 
-            // Fetch payments for stats
-            const historyRes = await axios.get(`${API_URL}/api/awe/payment/history`);
+            // Fetch payments for stats from quack history
+            const historyRes = await axios.get(`${API_URL}/api/quack/payment/history`);
             const history = historyRes.data.history || [];
 
             const totalSpent = history.reduce((acc: number, curr: any) => {
@@ -56,12 +55,11 @@ export default function DashboardOverview() {
                 return acc + (isNaN(val) ? 0 : val);
             }, 0);
 
-            setStats({
-                agents: agentCount,
+            setStats(prev => ({
+                ...prev,
                 usdcSpent: totalSpent.toLocaleString('en-US', { minimumFractionDigits: 2, maximumFractionDigits: 2 }),
-                conversations: 0, // No conversations index yet
                 transactions: history.length
-            });
+            }));
         } catch (error) {
             console.error('Error fetching stats:', error);
         } finally {
@@ -73,19 +71,17 @@ export default function DashboardOverview() {
         fetchStats();
     }, [address]);
 
-
-
     const statCards = [
         {
-            label: 'Total Agents',
-            value: loading ? '...' : stats.agents.toString(),
-            icon: Users,
-            change: '+0%',
+            label: 'Active Orchestrator',
+            value: loading ? '...' : '1',
+            icon: Brain,
+            change: 'Stable',
             changeType: 'positive' as const,
-            color: 'purple'
+            color: 'yellow'
         },
         {
-            label: 'USDC Spent',
+            label: 'USDC Volume (BNB)',
             value: loading ? '...' : `$${stats.usdcSpent}`,
             icon: DollarSign,
             change: '+0%',
@@ -93,7 +89,7 @@ export default function DashboardOverview() {
             color: 'emerald'
         },
         {
-            label: 'Conversations',
+            label: 'Agent Queries',
             value: loading ? '...' : stats.conversations.toString(),
             icon: MessageSquare,
             change: '+0%',
@@ -101,31 +97,23 @@ export default function DashboardOverview() {
             color: 'blue'
         },
         {
-            label: 'Transactions',
+            label: 'Q402 Transactions',
             value: loading ? '...' : stats.transactions.toString(),
             icon: Activity,
             change: '+0%',
             changeType: 'positive' as const,
-            color: 'pink'
+            color: 'yellow'
         },
     ];
 
     const bountyCards = [
-        {
-            title: 'AWE Network',
-            subtitle: 'Identity & Payments',
-            icon: Shield,
-            status: 'Active',
-            network: 'Base Sepolia',
-            color: 'blue'
-        },
         {
             title: 'Quack × ChainGPT',
             subtitle: 'AI Intelligence',
             icon: Brain,
             status: 'Active',
             network: 'BNB Testnet',
-            color: 'purple'
+            color: 'yellow'
         },
         {
             title: 'Unibase',
@@ -134,6 +122,14 @@ export default function DashboardOverview() {
             status: 'Active',
             network: 'Membase Hub',
             color: 'emerald'
+        },
+        {
+            title: 'Q402 Protocol',
+            subtitle: 'Delegated Payments',
+            icon: Shield,
+            status: 'Active',
+            network: 'BNB Testnet',
+            color: 'blue'
         },
     ];
 

@@ -18,32 +18,42 @@ class LLMService {
      * @returns {Promise<Object>} Response with text, tokens, and model
      */
     async chat(prompt, model = this.defaultModel, systemMessage = null) {
-        const cacheKey = `chat:${prompt}:${model}`;
-        const cached = this.getFromCache(cacheKey);
-        if (cached) {
-            logger.info('Returning cached response');
-            return cached;
+        try {
+            const cacheKey = `chat:${prompt}:${model}`;
+            const cached = this.getFromCache(cacheKey);
+            if (cached) {
+                logger.info('Returning cached response');
+                return cached;
+            }
+
+            const messages = [];
+            if (systemMessage) messages.push({ role: 'system', content: systemMessage });
+            messages.push({ role: 'user', content: prompt });
+
+            const response = await this.makeRequest('/chat/completions', {
+                model,
+                messages
+            });
+
+            const result = {
+                response: response.answer || (typeof response === 'string' ? response : JSON.stringify(response)),
+                tokens_used: response.creditsUsed || response.credits_used || 1,
+                model_used: model,
+                finish_reason: response.finish_reason || 'stop'
+            };
+
+            this.setCache(cacheKey, result);
+            return result;
+        } catch (error) {
+            logger.error('ChainGPT Chat error:', error.message);
+            return {
+                response: "I'm sorry, I'm having trouble connecting to my brain right now. Please try again in a moment.",
+                tokens_used: 0,
+                model_used: model,
+                finish_reason: 'error',
+                error: error.message
+            };
         }
-
-        // Support both ChainGPT 'question' style and OpenAI-like 'messages' style.
-        const messages = [];
-        if (systemMessage) messages.push({ role: 'system', content: systemMessage });
-        messages.push({ role: 'user', content: prompt });
-
-        const response = await this.makeRequest('/chat/completions', {
-            model,
-            messages
-        });
-
-        const result = {
-            response: response.answer || (typeof response === 'string' ? response : JSON.stringify(response)),
-            tokens_used: response.creditsUsed || response.credits_used || 1,
-            model_used: model,
-            finish_reason: response.finish_reason || 'stop'
-        };
-
-        this.setCache(cacheKey, result);
-        return result;
     }
 
     /**
@@ -143,6 +153,94 @@ class LLMService {
         };
     }
 
+    async getMarketNarrative(token = null) {
+        const cacheKey = `narrative:${token || 'global'}`;
+        const cached = this.getFromCache(cacheKey);
+        if (cached) return cached;
+
+        const prompt = token
+            ? `Analyze the current market narrative for ${token}. Include bullish/bearish sentiment, on-chain flows, and recent news context.`
+            : `Analyze the current global crypto market narrative. Identify the top 3 dominating narratives, fear/greed status, and major liquidations.`;
+
+        const systemMessage = 'You are the ChainGPT Hub V2 Market Narrative engine. Provide clear, data-driven alerts on crypto narratives.';
+        // Use defaultModel to ensure API compatibility
+        const response = await this.chat(prompt, this.defaultModel, systemMessage);
+
+        const result = {
+            ...response,
+            type: 'market_narrative',
+            token: token || 'GLOBAL',
+            timestamp: new Date().toISOString()
+        };
+
+        this.setCache(cacheKey, result);
+        return result;
+    }
+
+    /**
+     * Get AI Trading Assistant Insights (Liquidation Heatmaps)
+     * @param {string} token - Token to analyze
+     * @returns {Promise<Object>} Trading projections and heatmap data
+     */
+    async getTradingAssistant(token) {
+        const prompt = `Generate a predictive trading report for ${token}. Include:
+1. Liquidation Heatmap levels
+2. Improving pattern projections
+3. Volume metric assessment
+4. Price target projections (Short/Medium term)`;
+
+        const systemMessage = 'You are the ChainGPT Hub V2 AI Trading Assistant. Provide high-fidelity price projections and liquidation levels.';
+        // Use defaultModel to ensure API compatibility
+        const response = await this.chat(prompt, this.defaultModel, systemMessage);
+
+        return {
+            ...response,
+            type: 'trading_report',
+            token,
+            timestamp: new Date().toISOString()
+        };
+    }
+
+    /**
+     * Get Real-time Web3 News (Hub V2 Integration)
+     * @param {string} query - Optional search query
+     * @returns {Promise<Object>} Curated news feed
+     */
+    async getWeb3News(query = 'latest') {
+        try {
+            const response = await this.makeRequest('/news/latest', { query });
+            return {
+                news: response.answer || [],
+                source: 'ChainGPT Hub V2 News Feed',
+                query,
+                timestamp: new Date().toISOString()
+            };
+        } catch (error) {
+            if (error.response?.status === 404) {
+                logger.info('Falling back to /v1/hub/news for ChainGPT news');
+                try {
+                    const response = await this.makeRequest('/v1/hub/news', { query });
+                    return {
+                        news: response.answer || [],
+                        source: 'ChainGPT Hub V2 News Feed (v1)',
+                        query,
+                        timestamp: new Date().toISOString()
+                    };
+                } catch (v1Error) {
+                    logger.info('Falling back to /api/news/latest for ChainGPT news');
+                    const response = await this.makeRequest('/api/news/latest', { query });
+                    return {
+                        news: response.answer || [],
+                        source: 'ChainGPT Hub V2 News Feed (api)',
+                        query,
+                        timestamp: new Date().toISOString()
+                    };
+                }
+            }
+            throw error;
+        }
+    }
+
     /**
      * Make API request to ChainGPT
      * @param {string} endpoint - API endpoint
@@ -151,8 +249,7 @@ class LLMService {
      */
     async makeRequest(endpoint, data) {
         const url = `${this.apiUrl}${endpoint}`;
-
-        logger.info(`ChainGPT API request to ${url}`);
+        logger.info(`ChainGPT API request: ${endpoint}`);
 
         try {
             const response = await axios.post(url, data, {
@@ -163,129 +260,65 @@ class LLMService {
                 timeout: 30000
             });
 
-            const d = response.data;
-
-            // Normalize various response shapes (ChainGPT, OpenAI-like, or raw strings)
-            try {
-                // If ChainGPT 'answer' shape
-                if (d && typeof d === 'object' && typeof d.answer === 'string') {
-                    return {
-                        answer: d.answer,
-                        creditsUsed: d.creditsUsed || d.usage?.total_tokens || 0,
-                        finish_reason: d.finish_reason || null,
-                        raw: d
-                    };
-                }
-
-                // OpenAI-like response
-                if (d && typeof d === 'object' && Array.isArray(d.choices) && d.choices.length > 0) {
-                    const first = d.choices[0];
-                    const text = first.text || (first.message && first.message.content) || '';
-                    return {
-                        answer: text,
-                        creditsUsed: d.usage?.total_tokens || d.creditsUsed || 0,
-                        finish_reason: first.finish_reason || d.finish_reason || null,
-                        raw: d
-                    };
-                }
-
-                // If the API returned a simple string
-                if (typeof d === 'string') {
-                    return { answer: d, creditsUsed: 0, finish_reason: null, raw: d };
-                }
-
-                // Unknown shape: return it under raw and provide a JSON string as answer
-                return { answer: JSON.stringify(d), creditsUsed: d.usage?.total_tokens || 0, finish_reason: null, raw: d };
-            } catch (normErr) {
-                logger.warn('Failed to normalize ChainGPT response', normErr.message);
-                return { answer: JSON.stringify(d), creditsUsed: 0, finish_reason: null, raw: d };
-            }
+            return this.normalizeResponse(response.data);
         } catch (error) {
-            // Log upstream URL and response body/status for debugging
-            try {
-                logger.error('ChainGPT request failed', {
-                    url,
-                    status: error.response?.status,
-                    responseData: error.response?.data,
-                    message: error.message
-                });
-            } catch (logErr) {
-                logger.error('Failed to log ChainGPT error details', logErr.message);
-            }
+            logger.warn(`ChainGPT primary request failed: ${endpoint}`, error.message);
 
-            // If the upstream returned 404 for the simple endpoint, try the common /v1 prefix as a fallback.
-            // Some ChainGPT deployments require the /v1 prefix (e.g. /v1/chat/completions).
-            try {
-                const status = error.response?.status;
-                const respData = error.response?.data;
-                if (status === 404) {
-                    // Avoid duplicating /v1 if it's already present in the url
-                    if (!url.includes('/v1/')) {
-                        const altUrl = this.apiUrl.endsWith('/') ? `${this.apiUrl}v1${endpoint}` : `${this.apiUrl}/v1${endpoint}`;
-                        logger.info(`Attempting ChainGPT fallback API request to ${altUrl}`);
-                        try {
-                            const retryResp = await axios.post(altUrl, data, {
-                                headers: {
-                                    'Content-Type': 'application/json',
-                                    'Authorization': `Bearer ${this.apiKey}`
-                                },
-                                timeout: 30000
-                            });
-
-                            const d = retryResp.data;
-                            // reuse normalization logic from above
-                            if (d && typeof d === 'object' && typeof d.answer === 'string') {
-                                return {
-                                    answer: d.answer,
-                                    creditsUsed: d.creditsUsed || d.usage?.total_tokens || 0,
-                                    finish_reason: d.finish_reason || null,
-                                    raw: d
-                                };
-                            }
-
-                            if (d && typeof d === 'object' && Array.isArray(d.choices) && d.choices.length > 0) {
-                                const first = d.choices[0];
-                                const text = first.text || (first.message && first.message.content) || '';
-                                return {
-                                    answer: text,
-                                    creditsUsed: d.usage?.total_tokens || d.creditsUsed || 0,
-                                    finish_reason: first.finish_reason || d.finish_reason || null,
-                                    raw: d
-                                };
-                            }
-
-                            if (typeof d === 'string') {
-                                return { answer: d, creditsUsed: 0, finish_reason: null, raw: d };
-                            }
-
-                            return { answer: JSON.stringify(d), creditsUsed: d.usage?.total_tokens || 0, finish_reason: null, raw: d };
-                        } catch (retryErr) {
-                            logger.error('ChainGPT fallback request failed', { url: altUrl, status: retryErr.response?.status, responseData: retryErr.response?.data, message: retryErr.message });
-                            // fall through to rethrow original error below
-                        }
-                    }
+            // Fallback for 404
+            if (error.response?.status === 404 && !url.includes('/v1')) {
+                const altUrl = `${this.apiUrl}/v1${endpoint}`;
+                try {
+                    const retryResp = await axios.post(altUrl, data, {
+                        headers: {
+                            'Content-Type': 'application/json',
+                            'Authorization': `Bearer ${this.apiKey}`
+                        },
+                        timeout: 30000
+                    });
+                    return this.normalizeResponse(retryResp.data);
+                } catch (retryErr) {
+                    logger.error(`ChainGPT fallback failed: ${endpoint}`, retryErr.message);
                 }
-            } catch (fallbackErr) {
-                logger.error('Error while attempting ChainGPT fallback', fallbackErr.message);
             }
 
-            if (error.response?.status === 429) {
-                logger.warn('ChainGPT rate limit hit');
-                throw new Error('Rate limit exceeded. Please try again later.');
-            }
-
-            if (error.response?.status === 401) {
-                logger.error('ChainGPT authentication failed');
-                throw new Error('Invalid API key');
-            }
-
-            // If both primary and fallback endpoints returned 404, surface a clearer error
-            if (error.response?.status === 404) {
-                throw new Error('ChainGPT endpoint returned 404. Verify CHAINGPT_API_URL and that the upstream supports POST to /chat/completions or /v1/chat/completions');
-            }
-
-            throw error;
+            // Return graceful error payload instead of throwing
+            return {
+                answer: `Service temporarily unavailable. Error: ${error.message}`,
+                creditsUsed: 0,
+                status: 'error',
+                error: true
+            };
         }
+    }
+
+    normalizeResponse(d) {
+        if (!d) return { answer: 'Empty response', creditsUsed: 0 };
+
+        if (typeof d === 'string') return { answer: d, creditsUsed: 0 };
+
+        if (d.answer && typeof d.answer === 'string') {
+            return {
+                answer: d.answer,
+                creditsUsed: d.creditsUsed || d.usage?.total_tokens || 0,
+                finish_reason: d.finish_reason || 'stop'
+            };
+        }
+
+        if (Array.isArray(d.choices) && d.choices.length > 0) {
+            const first = d.choices[0];
+            const text = first.text || first.message?.content || '';
+            return {
+                answer: text,
+                creditsUsed: d.usage?.total_tokens || 0,
+                finish_reason: first.finish_reason || 'stop'
+            };
+        }
+
+        return {
+            answer: JSON.stringify(d),
+            creditsUsed: 0,
+            finish_reason: 'unknown'
+        };
     }
 
     /**

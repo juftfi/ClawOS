@@ -1,0 +1,866 @@
+# 🏆 AgentBridge - Complete Development Brief for Claude Code
+
+## 📋 PROJECT OVERVIEW
+
+**Project Name:** AgentBridge  
+**Track:** Unibase Track - BNB Good Vibes Only Hackathon  
+**Submission Deadline:** January 29, 2026  
+**Goal:** Build the first B2C-to-B2B autonomous agent commerce bridge using Unibase AIP 2.0
+
+---
+
+## 🎯 CORE CONCEPT
+
+AgentBridge is a two-sided platform that bridges consumer AI agents with business service agents, enabling autonomous commerce through:
+- **Consumer Side (B2C):** Personal AI agents that can autonomously discover, negotiate, and purchase services
+- **Business Side (B2B):** Service provider agents that can accept, negotiate, and fulfill requests from consumer agents
+- **Bridge Protocol:** Uses Unibase AIP 2.0 (ERC-8004 identity + x402 payments + decentralized memory) on BNB Chain
+
+---
+
+## 🏗️ TECHNICAL ARCHITECTURE
+
+### Tech Stack Requirements:
+
+**Blockchain Layer:**
+- BNB Chain (testnet: BSC Testnet, mainnet: BNB Smart Chain)
+- Solidity ^0.8.20 for smart contracts
+- Hardhat for development and deployment
+- OpenZeppelin contracts for security standards
+
+**Backend:**
+- Node.js 18+ with TypeScript
+- Express.js for API server
+- Unibase Agent SDK (https://github.com/unibaseio/unibase-agent-sdk)
+- Unibase AIP SDK (https://github.com/unibaseio/unibase-aip-sdk)
+- ethers.js v6 for blockchain interactions
+- IPFS/Pinata for decentralized storage
+
+**Frontend:**
+- Next.js 14+ (App Router)
+- React 18+ with TypeScript
+- Tailwind CSS for styling
+- shadcn/ui components
+- wagmi + viem for wallet connections
+- RainbowKit for wallet UI
+
+**Database & Storage:**
+- Decentralized memory via Unibase AIP
+- IPFS for metadata and agent profiles
+- MongoDB/PostgreSQL for off-chain indexing (optional)
+
+**DevOps:**
+- Docker for containerization
+- GitHub Actions for CI/CD
+- Vercel for frontend deployment
+- Railway/Render for backend hosting
+
+---
+
+## 📦 PROJECT STRUCTURE
+
+```
+agentbridge/
+├── contracts/                  # Smart contracts
+│   ├── src/
+│   │   ├── AgentIdentity.sol           # ERC-8004 implementation
+│   │   ├── ServiceRegistry.sol         # Service agent registration
+│   │   ├── RequestEscrow.sol           # x402 payment escrow
+│   │   ├── NegotiationEngine.sol       # Autonomous negotiation logic
+│   │   ├── ReputationNFT.sol           # Dynamic reputation system
+│   │   └── DisputeResolver.sol         # Automated disputes
+│   ├── test/
+│   ├── scripts/
+│   ├── hardhat.config.ts
+│   └── package.json
+│
+├── agent-sdk/                  # Agent implementation layer
+│   ├── src/
+│   │   ├── consumer/
+│   │   │   ├── PersonalAgent.ts        # Base consumer agent
+│   │   │   ├── ShoppingAgent.ts        # Shopping use case
+│   │   │   └── TravelAgent.ts          # Travel use case
+│   │   ├── business/
+│   │   │   ├── ServiceAgent.ts         # Base business agent
+│   │   │   ├── HotelAgent.ts           # Hotel service example
+│   │   │   └── GroceryAgent.ts         # Grocery service example
+│   │   ├── protocol/
+│   │   │   ├── discovery.ts            # Service discovery
+│   │   │   ├── negotiation.ts          # Negotiation protocol
+│   │   │   ├── payment.ts              # x402 integration
+│   │   │   └── memory.ts               # Decentralized memory
+│   │   └── utils/
+│   ├── examples/
+│   └── package.json
+│
+├── backend/                    # API server
+│   ├── src/
+│   │   ├── api/
+│   │   │   ├── routes/
+│   │   │   │   ├── agents.ts           # Agent endpoints
+│   │   │   │   ├── services.ts         # Service endpoints
+│   │   │   │   ├── requests.ts         # Request endpoints
+│   │   │   │   └── reputation.ts       # Reputation endpoints
+│   │   │   └── middleware/
+│   │   ├── services/
+│   │   │   ├── blockchain.ts           # Contract interactions
+│   │   │   ├── ipfs.ts                 # IPFS integration
+│   │   │   ├── aip.ts                  # AIP 2.0 integration
+│   │   │   └── indexer.ts              # Event indexing
+│   │   ├── config/
+│   │   └── server.ts
+│   ├── Dockerfile
+│   └── package.json
+│
+├── frontend/                   # Next.js application
+│   ├── app/
+│   │   ├── (consumer)/
+│   │   │   ├── dashboard/              # Consumer dashboard
+│   │   │   ├── agents/                 # Manage agents
+│   │   │   └── activity/               # Transaction history
+│   │   ├── (business)/
+│   │   │   ├── dashboard/              # Business dashboard
+│   │   │   ├── services/               # Manage services
+│   │   │   └── analytics/              # Performance metrics
+│   │   ├── api/                        # API routes
+│   │   ├── layout.tsx
+│   │   └── page.tsx
+│   ├── components/
+│   │   ├── ui/                         # shadcn components
+│   │   ├── consumer/
+│   │   ├── business/
+│   │   └── shared/
+│   ├── lib/
+│   │   ├── contracts/                  # Contract ABIs & addresses
+│   │   ├── hooks/                      # Custom React hooks
+│   │   └── utils/
+│   ├── public/
+│   └── package.json
+│
+├── docs/                       # Documentation
+│   ├── README.md                       # Main overview
+│   ├── QUICKSTART.md                   # 5-min setup guide
+│   ├── ARCHITECTURE.md                 # System design
+│   ├── AIP_INTEGRATION.md              # Unibase AIP details
+│   ├── API_REFERENCE.md                # API documentation
+│   ├── SMART_CONTRACTS.md              # Contract docs
+│   ├── DEPLOYMENT.md                   # Deployment guide
+│   └── tutorials/
+│       ├── consumer-setup.md
+│       ├── business-onboarding.md
+│       └── negotiation-guide.md
+│
+├── scripts/                    # Utility scripts
+│   ├── deploy.sh
+│   ├── setup-env.sh
+│   └── test-e2e.sh
+│
+├── .github/
+│   └── workflows/
+│       ├── test.yml
+│       └── deploy.yml
+│
+├── docker-compose.yml
+├── .env.example
+└── README.md
+```
+
+---
+
+## 🔧 CORE FEATURES TO IMPLEMENT
+
+### 1. Smart Contracts (Solidity)
+
+**AgentIdentity.sol (ERC-8004 Implementation)**
+```solidity
+// Core features:
+- Unique agent ID generation
+- Identity verification
+- Metadata storage (IPFS hash)
+- Owner management
+- Transfer restrictions
+```
+
+**ServiceRegistry.sol**
+```solidity
+// Features:
+- Service registration (name, category, pricing)
+- Service discovery indexing
+- Active/inactive status
+- Business verification
+- Service metadata (capabilities, SLA)
+```
+
+**RequestEscrow.sol (x402 Integration)**
+```solidity
+// Features:
+- Create escrow for agent requests
+- Milestone-based releases
+- Dispute initiation
+- Automatic refunds
+- x402 payment channel support
+- Multi-token support (BNB, USDT, USDC)
+```
+
+**NegotiationEngine.sol**
+```solidity
+// Features:
+- Offer/counter-offer state machine
+- Automatic acceptance criteria
+- Timeout mechanisms
+- Negotiation history
+- Price bounds enforcement
+```
+
+**ReputationNFT.sol**
+```solidity
+// Features:
+- Dynamic NFT with reputation score
+- On-chain achievement tracking
+- Reputation decay over time
+- Verification badges
+- Cross-agent reputation queries
+```
+
+### 2. Agent SDK Implementation
+
+**PersonalAgent.ts (Consumer Agent)**
+```typescript
+// Core methods:
+- initialize(config, erc8004Id)
+- discoverServices(category, filters)
+- negotiateWithService(serviceId, requirements)
+- executePayment(serviceId, amount)
+- storePreference(key, value)  // Decentralized memory
+- getReputation()
+```
+
+**ServiceAgent.ts (Business Agent)**
+```typescript
+// Core methods:
+- initialize(config, erc8004Id, businessInfo)
+- registerService(serviceDetails)
+- listenForRequests()
+- respondToNegotiation(requestId, offer)
+- fulfillRequest(requestId, proof)
+- updateAvailability(status)
+```
+
+**Protocol Integration:**
+```typescript
+// discovery.ts - Service discovery
+- searchServices(filters)
+- rankByReputation()
+- filterByPrice()
+
+// negotiation.ts - Autonomous negotiation
+- createOffer()
+- evaluateCounterOffer()
+- acceptOrReject()
+- finalizeAgreement()
+
+// payment.ts - x402 integration
+- createPaymentChannel()
+- streamPayment()
+- releaseEscrow()
+- handleDispute()
+
+// memory.ts - Decentralized memory
+- storeAgentMemory(key, value)
+- retrieveMemory(key)
+- updatePreferences()
+```
+
+### 3. Backend API
+
+**Required Endpoints:**
+
+```typescript
+// Agent Management
+POST   /api/agents/create              // Deploy new agent
+GET    /api/agents/:id                 // Get agent details
+PUT    /api/agents/:id                 // Update agent config
+GET    /api/agents/:id/activity        // Get transaction history
+
+// Service Management
+POST   /api/services/register          // Register service
+GET    /api/services                   // List all services
+GET    /api/services/:id               // Get service details
+PUT    /api/services/:id               // Update service
+
+// Request & Negotiation
+POST   /api/requests/create            // Create service request
+GET    /api/requests/:id               // Get request status
+POST   /api/requests/:id/negotiate     // Send negotiation offer
+POST   /api/requests/:id/accept        // Accept agreement
+
+// Reputation
+GET    /api/reputation/:agentId        // Get reputation score
+POST   /api/reputation/verify          // Verify transaction
+
+// Discovery
+GET    /api/discovery/search           // Search services
+GET    /api/discovery/trending         // Trending services
+```
+
+### 4. Frontend Components
+
+**Consumer Dashboard:**
+- Agent creation wizard (step-by-step)
+- Active agents list with status
+- Transaction history with filters
+- Reputation score display
+- Spending analytics
+- Preference management
+
+**Business Dashboard:**
+- Service registration form
+- Request inbox with filters
+- Performance analytics (requests, revenue, ratings)
+- Reputation management
+- Pricing strategy tools
+- Automated response settings
+
+**Shared Components:**
+- Wallet connection (RainbowKit)
+- Agent identity card (ERC-8004 display)
+- Negotiation chat interface
+- Payment status tracker
+- Reputation badge display
+
+---
+
+## 🔗 UNIBASE AIP 2.0 INTEGRATION
+
+### Required Integrations:
+
+**1. ERC-8004 Identity:**
+```typescript
+// Use Unibase's identity contracts
+import { IdentityRegistry } from '@unibase/aip-sdk';
+
+// Create agent identity
+const identity = await IdentityRegistry.createIdentity({
+  owner: walletAddress,
+  metadata: ipfsHash,
+  agentType: 'consumer' | 'business'
+});
+```
+
+**2. x402 Payment Protocol:**
+```typescript
+// Import x402 from Unibase SDK
+import { X402Payment } from '@unibase/aip-sdk';
+
+// Create payment channel
+const payment = await X402Payment.createChannel({
+  from: consumerAgentId,
+  to: businessAgentId,
+  amount: negotiatedPrice,
+  escrowContract: escrowAddress
+});
+```
+
+**3. Decentralized Memory:**
+```typescript
+// Use Unibase memory storage
+import { MemoryStore } from '@unibase/aip-sdk';
+
+// Store agent preferences
+await MemoryStore.set({
+  agentId: agentIdentity,
+  key: 'preferences.hotel.maxPrice',
+  value: '200',
+  encrypted: true
+});
+
+// Retrieve memory
+const prefs = await MemoryStore.get({
+  agentId: agentIdentity,
+  key: 'preferences.hotel.*'
+});
+```
+
+---
+
+## 📊 JUDGING CRITERIA ALIGNMENT
+
+### Innovation (30 points):
+**Implementation Requirements:**
+- [ ] First-of-its-kind B2C-to-B2B bridge
+- [ ] Autonomous negotiation with ML-based price optimization
+- [ ] Cross-side reputation that affects both consumers and businesses
+- [ ] Real-time service discovery with semantic search
+- [ ] Non-crypto business onboarding (traditional payment → x402)
+
+**Documentation to Highlight:**
+- Novel architecture diagrams
+- Comparison with existing solutions (show the gap)
+- Future roadmap (network effects, cross-chain)
+
+### Technical Complexity (30 points):
+**Must-Have Features:**
+- [ ] Full ERC-8004 implementation with metadata
+- [ ] x402 payment channels with streaming
+- [ ] Decentralized memory with encryption
+- [ ] Multi-signature escrow contracts
+- [ ] Gas-optimized smart contracts
+- [ ] Event indexing for fast queries
+- [ ] Mobile-responsive PWA
+- [ ] Real-time WebSocket updates
+
+**Code Quality:**
+- TypeScript strict mode
+- 80%+ test coverage
+- Security audits (automated tools)
+- Clean architecture patterns
+- Comprehensive error handling
+
+### User Experience (20 points):
+**Consumer UX:**
+- [ ] One-click agent deployment (<30 seconds)
+- [ ] Natural language configuration
+- [ ] Real-time activity feed
+- [ ] Mobile app (PWA)
+- [ ] Privacy controls
+
+**Business UX:**
+- [ ] No-code service registration
+- [ ] Stripe-like payment onboarding
+- [ ] Analytics dashboard
+- [ ] Automated response rules
+- [ ] White-label options
+
+**Developer UX:**
+- [ ] 5-line SDK integration
+- [ ] 10+ code examples
+- [ ] Interactive playground
+- [ ] Postman collection
+
+### Documentation (20 points):
+**Required Docs:**
+- [ ] README with video demo (2-3 min)
+- [ ] QUICKSTART (5-min deployment)
+- [ ] ARCHITECTURE with diagrams
+- [ ] AIP_INTEGRATION (how we use Unibase)
+- [ ] API_REFERENCE (complete)
+- [ ] SMART_CONTRACTS (contract docs)
+- [ ] 3+ tutorials
+- [ ] Troubleshooting guide
+
+---
+
+## 🚀 IMPLEMENTATION PRIORITIES
+
+### Day 1-2 (Jan 22-23): Foundation
+**Priority 1: Smart Contracts**
+```bash
+# Tasks:
+1. Set up Hardhat project
+2. Implement ERC-8004 (AgentIdentity.sol)
+3. Implement ServiceRegistry.sol
+4. Implement RequestEscrow.sol
+5. Write unit tests
+6. Deploy to BSC testnet
+```
+
+**Priority 2: Documentation**
+```bash
+# Tasks:
+1. Create README with project overview
+2. Set up GitHub repo structure
+3. Write ARCHITECTURE.md
+4. Post concept on X
+5. Join Unibase Telegram
+```
+
+### Day 3-4 (Jan 24-25): Core Protocol
+**Priority 1: Agent SDK**
+```bash
+# Tasks:
+1. Integrate Unibase Agent SDK
+2. Implement PersonalAgent.ts
+3. Implement ServiceAgent.ts
+4. Build discovery protocol
+5. Build negotiation protocol
+6. Test agent-to-agent communication
+```
+
+**Priority 2: Backend API**
+```bash
+# Tasks:
+1. Set up Express server
+2. Implement blockchain service
+3. Implement IPFS integration
+4. Build core API endpoints
+5. Set up event indexing
+```
+
+### Day 5-6 (Jan 26-27): Frontend
+**Priority 1: Core UI**
+```bash
+# Tasks:
+1. Set up Next.js project
+2. Integrate wagmi + RainbowKit
+3. Build consumer dashboard
+4. Build business dashboard
+5. Create agent deployment wizard
+6. Implement real-time updates
+```
+
+**Priority 2: UX Polish**
+```bash
+# Tasks:
+1. Mobile responsiveness
+2. Loading states
+3. Error handling UI
+4. Success animations
+5. Tooltip help system
+```
+
+### Day 7 (Jan 28): Testing & Polish
+```bash
+# Tasks:
+1. End-to-end testing
+2. Security review
+3. Gas optimization
+4. Performance testing
+5. Bug fixes
+6. Demo scenario setup
+```
+
+### Day 8 (Jan 29): Launch
+```bash
+# Tasks:
+1. Record demo video
+2. Final documentation
+3. Deploy to mainnet
+4. Create submission post
+5. Submit via form
+6. Share in Unibase ecosystem
+```
+
+---
+
+## 🎬 DEMO VIDEO REQUIREMENTS
+
+**Format:** 2-3 minutes, 1080p, professional editing
+
+**Script Structure:**
+
+**[0:00-0:20] Hook & Problem**
+- Show: Frustrated consumer booking hotels manually
+- Text: "The $30T agent economy is coming..."
+- Problem: "But consumers and businesses can't connect"
+
+**[0:20-0:40] Solution**
+- Show: AgentBridge logo animation
+- Split screen: Consumer agent ↔ Business agent
+- Text: "The first B2C-to-B2B agent bridge"
+
+**[0:40-1:20] Live Demo**
+1. Consumer creates shopping agent (show ERC-8004)
+2. Agent discovers services
+3. Autonomous negotiation (show prices changing)
+4. x402 payment (show escrow)
+5. Service fulfilled
+6. Reputation updates
+
+**[1:20-1:50] Impact**
+- Show metrics: "3 txns in 30 sec, $0.002 fees"
+- Show dashboards: consumer savings + business revenue
+- Text: "Real agents. Real value. Real Web3."
+
+**[1:50-2:00] CTA**
+- "Try AgentBridge: [link]"
+- "@Unibase_AI | @BNBCHAIN"
+- "#VibingOnBNB"
+
+---
+
+## 📝 SUBMISSION CHECKLIST
+
+### X Post Requirements:
+```
+✅ Demo video (2-3 min)
+✅ Project description
+✅ Hashtags: #VibingOnBNB #Unibase
+✅ Mentions: @BNBCHAIN @Unibase_AI
+✅ Telegram contact
+✅ Integration explanation
+✅ GitHub link
+```
+
+### GitHub Repository:
+```
+✅ Clean README with badges
+✅ Comprehensive documentation
+✅ Clear deployment instructions
+✅ Working examples
+✅ Test coverage
+✅ CI/CD setup
+✅ License (MIT)
+```
+
+### Google Form Submission:
+```
+✅ Project name
+✅ Team info
+✅ X post link
+✅ GitHub repo link
+✅ Demo video link
+✅ Unibase integration details
+```
+
+---
+
+## 🔐 SECURITY REQUIREMENTS
+
+**Smart Contract Security:**
+- [ ] Reentrancy guards
+- [ ] Access control
+- [ ] Integer overflow protection
+- [ ] Pausable contracts
+- [ ] Upgrade patterns (if needed)
+
+**API Security:**
+- [ ] Rate limiting
+- [ ] Input validation
+- [ ] CORS configuration
+- [ ] Authentication (JWT)
+- [ ] Encryption for sensitive data
+
+**Frontend Security:**
+- [ ] XSS prevention
+- [ ] CSRF protection
+- [ ] Secure wallet connections
+- [ ] Environment variable protection
+
+---
+
+## 🌐 DEPLOYMENT CONFIGURATION
+
+### Environment Variables:
+```bash
+# Blockchain
+BNB_TESTNET_RPC=https://data-seed-prebsc-1-s1.binance.org:8545
+BNB_MAINNET_RPC=https://bsc-dataseed.binance.org/
+PRIVATE_KEY=your_deployer_private_key
+ETHERSCAN_API_KEY=your_bscscan_api_key
+
+# Unibase
+UNIBASE_API_KEY=your_unibase_key
+UNIBASE_AGENT_SDK_URL=
+
+# IPFS
+PINATA_API_KEY=
+PINATA_SECRET_KEY=
+
+# Backend
+PORT=3001
+DATABASE_URL=
+JWT_SECRET=
+
+# Frontend
+NEXT_PUBLIC_CONTRACT_ADDRESS=
+NEXT_PUBLIC_CHAIN_ID=97  # BSC Testnet
+NEXT_PUBLIC_API_URL=http://localhost:3001
+```
+
+### Docker Compose:
+```yaml
+version: '3.8'
+services:
+  backend:
+    build: ./backend
+    ports:
+      - "3001:3001"
+    environment:
+      - NODE_ENV=production
+  
+  frontend:
+    build: ./frontend
+    ports:
+      - "3000:3000"
+    depends_on:
+      - backend
+```
+
+---
+
+## 📚 KEY RESOURCES
+
+**Unibase Documentation:**
+- Docs: https://openos-labs.gitbook.io/unibase-docs/
+- Agent SDK: https://github.com/unibaseio/unibase-agent-sdk
+- AIP SDK: https://github.com/unibaseio/unibase-aip-sdk
+- AIP 2.0 Spec: https://openos-labs.gitbook.io/unibase-docs/~/changes/48/aip-2.0-agent-internet-protocol
+
+**BNB Chain:**
+- Docs: https://docs.bnbchain.org/
+- Testnet Faucet: https://testnet.bnbchain.org/faucet-smart
+- Explorer: https://testnet.bscscan.com/
+
+**Support:**
+- Telegram: https://t.me/unibase_ai/783832
+
+---
+
+## 🎯 SUCCESS METRICS
+
+**Technical Excellence:**
+- 100% of AIP 2.0 features integrated
+- <2 sec page load time
+- >80% test coverage
+- Zero critical security issues
+
+**UX Excellence:**
+- <30 sec agent deployment
+- <5 clicks to complete transaction
+- Mobile-responsive on all screens
+- Clear error messages
+
+**Documentation Excellence:**
+- 100% API coverage
+- 10+ code examples
+- Video demos for all features
+- Community contributors (GitHub stars)
+
+---
+
+## 🏆 WINNING FACTORS
+
+**What Makes This 100% Win:**
+1. ✅ First B2C-to-B2B agent bridge (unique)
+2. ✅ Full AIP 2.0 integration (technical)
+3. ✅ Beautiful UX (consumer + business)
+4. ✅ Production-ready code (quality)
+5. ✅ Comprehensive docs (presentation)
+6. ✅ Live demo (proof)
+7. ✅ Clear vision (innovation)
+8. ✅ Real utility (impact)
+
+---
+
+## 💻 DEVELOPMENT GUIDELINES FOR CLAUDE CODE
+
+**When implementing, you should:**
+
+1. **Follow Senior Developer Standards:**
+   - Write clean, maintainable TypeScript/Solidity
+   - Use design patterns (Factory, Strategy, Observer)
+   - Implement comprehensive error handling
+   - Add detailed code comments
+   - Create reusable components
+
+2. **Apply DevOps Best Practices:**
+   - Containerize everything (Docker)
+   - Set up CI/CD pipelines
+   - Implement monitoring and logging
+   - Use environment-based configs
+   - Automate deployments
+
+3. **Security-First Approach:**
+   - Follow OWASP guidelines
+   - Implement input validation everywhere
+   - Use security linters (Slither for Solidity)
+   - Add rate limiting
+   - Encrypt sensitive data
+
+4. **Performance Optimization:**
+   - Lazy loading for frontend
+   - Database indexing
+   - Caching strategies
+   - Gas optimization for contracts
+   - Bundle size optimization
+
+5. **Testing Strategy:**
+   - Unit tests for all functions
+   - Integration tests for APIs
+   - E2E tests for critical flows
+   - Contract fuzzing tests
+   - Load testing
+
+6. **Documentation:**
+   - JSDoc for all functions
+   - README for each module
+   - API documentation (OpenAPI)
+   - Architecture diagrams
+   - Deployment guides
+
+---
+
+## 🚨 CRITICAL REMINDERS
+
+**Must-Haves for Submission:**
+- [ ] Working demo on testnet/mainnet
+- [ ] 2-3 min demo video
+- [ ] Complete GitHub repository
+- [ ] X post with all requirements
+- [ ] Google Form submission
+- [ ] Shared in Unibase ecosystem
+
+**Must-Avoid:**
+- ❌ Incomplete features
+- ❌ Broken deployment
+- ❌ Poor documentation
+- ❌ Security vulnerabilities
+- ❌ Copied code without attribution
+
+**Must-Highlight:**
+- ✨ Unibase AIP 2.0 integration
+- ✨ B2C-to-B2B uniqueness
+- ✨ Autonomous agent behavior
+- ✨ Production-ready quality
+- ✨ Real-world use cases
+
+---
+
+## 📞 SUPPORT & RESOURCES
+
+**If Issues Arise:**
+1. Check Unibase docs first
+2. Search GitHub issues
+3. Ask in Telegram support group
+4. Reference example implementations
+5. Review AIP 2.0 specification
+
+**Daily Progress Checklist:**
+- [ ] Commit code to GitHub
+- [ ] Post update on X
+- [ ] Test new features
+- [ ] Update documentation
+- [ ] Review security
+
+---
+
+## 🎓 EXPECTED CLAUDE CODE BEHAVIOR
+
+**You (Claude Code) should act as:**
+- 10+ years full-stack developer
+- Web3 security expert
+- 50+ hackathon winner
+- DevOps specialist
+- Senior architect
+
+**Your outputs should be:**
+- Production-ready code
+- Enterprise-level architecture
+- Optimized and secure
+- Well-documented
+- Following best practices
+
+**Your approach should be:**
+- Proactive problem-solving
+- Suggesting improvements
+- Anticipating edge cases
+- Optimizing performance
+- Ensuring scalability
+
+---
+
+## 🎬 LET'S BUILD AND WIN!
+
+This brief contains everything needed to build a winning hackathon project. Follow the priorities, implement with excellence, and we'll dominate the Unibase track!
+
+**Remember:** We're not just building a demo, we're building the foundation of the $30T agent economy. Make it production-ready, make it beautiful, make it win! 🏆

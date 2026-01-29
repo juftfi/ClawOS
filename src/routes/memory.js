@@ -565,4 +565,29 @@ router.get('/stats', asyncHandler(async (req, res) => {
     }
 }));
 
+/**
+ * @route   POST /api/memory/aip/store
+ * @desc    Store verifiable memory via AIP
+ * @access  Public
+ */
+router.post('/aip/store', asyncHandler(async (req, res) => {
+    const { agentId, content, metadata } = req.body;
+    if (!agentId || !content) {
+        return res.status(400).json({ success: false, error: 'Missing agentId or content' });
+    }
+    const result = await membaseService.storeAIP(agentId, content, metadata);
+    res.json({ success: true, data: result });
+}));
+
+/**
+ * @route   GET /api/memory/aip/query/:agentId
+ * @desc    Query verifiable memory via AIP
+ * @access  Public
+ */
+router.get('/aip/query/:agentId', asyncHandler(async (req, res) => {
+    const { agentId } = req.params;
+    const history = await membaseService.queryAIP(agentId);
+    res.json({ success: true, data: history });
+}));
+
 module.exports = router;

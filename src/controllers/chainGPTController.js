@@ -280,6 +280,34 @@ class ChainGPTController {
     });
 
     /**
+     * Handle market narrative request
+     */
+    getMarketNarrative = asyncHandler(async (req, res) => {
+        const { token } = req.body;
+        const result = await llmService.getMarketNarrative(token);
+        res.json({ success: true, data: result, timestamp: new Date().toISOString() });
+    });
+
+    /**
+     * Handle trading assistant request
+     */
+    getTradingAssistant = asyncHandler(async (req, res) => {
+        const { token } = req.body;
+        if (!token) return res.status(400).json({ success: false, error: 'Token is required' });
+        const result = await llmService.getTradingAssistant(token);
+        res.json({ success: true, data: result, timestamp: new Date().toISOString() });
+    });
+
+    /**
+     * Handle web3 news request
+     */
+    getWeb3News = asyncHandler(async (req, res) => {
+        const { query } = req.body;
+        const result = await llmService.getWeb3News(query);
+        res.json({ success: true, data: result, timestamp: new Date().toISOString() });
+    });
+
+    /**
      * Clear LLM cache
      */
     clearCache = asyncHandler(async (req, res) => {

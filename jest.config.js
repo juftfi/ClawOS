@@ -19,6 +19,12 @@ module.exports = {
         '**/__tests__/**/*.test.js',
         '**/?(*.)+(spec|test).js'
     ],
+    moduleNameMapper: {
+        '^uuid$': 'uuid'
+    },
+    transformIgnorePatterns: [
+        '/node_modules/(?!(uuid)/)'
+    ],
     setupFilesAfterEnv: ['<rootDir>/jest.setup.js'],
     testTimeout: 10000,
     verbose: true,

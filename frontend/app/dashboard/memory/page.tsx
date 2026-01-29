@@ -2,199 +2,134 @@
 
 import { useState, useEffect } from 'react';
 import { useAccount } from 'wagmi';
-import { Database, HardDrive, MessageSquare, TrendingUp, ExternalLink, RefreshCw } from 'lucide-react';
+import { Database, ShieldCheck, History, Search, RefreshCw, Cpu, Brain, Lock } from 'lucide-react';
 import axios from 'axios';
-
-interface MemoryStats {
-    totalConversations: number;
-    totalMessages: number;
-    storageUsed: string;
-    lastSync: string;
-    hubUrl: string;
-    isConnected: boolean;
-}
-
-interface Conversation {
-    agentId: string;
-    messageCount: number;
-    lastMessage: string;
-    timestamp: string;
-}
 
 export default function MemoryPage() {
     const { address, isConnected } = useAccount();
-    const [stats, setStats] = useState<MemoryStats | null>(null);
-    const [conversations, setConversations] = useState<Conversation[]>([]);
+    const [memoryItems, setMemoryItems] = useState<any[]>([]);
     const [loading, setLoading] = useState(true);
-    const [refreshing, setRefreshing] = useState(false);
+    const [stats, setStats] = useState({
+        totalRecords: 0,
+        verifiableProofs: 0,
+        storageType: 'Unibase AIP'
+    });
 
-    useEffect(() => {
-        if (isConnected && address) {
-            loadMemoryData();
-        }
-    }, [address, isConnected]);
-
-    const loadMemoryData = async () => {
+    const fetchMemory = async () => {
         try {
+            setLoading(true);
             const API_URL = process.env.NEXT_PUBLIC_API_URL || 'http://localhost:3000';
+            const response = await axios.get(`${API_URL}/api/memory/aip/query/primary-orchestrator`);
 
-            // Load memory stats
-            const statsRes = await axios.get(`${API_URL}/api/memory/stats`);
-            if (statsRes.data.success) {
-                setStats(statsRes.data.data);
+            if (response.data.success) {
+                setMemoryItems(response.data.data);
+                setStats({
+                    totalRecords: response.data.data.length,
+                    verifiableProofs: response.data.data.filter((i: any) => i.metadata?.verifiable).length,
+                    storageType: 'Unibase AIP Protocol'
+                });
             }
-
-            // Load conversation history for this wallet
-            const agentId = `user-${address}`;
-            const convRes = await axios.get(`${API_URL}/api/memory/conversation/${agentId}`);
-            if (convRes.data.success) {
-                const messages = convRes.data.data.messages || [];
-                setConversations([{
-                    agentId,
-                    messageCount: messages.length,
-                    lastMessage: messages[messages.length - 1]?.content || 'No messages yet',
-                    timestamp: messages[messages.length - 1]?.timestamp || new Date().toISOString()
-                }]);
-            }
-        } catch (error) {
-            console.error('Failed to load memory data:', error);
+        } catch (err) {
+            console.error('Failed to fetch memory:', err);
         } finally {
             setLoading(false);
         }
     };
 
-    const handleRefresh = async () => {
-        setRefreshing(true);
-        await loadMemoryData();
-        setRefreshing(false);
-    };
+    useEffect(() => {
+        if (isConnected) fetchMemory();
+    }, [isConnected]);
 
     return (
-        <div className="space-y-6">
+        <div className="max-w-6xl mx-auto space-y-8">
             {/* Header */}
-            <div className="flex items-center justify-between">
+            <div className="flex flex-col md:flex-row md:items-center justify-between gap-4">
                 <div>
-                    <h1 className="text-3xl font-bold text-white mb-2">Decentralized Memory</h1>
-                    <p className="text-slate-400">Powered by Unibase Membase - Persistent, decentralized storage</p>
+                    <h1 className="text-3xl font-bold text-white mb-2">Immortal Memory</h1>
+                    <p className="text-slate-400">Verifiable persistent storage for Agent Orchestrator via Unibase AIP.</p>
                 </div>
-                <button
-                    onClick={handleRefresh}
-                    disabled={refreshing}
-                    className="px-4 py-2 bg-slate-800 hover:bg-slate-700 text-white rounded-lg transition-colors flex items-center gap-2"
-                >
-                    <RefreshCw className={`w-4 h-4 ${refreshing ? 'animate-spin' : ''}`} />
-                    Refresh
-                </button>
-            </div>
-
-            {/* Connection Status */}
-            <div className="bg-slate-900 border border-slate-800 rounded-2xl p-6">
-                <div className="flex items-center gap-3 mb-4">
-                    <div className={`w-10 h-10 rounded-lg ${stats?.isConnected ? 'bg-emerald-600/20' : 'bg-red-600/20'} flex items-center justify-center`}>
-                        <Database className={`w-5 h-5 ${stats?.isConnected ? 'text-emerald-400' : 'text-red-400'}`} />
-                    </div>
-                    <div>
-                        <h2 className="text-xl font-bold text-white">Membase Hub Status</h2>
-                        <p className="text-sm text-slate-400">{stats?.hubUrl || 'https://testnet.hub.membase.io'}</p>
-                    </div>
-                </div>
-                <div className="flex items-center gap-2">
-                    <div className={`w-2 h-2 rounded-full ${stats?.isConnected ? 'bg-emerald-500' : 'bg-red-500'}`}></div>
-                    <span className={`text-sm font-medium ${stats?.isConnected ? 'text-emerald-400' : 'text-red-400'}`}>
-                        {stats?.isConnected ? 'Connected' : 'Disconnected'}
-                    </span>
-                    {stats?.lastSync && (
-                        <span className="text-sm text-slate-500 ml-2">
-                            Last sync: {new Date(stats.lastSync).toLocaleString()}
-                        </span>
-                    )}
+                <div className="flex items-center gap-3 px-4 py-2 bg-emerald-500/10 border border-emerald-500/20 rounded-xl">
+                    <ShieldCheck className="w-5 h-5 text-emerald-400" />
+                    <span className="text-sm font-medium text-emerald-300">zk-SNARK Verifiable</span>
                 </div>
             </div>
 
-            {/* Storage Stats */}
+            {/* Stats Grid */}
             <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
-                <div className="bg-slate-900 border border-slate-800 rounded-2xl p-6">
-                    <div className="flex items-center gap-3 mb-2">
-                        <MessageSquare className="w-5 h-5 text-purple-400" />
-                        <span className="text-slate-400">Total Messages</span>
+                {[
+                    { label: 'Total Memory Logs', value: stats.totalRecords, icon: Database, color: 'blue' },
+                    { label: 'Verifiable Proofs', value: stats.verifiableProofs, icon: Lock, color: 'emerald' },
+                    { label: 'Protocol Standard', value: stats.storageType, icon: Cpu, color: 'purple' }
+                ].map((stat, i) => (
+                    <div key={i} className="bg-slate-900 border border-slate-800 rounded-2xl p-6">
+                        <div className="flex items-center gap-4">
+                            <div className={`w-12 h-12 rounded-xl bg-${stat.color}-500/10 flex items-center justify-center`}>
+                                <stat.icon className={`w-6 h-6 text-${stat.color}-400`} />
+                            </div>
+                            <div>
+                                <p className="text-xs text-slate-500 uppercase tracking-wider font-bold">{stat.label}</p>
+                                <p className="text-2xl font-bold text-white">{stat.value}</p>
+                            </div>
+                        </div>
                     </div>
-                    <p className="text-3xl font-bold text-white">{stats?.totalMessages || 0}</p>
-                </div>
-                <div className="bg-slate-900 border border-slate-800 rounded-2xl p-6">
-                    <div className="flex items-center gap-3 mb-2">
-                        <TrendingUp className="w-5 h-5 text-blue-400" />
-                        <span className="text-slate-400">Conversations</span>
-                    </div>
-                    <p className="text-3xl font-bold text-white">{stats?.totalConversations || 0}</p>
-                </div>
-                <div className="bg-slate-900 border border-slate-800 rounded-2xl p-6">
-                    <div className="flex items-center gap-3 mb-2">
-                        <HardDrive className="w-5 h-5 text-emerald-400" />
-                        <span className="text-slate-400">Storage Used</span>
-                    </div>
-                    <p className="text-3xl font-bold text-white">{stats?.storageUsed || '0 KB'}</p>
-                </div>
+                ))}
             </div>
 
-            {/* Conversation History */}
-            <div className="bg-slate-900 border border-slate-800 rounded-2xl p-6">
-                <h2 className="text-xl font-bold text-white mb-4">Your Conversations</h2>
-                <div className="space-y-3">
-                    {conversations.length === 0 ? (
-                        <p className="text-center text-slate-500 py-8">No conversations found</p>
-                    ) : (
-                        conversations.map((conv, i) => (
-                            <div key={i} className="p-4 bg-slate-800/50 rounded-lg">
-                                <div className="flex items-start justify-between mb-2">
-                                    <div>
-                                        <div className="text-white font-medium font-mono text-sm">{conv.agentId}</div>
-                                        <div className="text-xs text-slate-400 mt-1">
-                                            {conv.messageCount} messages
+            {/* Memory List */}
+            <div className="bg-slate-900 border border-slate-800 rounded-2xl overflow-hidden">
+                <div className="px-6 py-4 border-b border-slate-800 flex items-center justify-between">
+                    <h3 className="font-bold text-white flex items-center gap-2">
+                        <History className="w-4 h-4 text-slate-400" />
+                        AIP Memory Logs
+                    </h3>
+                    <button
+                        onClick={fetchMemory}
+                        className="p-2 hover:bg-slate-800 rounded-lg transition-colors text-slate-400"
+                    >
+                        <RefreshCw className={`w-4 h-4 ${loading ? 'animate-spin' : ''}`} />
+                    </button>
+                </div>
+
+                {loading ? (
+                    <div className="p-12 text-center text-slate-500 flex flex-col items-center gap-4">
+                        <Loader2 className="w-8 h-8 animate-spin" />
+                        <p>Accessing Unibase Hub...</p>
+                    </div>
+                ) : memoryItems.length > 0 ? (
+                    <div className="divide-y divide-slate-800">
+                        {memoryItems.map((item, i) => (
+                            <div key={i} className="p-6 hover:bg-slate-800/30 transition-colors">
+                                <div className="flex items-start justify-between gap-4">
+                                    <div className="space-y-2 flex-1">
+                                        <div className="flex items-center gap-2">
+                                            <Brain className="w-4 h-4 text-purple-400" />
+                                            <span className="text-xs font-mono text-slate-500 uppercase">{item.id}</span>
+                                        </div>
+                                        <p className="text-slate-300 text-sm leading-relaxed">
+                                            {item.content}
+                                        </p>
+                                        <div className="flex items-center gap-4 pt-2">
+                                            <span className="text-[10px] text-slate-500 font-mono">
+                                                TIMESTAMP: {new Date(item.timestamp).toLocaleString()}
+                                            </span>
+                                            {item.metadata?.verifiable && (
+                                                <span className="flex items-center gap-1 text-[10px] text-emerald-400 font-bold bg-emerald-500/10 px-2 py-0.5 rounded border border-emerald-500/20">
+                                                    <ShieldCheck className="w-3 h-3" />
+                                                    ZK-PROOF VERIFIED
+                                                </span>
+                                            )}
                                         </div>
                                     </div>
-                                    <span className="text-xs text-slate-500">
-                                        {new Date(conv.timestamp).toLocaleDateString()}
-                                    </span>
+                                    <Search className="w-5 h-5 text-slate-600 cursor-help" title="Inspect IPFS Content" />
                                 </div>
-                                <p className="text-sm text-slate-300 line-clamp-2">{conv.lastMessage}</p>
                             </div>
-                        ))
-                    )}
-                </div>
-            </div>
-
-            {/* Decentralized Storage Info */}
-            <div className="bg-slate-900 border border-slate-800 rounded-2xl p-6">
-                <h2 className="text-xl font-bold text-white mb-4">Decentralized Storage Proof</h2>
-                <div className="space-y-3">
-                    <div className="flex items-start gap-3 p-3 bg-purple-500/10 border border-purple-500/20 rounded-lg">
-                        <Database className="w-5 h-5 text-purple-400 flex-shrink-0 mt-0.5" />
-                        <div className="text-sm text-purple-300">
-                            <strong>Persistent Storage:</strong> All conversations are stored on Membase Hub, ensuring data persistence across sessions
-                        </div>
+                        ))}
                     </div>
-                    <div className="flex items-start gap-3 p-3 bg-blue-500/10 border border-blue-500/20 rounded-lg">
-                        <Database className="w-5 h-5 text-blue-400 flex-shrink-0 mt-0.5" />
-                        <div className="text-sm text-blue-300">
-                            <strong>Cross-Agent Memory:</strong> Agents can share context and learnings through the decentralized memory layer
-                        </div>
+                ) : (
+                    <div className="p-12 text-center text-slate-500">
+                        <p>No verifiable memory logs found for this agent.</p>
                     </div>
-                    <div className="flex items-start gap-3 p-3 bg-emerald-500/10 border border-emerald-500/20 rounded-lg">
-                        <Database className="w-5 h-5 text-emerald-400 flex-shrink-0 mt-0.5" />
-                        <div className="text-sm text-emerald-300">
-                            <strong>Wallet-Based Identity:</strong> Your conversations are tied to your wallet address for secure, portable identity
-                        </div>
-                    </div>
-                </div>
-                <a
-                    href="https://testnet.hub.membase.io"
-                    target="_blank"
-                    rel="noreferrer"
-                    className="mt-4 inline-flex items-center gap-2 text-purple-400 hover:text-purple-300 text-sm"
-                >
-                    View on Membase Hub
-                    <ExternalLink className="w-4 h-4" />
-                </a>
+                )}
             </div>
         </div>
     );

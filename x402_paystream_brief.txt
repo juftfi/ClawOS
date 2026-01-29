@@ -1,0 +1,1758 @@
+# 🏆 PayStream - X402 AI Native Payments Platform
+
+## Complete Development Brief for Claude Code - AEON Track
+
+---
+
+## 📋 PROJECT OVERVIEW
+
+**Project Name:** PayStream  
+**Track:** AEON X402 / AI Track - Building AI-Native Payments & Agents  
+**Hackathon:** BNB Good Vibes Only Hackathon  
+**Submission Deadline:** January 29, 2026  
+**Prize:** $2,000 per winning project
+
+**Tagline:** *"AI agents that earn, spend, and subscribe - autonomously"*
+
+---
+
+## 🎯 CORE CONCEPT - THE WINNING ANGLE
+
+### Problem Statement
+
+Current x402 implementations focus on ONE-TIME PAYMENTS for API calls. But real businesses need:
+- **Recurring subscriptions** (Netflix model for AI services)
+- **Pay-per-use metering** (AWS model for AI compute)
+- **Revenue sharing** (Marketplace splits between agent creators and platform)
+- **Automated invoicing** (B2B compliance requirements)
+
+### Solution: PayStream
+
+The **first x402-native subscription and metering platform** that enables:
+
+**B2C Side (Consumer Agents):**
+- AI agents that autonomously subscribe to services
+- Automatic payment streaming (pay-per-second usage)
+- Budget management and spending alerts
+- Usage analytics and cost optimization
+
+**B2B Side (Service Providers):**
+- Create subscription tiers for AI agents
+- Real-time revenue streaming
+- Automated invoicing with x402 receipts
+- Revenue analytics dashboard
+- Compliance-ready transaction logs
+
+**Why This Wins:**
+1. ✅ **First subscription model for x402** - Novel use case
+2. ✅ **B2C + B2B dual market** - Addresses both sides
+3. ✅ **Real revenue streams** - Not just one-time payments
+4. ✅ **Enterprise-ready** - Compliance and invoicing built-in
+5. ✅ **Full AEON x402 integration** - Shows deep technical expertise
+
+---
+
+## 🏗️ TECHNICAL ARCHITECTURE
+
+### Tech Stack
+
+**Blockchain Layer:**
+- BNB Chain (BSC) - Primary network
+- X Layer (196) - Secondary network support
+- AEON x402 SDK V2 - Payment protocol
+- Solidity ^0.8.20 - Smart contracts
+- Hardhat - Development framework
+
+**Backend:**
+- Node.js 20+ with TypeScript
+- Express.js / Hono - API framework
+- AEON x402 Server SDK (`@x402/hono`)
+- AEON Facilitator Client (`@x402/core/server`)
+- PostgreSQL - Transaction indexing
+- Redis - Caching and rate limiting
+- Bull Queue - Payment processing
+
+**Frontend:**
+- Next.js 14 (App Router)
+- React 18 with TypeScript
+- Tailwind CSS + shadcn/ui
+- wagmi + viem - Wallet integration
+- RainbowKit - Wallet UI
+- Recharts - Analytics visualization
+
+**AI Integration:**
+- OpenAI API - AI agent examples
+- Anthropic Claude API - Alternative AI backend
+- LangChain - Agent orchestration
+
+---
+
+## 📦 PROJECT STRUCTURE
+
+```
+paystream/
+├── contracts/                      # Smart contracts
+│   ├── src/
+│   │   ├── PayStreamRegistry.sol           # Service registration
+│   │   ├── SubscriptionManager.sol         # Subscription logic
+│   │   ├── PaymentStream.sol               # Streaming payments
+│   │   ├── MeteringEngine.sol              # Usage tracking
+│   │   ├── RevenueShare.sol                # Split payments
+│   │   └── InvoiceGenerator.sol            # Automated invoices
+│   ├── test/
+│   ├── scripts/
+│   └── hardhat.config.ts
+│
+├── x402-server/                    # Payment server
+│   ├── src/
+│   │   ├── middleware/
+│   │   │   ├── x402Payment.ts              # AEON x402 middleware
+│   │   │   ├── subscription.ts             # Subscription validation
+│   │   │   └── metering.ts                 # Usage tracking
+│   │   ├── routes/
+│   │   │   ├── subscriptions.ts            # Subscription endpoints
+│   │   │   ├── payments.ts                 # Payment endpoints
+│   │   │   ├── invoices.ts                 # Invoice endpoints
+│   │   │   └── analytics.ts                # Analytics endpoints
+│   │   ├── services/
+│   │   │   ├── facilitator.ts              # AEON facilitator client
+│   │   │   ├── streaming.ts                # Payment streaming
+│   │   │   ├── metering.ts                 # Usage metering
+│   │   │   └── revenue.ts                  # Revenue calculations
+│   │   ├── config/
+│   │   │   ├── chains.ts                   # Supported chains
+│   │   │   └── tokens.ts                   # Supported tokens
+│   │   └── server.ts
+│   ├── Dockerfile
+│   └── package.json
+│
+├── x402-client/                    # Client SDK
+│   ├── src/
+│   │   ├── agents/
+│   │   │   ├── SubscriptionAgent.ts        # Subscription management
+│   │   │   ├── BudgetAgent.ts              # Budget monitoring
+│   │   │   └── OptimizationAgent.ts        # Cost optimization
+│   │   ├── core/
+│   │   │   ├── x402Client.ts               # AEON x402 client
+│   │   │   ├── streaming.ts                # Streaming logic
+│   │   │   └── wallet.ts                   # Wallet management
+│   │   └── utils/
+│   └── package.json
+│
+├── backend-api/                    # Main API server
+│   ├── src/
+│   │   ├── api/
+│   │   │   ├── routes/
+│   │   │   │   ├── agents.ts               # AI agent endpoints
+│   │   │   │   ├── services.ts             # Service provider endpoints
+│   │   │   │   ├── subscriptions.ts        # Subscription management
+│   │   │   │   ├── payments.ts             # Payment history
+│   │   │   │   ├── analytics.ts            # Analytics endpoints
+│   │   │   │   └── invoices.ts             # Invoice generation
+│   │   │   └── middleware/
+│   │   ├── services/
+│   │   │   ├── blockchain.ts               # Contract interactions
+│   │   │   ├── ai.ts                       # AI integration
+│   │   │   ├── metering.ts                 # Usage tracking
+│   │   │   ├── invoicing.ts                # Invoice generation
+│   │   │   └── analytics.ts                # Analytics processing
+│   │   ├── workers/
+│   │   │   ├── paymentProcessor.ts         # Process payments
+│   │   │   ├── subscriptionMonitor.ts      # Monitor subscriptions
+│   │   │   └── invoiceGenerator.ts         # Generate invoices
+│   │   └── server.ts
+│   └── package.json
+│
+├── frontend/                       # Next.js app
+│   ├── app/
+│   │   ├── (consumer)/
+│   │   │   ├── dashboard/                  # Consumer dashboard
+│   │   │   ├── subscriptions/              # Manage subscriptions
+│   │   │   ├── agents/                     # AI agent management
+│   │   │   ├── budget/                     # Budget monitoring
+│   │   │   └── analytics/                  # Usage analytics
+│   │   ├── (provider)/
+│   │   │   ├── dashboard/                  # Provider dashboard
+│   │   │   ├── services/                   # Service management
+│   │   │   ├── pricing/                    # Pricing tiers
+│   │   │   ├── revenue/                    # Revenue analytics
+│   │   │   └── invoices/                   # Invoice management
+│   │   ├── (marketplace)/
+│   │   │   ├── browse/                     # Browse services
+│   │   │   ├── search/                     # Search services
+│   │   │   └── categories/                 # Service categories
+│   │   ├── api/
+│   │   └── layout.tsx
+│   ├── components/
+│   │   ├── ui/                             # shadcn components
+│   │   ├── consumer/
+│   │   │   ├── SubscriptionCard.tsx
+│   │   │   ├── BudgetMonitor.tsx
+│   │   │   ├── AgentCreator.tsx
+│   │   │   └── UsageChart.tsx
+│   │   ├── provider/
+│   │   │   ├── ServiceEditor.tsx
+│   │   │   ├── PricingTiers.tsx
+│   │   │   ├── RevenueChart.tsx
+│   │   │   └── InvoiceTable.tsx
+│   │   └── shared/
+│   │       ├── PaymentStatus.tsx
+│   │       ├── WalletConnect.tsx
+│   │       └── NetworkSelector.tsx
+│   ├── lib/
+│   │   ├── contracts/                      # Contract ABIs
+│   │   ├── hooks/
+│   │   │   ├── useSubscription.ts
+│   │   │   ├── usePayment.ts
+│   │   │   ├── useMetering.ts
+│   │   │   └── useInvoice.ts
+│   │   └── utils/
+│   └── package.json
+│
+├── ai-agents/                      # Example AI agents
+│   ├── shopping-agent/
+│   │   ├── index.ts                        # Shopping AI
+│   │   └── config.json
+│   ├── research-agent/
+│   │   ├── index.ts                        # Research AI
+│   │   └── config.json
+│   └── assistant-agent/
+│       ├── index.ts                        # General assistant
+│       └── config.json
+│
+├── docs/                           # Documentation
+│   ├── README.md
+│   ├── QUICKSTART.md
+│   ├── ARCHITECTURE.md
+│   ├── X402_INTEGRATION.md
+│   ├── API_REFERENCE.md
+│   ├── SMART_CONTRACTS.md
+│   ├── DEPLOYMENT.md
+│   └── tutorials/
+│       ├── creating-subscription-service.md
+│       ├── deploying-ai-agent.md
+│       ├── setting-up-payment-streaming.md
+│       └── generating-invoices.md
+│
+├── scripts/
+│   ├── deploy-contracts.sh
+│   ├── setup-facilitator.sh
+│   └── test-e2e.sh
+│
+├── docker-compose.yml
+└── .env.example
+```
+
+---
+
+## 🔧 CORE FEATURES TO IMPLEMENT
+
+### 1. Smart Contracts
+
+**SubscriptionManager.sol**
+```solidity
+// Features:
+- Create subscription tiers (Basic, Pro, Enterprise)
+- Subscribe/unsubscribe agents
+- Track subscription status (active, paused, expired)
+- Handle grace periods
+- Automatic renewal logic
+- Upgrade/downgrade tiers
+```
+
+**PaymentStream.sol**
+```solidity
+// Features:
+- Continuous payment streaming (pay-per-second)
+- Start/stop/pause streams
+- Withdraw accumulated funds
+- Calculate pro-rata amounts
+- Handle stream cancellation refunds
+- Multi-token support (USDT, USDC)
+```
+
+**MeteringEngine.sol**
+```solidity
+// Features:
+- Track API call count
+- Record compute usage (tokens, seconds)
+- Calculate overage charges
+- Tier-based rate limits
+- Usage quotas per subscription
+- Real-time usage reporting
+```
+
+**RevenueShare.sol**
+```solidity
+// Features:
+- Split payments (platform fee, creator share)
+- Configurable split percentages
+- Automatic distribution
+- Withdrawal functions
+- Revenue tracking per party
+```
+
+**InvoiceGenerator.sol**
+```solidity
+// Features:
+- Generate invoice metadata
+- Store invoice hashes on-chain
+- Link to x402 transaction receipts
+- Invoice status tracking
+- Payment reconciliation
+```
+
+### 2. X402 Server Implementation
+
+**Payment Middleware:**
+```typescript
+import { paymentMiddleware, x402ResourceServer } from "@x402/hono";
+import { ExactEvmScheme } from "@x402/evm/exact/server";
+import { HTTPFacilitatorClient } from "@x402/core/server";
+
+// Initialize facilitator client
+const facilitatorClient = new HTTPFacilitatorClient({
+  url: process.env.AEON_FACILITATOR_URL,
+  createAuthHeaders: async () => ({
+    verify: { Authorization: `Bearer ${process.env.AEON_API_KEY}` },
+    settle: { Authorization: `Bearer ${process.env.AEON_API_KEY}` },
+    supported: { Authorization: `Bearer ${process.env.AEON_API_KEY}` }
+  })
+});
+
+// Configure payment routes
+const routeConfig = {
+  "GET /api/research": {
+    accepts: [
+      {
+        scheme: "exact",
+        price: "$0.01", // 1 cent per query
+        network: "eip155:56", // BSC
+        payTo: SERVICE_PROVIDER_ADDRESS,
+        description: "Research API access",
+        mimeType: "application/json"
+      }
+    ]
+  },
+  "POST /api/generate": {
+    accepts: [
+      {
+        scheme: "exact",
+        price: "$0.05", // 5 cents per generation
+        network: "eip155:56",
+        payTo: SERVICE_PROVIDER_ADDRESS,
+        description: "AI generation service",
+        mimeType: "application/json"
+      }
+    ]
+  }
+};
+
+// Apply middleware
+app.use(
+  paymentMiddleware(
+    routeConfig,
+    new x402ResourceServer(facilitatorClient)
+      .register("eip155:56", new ExactEvmScheme())
+      .register("eip155:196", new ExactEvmScheme())
+      .register("eip155:8453", new ExactEvmScheme())
+  )
+);
+```
+
+**Subscription Validation Middleware:**
+```typescript
+async function subscriptionMiddleware(c: Context, next: Next) {
+  const agentAddress = c.req.header("X-Agent-Address");
+  
+  // Check if agent has active subscription
+  const subscription = await getActiveSubscription(agentAddress);
+  
+  if (!subscription) {
+    return c.json({ error: "Active subscription required" }, 403);
+  }
+  
+  // Check usage limits
+  const usage = await getCurrentUsage(agentAddress);
+  if (usage >= subscription.limit) {
+    return c.json({ error: "Usage limit exceeded" }, 429);
+  }
+  
+  // Track usage
+  await incrementUsage(agentAddress);
+  
+  await next();
+}
+```
+
+**Metering Middleware:**
+```typescript
+async function meteringMiddleware(c: Context, next: Next) {
+  const startTime = Date.now();
+  
+  await next();
+  
+  const endTime = Date.now();
+  const duration = endTime - startTime;
+  
+  // Record usage metrics
+  await recordMetrics({
+    agentAddress: c.req.header("X-Agent-Address"),
+    endpoint: c.req.path,
+    duration,
+    timestamp: startTime,
+    status: c.res.status
+  });
+}
+```
+
+### 3. X402 Client SDK
+
+**SubscriptionAgent.ts**
+```typescript
+import { x402Client, wrapFetchWithPayment } from "@x402/fetch";
+import { registerExactEvmScheme } from "@x402/evm/exact/client";
+
+class SubscriptionAgent {
+  private client: x402Client;
+  private walletAddress: string;
+  
+  async subscribe(serviceId: string, tier: string) {
+    // Create subscription on-chain
+    const tx = await this.subscriptionContract.subscribe(serviceId, tier);
+    await tx.wait();
+    
+    // Start payment stream
+    await this.startPaymentStream(serviceId, tier);
+  }
+  
+  async makePayableRequest(url: string, options: RequestInit) {
+    const fetchWithPayment = wrapFetchWithPayment(fetch, this.client);
+    return await fetchWithPayment(url, options);
+  }
+  
+  async getUsageStats() {
+    return await this.meteringContract.getUsage(this.walletAddress);
+  }
+  
+  async cancelSubscription(serviceId: string) {
+    // Stop payment stream
+    await this.stopPaymentStream(serviceId);
+    
+    // Cancel subscription on-chain
+    const tx = await this.subscriptionContract.cancel(serviceId);
+    await tx.wait();
+  }
+}
+```
+
+**BudgetAgent.ts**
+```typescript
+class BudgetAgent {
+  async setBudget(monthlyLimit: bigint) {
+    await this.budgetContract.setMonthlyLimit(monthlyLimit);
+  }
+  
+  async checkBudget(): Promise<BudgetStatus> {
+    const usage = await this.getCurrentSpending();
+    const limit = await this.getMonthlyLimit();
+    
+    return {
+      used: usage,
+      limit,
+      remaining: limit - usage,
+      percentageUsed: (usage * 100n) / limit
+    };
+  }
+  
+  async enableAlerts(thresholds: number[]) {
+    // Set up spending alerts at 50%, 80%, 95%
+    await this.budgetContract.setAlerts(thresholds);
+  }
+}
+```
+
+### 4. Backend API Endpoints
+
+**Subscription Management:**
+```typescript
+// POST /api/subscriptions/create
+async createSubscription(req, res) {
+  const { serviceId, tier, agentAddress } = req.body;
+  
+  // Create subscription in DB
+  const subscription = await db.subscriptions.create({
+    serviceId,
+    tier,
+    agentAddress,
+    status: 'pending',
+    startDate: new Date(),
+    nextBilling: calculateNextBilling(tier)
+  });
+  
+  // Initialize payment stream
+  await initializePaymentStream(subscription);
+  
+  res.json({ subscription });
+}
+
+// GET /api/subscriptions/:agentAddress
+async getSubscriptions(req, res) {
+  const { agentAddress } = req.params;
+  
+  const subscriptions = await db.subscriptions.findMany({
+    where: { agentAddress },
+    include: { service: true }
+  });
+  
+  res.json({ subscriptions });
+}
+
+// POST /api/subscriptions/:id/cancel
+async cancelSubscription(req, res) {
+  const { id } = req.params;
+  
+  await stopPaymentStream(id);
+  await db.subscriptions.update({
+    where: { id },
+    data: { status: 'cancelled', endDate: new Date() }
+  });
+  
+  res.json({ success: true });
+}
+```
+
+**Payment Processing:**
+```typescript
+// GET /api/payments/history
+async getPaymentHistory(req, res) {
+  const { agentAddress } = req.query;
+  
+  const payments = await db.payments.findMany({
+    where: { payer: agentAddress },
+    orderBy: { timestamp: 'desc' }
+  });
+  
+  res.json({ payments });
+}
+
+// POST /api/payments/withdraw
+async withdrawRevenue(req, res) {
+  const { serviceId } = req.body;
+  
+  // Calculate withdrawable amount
+  const amount = await calculateRevenue(serviceId);
+  
+  // Execute withdrawal
+  const tx = await revenueContract.withdraw(serviceId, amount);
+  
+  res.json({ transaction: tx.hash, amount });
+}
+```
+
+**Invoice Generation:**
+```typescript
+// GET /api/invoices/:agentAddress
+async getInvoices(req, res) {
+  const { agentAddress } = req.params;
+  
+  const invoices = await db.invoices.findMany({
+    where: { agentAddress },
+    include: { payments: true }
+  });
+  
+  res.json({ invoices });
+}
+
+// POST /api/invoices/generate
+async generateInvoice(req, res) {
+  const { subscriptionId, month, year } = req.body;
+  
+  // Collect all payments for the period
+  const payments = await getPaymentsForPeriod(subscriptionId, month, year);
+  
+  // Generate invoice metadata
+  const invoice = await createInvoice({
+    subscriptionId,
+    period: { month, year },
+    payments,
+    total: calculateTotal(payments)
+  });
+  
+  // Store invoice hash on-chain
+  await invoiceContract.recordInvoice(invoice.id, invoice.hash);
+  
+  res.json({ invoice });
+}
+```
+
+**Analytics:**
+```typescript
+// GET /api/analytics/usage
+async getUsageAnalytics(req, res) {
+  const { agentAddress, period } = req.query;
+  
+  const metrics = await db.metrics.aggregate({
+    where: {
+      agentAddress,
+      timestamp: { gte: period.start, lte: period.end }
+    },
+    _sum: { calls: true, duration: true, cost: true }
+  });
+  
+  res.json({ metrics });
+}
+
+// GET /api/analytics/revenue
+async getRevenueAnalytics(req, res) {
+  const { serviceId, period } = req.query;
+  
+  const revenue = await db.payments.aggregate({
+    where: {
+      serviceId,
+      timestamp: { gte: period.start, lte: period.end }
+    },
+    _sum: { amount: true }
+  });
+  
+  res.json({ revenue });
+}
+```
+
+### 5. Frontend Components
+
+**Consumer Dashboard:**
+```typescript
+// components/consumer/SubscriptionCard.tsx
+function SubscriptionCard({ subscription }) {
+  const { service, tier, status, usage, limit } = subscription;
+  
+  return (
+    <Card>
+      <CardHeader>
+        <CardTitle>{service.name}</CardTitle>
+        <Badge>{tier}</Badge>
+      </CardHeader>
+      <CardContent>
+        <UsageProgress current={usage} max={limit} />
+        <div className="flex justify-between mt-4">
+          <span>Next billing: {subscription.nextBilling}</span>
+          <span>${subscription.monthlyPrice}</span>
+        </div>
+      </CardContent>
+      <CardFooter>
+        <Button onClick={() => cancelSubscription(subscription.id)}>
+          Cancel
+        </Button>
+      </CardFooter>
+    </Card>
+  );
+}
+
+// components/consumer/BudgetMonitor.tsx
+function BudgetMonitor({ agentAddress }) {
+  const { data: budget } = useBudget(agentAddress);
+  
+  return (
+    <Card>
+      <CardHeader>
+        <CardTitle>Monthly Budget</CardTitle>
+      </CardHeader>
+      <CardContent>
+        <Progress value={budget.percentageUsed} />
+        <div className="mt-2">
+          <span>Used: ${budget.used}</span>
+          <span>Remaining: ${budget.remaining}</span>
+        </div>
+      </CardContent>
+    </Card>
+  );
+}
+
+// components/consumer/AgentCreator.tsx
+function AgentCreator() {
+  const [config, setConfig] = useState({});
+  
+  async function deployAgent() {
+    const agent = new SubscriptionAgent(config);
+    await agent.initialize();
+    // Show success message
+  }
+  
+  return (
+    <Dialog>
+      <DialogContent>
+        <DialogHeader>
+          <DialogTitle>Create AI Agent</DialogTitle>
+        </DialogHeader>
+        <Form onSubmit={deployAgent}>
+          <Input name="name" placeholder="Agent name" />
+          <Select name="type">
+            <option>Shopping Agent</option>
+            <option>Research Agent</option>
+            <option>Assistant Agent</option>
+          </Select>
+          <Input name="budget" type="number" placeholder="Monthly budget" />
+          <Button type="submit">Deploy Agent</Button>
+        </Form>
+      </DialogContent>
+    </Dialog>
+  );
+}
+```
+
+**Provider Dashboard:**
+```typescript
+// components/provider/ServiceEditor.tsx
+function ServiceEditor() {
+  const [service, setService] = useState({});
+  
+  async function publishService() {
+    await createService(service);
+    // Show success
+  }
+  
+  return (
+    <Card>
+      <CardHeader>
+        <CardTitle>Create Service</CardTitle>
+      </CardHeader>
+      <CardContent>
+        <Input name="name" placeholder="Service name" />
+        <Textarea name="description" placeholder="Description" />
+        <PricingTiers onChange={tiers => setService({...service, tiers})} />
+        <NetworkSelector onChange={network => setService({...service, network})} />
+      </CardContent>
+      <CardFooter>
+        <Button onClick={publishService}>Publish Service</Button>
+      </CardFooter>
+    </Card>
+  );
+}
+
+// components/provider/RevenueChart.tsx
+function RevenueChart({ serviceId }) {
+  const { data: revenue } = useRevenue(serviceId);
+  
+  return (
+    <Card>
+      <CardHeader>
+        <CardTitle>Revenue Analytics</CardTitle>
+      </CardHeader>
+      <CardContent>
+        <LineChart data={revenue}>
+          <XAxis dataKey="date" />
+          <YAxis />
+          <Line dataKey="amount" stroke="#8884d8" />
+        </LineChart>
+      </CardContent>
+    </Card>
+  );
+}
+```
+
+---
+
+## 📊 JUDGING CRITERIA ALIGNMENT
+
+### Innovation (30 points):
+
+**Novel Features:**
+- ✅ **First subscription model for x402** - No one has built recurring payments
+- ✅ **Payment streaming** - Pay-per-second instead of one-time
+- ✅ **Automated invoicing** - B2B compliance built-in
+- ✅ **Revenue sharing** - Marketplace economics
+- ✅ **AI budget management** - Agents that manage their own spending
+
+**Documentation to Highlight:**
+- Comparison with one-time x402 payments
+- How streaming works technically
+- Revenue sharing model explanation
+- Future roadmap (cross-chain subscriptions)
+
+### Technical Complexity (30 points):
+
+**Must-Have Features:**
+- ✅ Full AEON x402 SDK integration (server + client)
+- ✅ Multiple payment schemes (one-time + streaming)
+- ✅ Smart contract system (5+ contracts)
+- ✅ Real-time metering and analytics
+- ✅ Multi-network support (BSC, X Layer, Base)
+- ✅ Worker queues for background processing
+- ✅ WebSocket for real-time updates
+- ✅ Production-grade error handling
+
+**Code Quality:**
+- TypeScript strict mode
+- 80%+ test coverage
+- Automated testing (unit + integration + E2E)
+- Security audits (Slither for contracts)
+- Performance optimization (caching, indexing)
+
+### User Experience (20 points):
+
+**Consumer UX:**
+- ✅ One-click agent deployment
+- ✅ Visual subscription management
+- ✅ Real-time usage dashboard
+- ✅ Spending alerts and notifications
+- ✅ Mobile-responsive design
+
+**Provider UX:**
+- ✅ No-code service creation
+- ✅ Flexible pricing tiers
+- ✅ Real-time revenue dashboard
+- ✅ Automated invoicing
+- ✅ Analytics and insights
+
+**Developer UX:**
+- ✅ Simple SDK integration (< 10 lines)
+- ✅ Comprehensive examples
+- ✅ Interactive playground
+- ✅ Postman collection
+
+### Documentation (20 points):
+
+**Required Docs:**
+- ✅ README with 2-3 min video
+- ✅ QUICKSTART (5-min deployment)
+- ✅ ARCHITECTURE with diagrams
+- ✅ X402_INTEGRATION (AEON-specific details)
+- ✅ API_REFERENCE (OpenAPI spec)
+- ✅ SMART_CONTRACTS (Natspec docs)
+- ✅ 4+ tutorials
+- ✅ Troubleshooting guide
+
+---
+
+## 🚀 8-DAY IMPLEMENTATION PLAN
+
+### **Day 1-2 (Jan 22-23): Foundation**
+
+**Smart Contracts (Priority 1):**
+```bash
+Tasks:
+1. Set up Hardhat project
+2. Implement SubscriptionManager.sol
+3. Implement PaymentStream.sol
+4. Implement MeteringEngine.sol
+5. Write unit tests (>80% coverage)
+6. Deploy to BSC testnet
+7. Verify contracts on BscScan
+```
+
+**Documentation (Priority 2):**
+```bash
+Tasks:
+1. Create README with project overview
+2. Write ARCHITECTURE.md
+3. Post concept on X with mockups
+4. Join AEON Telegram
+5. Gather community feedback
+```
+
+### **Day 3-4 (Jan 24-25): X402 Integration**
+
+**X402 Server (Priority 1):**
+```bash
+Tasks:
+1. Install AEON x402 SDK packages
+2. Set up facilitator client
+3. Implement payment middleware
+4. Implement subscription middleware
+5. Implement metering middleware
+6. Configure route protection
+7. Test payment flows
+```
+
+**X402 Client (Priority 2):**
+```bash
+Tasks:
+1. Install AEON x402 client packages
+2. Implement SubscriptionAgent class
+3. Implement BudgetAgent class
+4. Create wallet integration
+5. Build payment wrapper
+6. Test end-to-end flows
+```
+
+### **Day 5-6 (Jan 26-27): Frontend + Backend**
+
+**Frontend (Priority 1):**
+```bash
+Tasks:
+1. Set up Next.js project
+2. Integrate wagmi + RainbowKit
+3. Build consumer dashboard
+4. Build provider dashboard
+5. Create subscription components
+6. Implement real-time updates
+7. Mobile responsiveness
+```
+
+**Backend API (Priority 2):**
+```bash
+Tasks:
+1. Set up Express/Hono server
+2. Implement subscription endpoints
+3. Implement payment endpoints
+4. Implement analytics endpoints
+5. Set up worker queues
+6. Configure PostgreSQL
+7. Set up Redis caching
+```
+
+### **Day 7 (Jan 28): Testing + Polish**
+
+```bash
+Tasks:
+1. End-to-end testing
+2. Security review (Slither)
+3. Performance testing
+4. Gas optimization
+5. Bug fixes
+6. UI/UX polish
+7. Demo scenario setup
+```
+
+### **Day 8 (Jan 29): Launch**
+
+```bash
+Tasks:
+1. Record demo video (2-3 min)
+2. Finalize documentation
+3. Deploy to BSC mainnet
+4. Deploy frontend (Vercel)
+5. Create submission X post
+6. Submit via Google Form
+7. Share in AEON ecosystem
+```
+
+---
+
+## 🎬 DEMO VIDEO SCRIPT (2-3 minutes)
+
+**[0:00-0:20] The Problem**
+- Show: Developer manually managing API payments
+- Show: Business struggling with invoicing AI agents
+- Text: "x402 enables payments, but what about subscriptions?"
+
+**[0:20-0:40] The Solution**
+- PayStream logo animation
+- Show: Agent subscribing to service autonomously
+- Text: "The first subscription and streaming platform for x402"
+
+**[0:40-1:30] Live Demo**
+1. **Consumer Side:**
+   - Create AI agent (shopping agent)
+   - Agent subscribes to research API (Basic tier)
+   - Show payment streaming (real-time counter)
+   - Agent makes multiple API calls (automatic x402 payments)
+   - Show usage dashboard updating
+   - Show invoice generated automatically
+
+2. **Provider Side:**
+   - Create service with pricing tiers
+   - Show revenue streaming in real-time
+   - Show subscriber list
+   - Generate monthly invoice report
+
+**[1:30-1:50] Impact**
+- Show metrics: "10 subscriptions in 1 minute"
+- Show: "$0.0001 per payment, $5/month revenue"
+- Text: "Real subscriptions. Real revenue. Real x402."
+
+**[1:50-2:00] CTA**
+- "Try PayStream: [link]"
+- "Built on @AEON_Community x402"
+- "Powered by @BNBCHAIN"
+- "#VibingOnBNB"
+
+---
+
+## 🔐 X402 IMPLEMENTATION DETAILS
+
+### AEON Facilitator Configuration
+
+**Environment Variables:**
+```bash
+# AEON Facilitator
+AEON_FACILITATOR_URL=https://facilitator.aeon.xyz
+AEON_API_KEY=your_aeon_api_key
+
+# Service Provider
+SERVICE_PROVIDER_ADDRESS=0x2EC8A3D26b720c7a2B16f582d883F798bEEA3628
+SERVICE_PROVIDER_PRIVATE_KEY=0x...
+
+# Networks
+BSC_RPC_URL=https://bsc-dataseed.binance.org/
+X_LAYER_RPC_URL=https://rpc.xlayer.tech
+BASE_RPC_URL=https://mainnet.base.org
+
+# Tokens
+BSC_USDT=0x55d398326f99059fF775485246999027B3197955
+BSC_USDC=0x8ac76a51cc950d9822d68b83fe1ad97b32cd580d
+X_LAYER_USDT=0x779ded0c9e1022225f8e0630b35a9b54be713736
+BASE_USDC=0x833589fCD6eDb6E08f4c7C32D4f71b54bdA02913
+```
+
+### Payment Requirements Structure
+
+**Subscription Payment (Monthly):**
+```json
+{
+  "scheme": "exact",
+  "network": "eip155:56",
+  "amount": "10000000", // $10 in smallest unit
+  "asset": "0x55d398326f99059fF775485246999027B3197955",
+  "payTo": "0x2EC8A3D26b720c7a2B16f582d883F798bEEA3628",
+  "maxTimeoutSeconds": 300,
+  "extra": {
+    "name": "USDT",
+    "version": "2",
+    "subscriptionId": "sub_123",
+    "tier": "pro"
+  }
+}
+```
+
+**Pay-Per-Use Payment:**
+```json
+{
+  "scheme": "exact",
+  "network": "eip155:56",
+  "amount": "1000", // $0.01 per request
+  "asset": "0x55d398326f99059fF775485246999027B3197955",
+  "payTo": "0x2EC8A3D26b720c7a2B16f582d883F798bEEA3628",
+  "maxTimeoutSeconds": 60,
+  "extra": {
+    "name": "USDT",
+    "version": "2",
+    "requestId": "req_abc123"
+  }
+}
+```
+
+### Payment Flow Implementation
+
+**Step 1: Client Request (No Payment)**
+```typescript
+const response = await fetch("https://api.paystream.xyz/research", {
+  method: "GET",
+  headers: {
+    "X-Agent-Address": agentAddress
+  }
+});
+
+// Response: 402 Payment Required
+// Headers: payment-required: [base64_encoded_requirements]
+```
+
+**Step 2: Client Processes Payment Requirements**
+```typescript
+import { x402Client } from "@x402/fetch";
+import { registerExactEvmScheme } from "@x402/evm/exact/client";
+
+const client = new x402Client();
+registerExactEvmScheme(client, { signer: evmSigner });
+
+// Parse payment requirements from 402 response
+const paymentRequired = parsePaymentRequired(
+  response.headers.get("payment-required")
+);
+
+// Generate payment signature
+const paymentSignature = await client.generatePayment(paymentRequired);
+```
+
+**Step 3: Client Retries with Payment**
+```typescript
+const response = await fetch("https://api.paystream.xyz/research", {
+  method: "GET",
+  headers: {
+    "X-Agent-Address": agentAddress,
+    "payment-signature": paymentSignature // Base64 encoded
+  }
+});
+
+// Response: 200 OK with data
+// Headers: x402-transaction: [transaction_hash]
+```
+
+**Step 4: Server Verifies and Settles**
+```typescript
+// Server-side (middleware)
+async function verifyAndSettle(c: Context) {
+  const paymentSignature = c.req.header("payment-signature");
+  const paymentRequired = c.req.header("payment-required");
+  
+  // Verify payment with AEON facilitator
+  const verifyResult = await facilitatorClient.verify({
+    paymentSignature,
+    paymentRequired
+  });
+  
+  if (!verifyResult.isValid) {
+    return c.json({ error: verifyResult.invalidReason }, 403);
+  }
+  
+  // Settle payment
+  const settleResult = await facilitatorClient.settle({
+    paymentSignature,
+    paymentRequired
+  });
+  
+  if (settleResult.success) {
+    // Payment successful - return data
+    c.header("x402-transaction", settleResult.transaction);
+    return c.json({ data: serviceData });
+  }
+}
+```
+
+### Subscription Payment Streaming
+
+**Initialize Stream:**
+```typescript
+class PaymentStream {
+  async startStream(subscriptionId: string, monthlyAmount: bigint) {
+    // Calculate per-second rate
+    const secondsInMonth = 30n * 24n * 60n * 60n;
+    const ratePerSecond = monthlyAmount / secondsInMonth;
+    
+    // Create stream in contract
+    const tx = await paymentStreamContract.createStream({
+      subscriptionId,
+      recipient: serviceProviderAddress,
+      token: usdtAddress,
+      ratePerSecond,
+      startTime: Math.floor(Date.now() / 1000)
+    });
+    
+    await tx.wait();
+  }
+  
+  async getStreamBalance(subscriptionId: string) {
+    return await paymentStreamContract.getStreamedAmount(subscriptionId);
+  }
+  
+  async withdrawStream(subscriptionId: string) {
+    const amount = await this.getStreamBalance(subscriptionId);
+    const tx = await paymentStreamContract.withdraw(subscriptionId, amount);
+    return tx.wait();
+  }
+}
+```
+
+### Metering Implementation
+
+**Track Usage:**
+```typescript
+class MeteringService {
+  async recordUsage(agentAddress: string, endpoint: string, cost: bigint) {
+    // Store in database
+    await db.usage.create({
+      data: {
+        agentAddress,
+        endpoint,
+        cost,
+        timestamp: new Date()
+      }
+    });
+    
+    // Update on-chain meter
+    await meteringContract.recordUsage(agentAddress, cost);
+  }
+  
+  async getUsageSummary(agentAddress: string, period: Period) {
+    return await db.usage.aggregate({
+      where: {
+        agentAddress,
+        timestamp: { gte: period.start, lte: period.end }
+      },
+      _sum: { cost: true },
+      _count: true
+    });
+  }
+  
+  async checkLimits(agentAddress: string): Promise<boolean> {
+    const subscription = await getActiveSubscription(agentAddress);
+    const usage = await this.getCurrentUsage(agentAddress);
+    
+    return usage < subscription.limit;
+  }
+}
+```
+
+---
+
+## 📝 ENVIRONMENT SETUP
+
+### Server `.env`:
+```bash
+# Blockchain
+BNB_TESTNET_RPC=https://data-seed-prebsc-1-s1.binance.org:8545
+BNB_MAINNET_RPC=https://bsc-dataseed.binance.org/
+X_LAYER_RPC=https://rpc.xlayer.tech
+BASE_RPC=https://mainnet.base.org
+
+# AEON Facilitator
+AEON_FACILITATOR_URL=https://facilitator.aeon.xyz
+AEON_API_KEY=your_api_key_from_aeon
+
+# Service Provider
+SERVICE_PROVIDER_ADDRESS=0x2EC8A3D26b720c7a2B16f582d883F798bEEA3628
+SERVICE_PROVIDER_PRIVATE_KEY=0x...
+
+# Contracts (after deployment)
+SUBSCRIPTION_MANAGER_ADDRESS=0x...
+PAYMENT_STREAM_ADDRESS=0x...
+METERING_ENGINE_ADDRESS=0x...
+REVENUE_SHARE_ADDRESS=0x...
+INVOICE_GENERATOR_ADDRESS=0x...
+
+# Database
+DATABASE_URL=postgresql://user:password@localhost:5432/paystream
+REDIS_URL=redis://localhost:6379
+
+# API
+PORT=4021
+NODE_ENV=development
+JWT_SECRET=your_secret_key
+
+# AI (Optional)
+OPENAI_API_KEY=sk-...
+ANTHROPIC_API_KEY=sk-ant-...
+```
+
+### Client `.env`:
+```bash
+# Blockchain
+NEXT_PUBLIC_CHAIN_ID=56
+NEXT_PUBLIC_BSC_RPC=https://bsc-dataseed.binance.org/
+
+# API
+NEXT_PUBLIC_API_URL=http://localhost:4021
+NEXT_PUBLIC_SOCKET_URL=ws://localhost:4021
+
+# Contracts
+NEXT_PUBLIC_SUBSCRIPTION_MANAGER=0x...
+NEXT_PUBLIC_PAYMENT_STREAM=0x...
+
+# Wallet
+WALLET_PRIVATE_KEY=0x... # For agent deployment only
+
+# Services
+NEXT_PUBLIC_AEON_FACILITATOR=https://facilitator.aeon.xyz
+```
+
+---
+
+## 🧪 TESTING STRATEGY
+
+### Unit Tests
+
+**Smart Contracts:**
+```typescript
+describe("SubscriptionManager", () => {
+  it("should create subscription", async () => {
+    const tx = await subscriptionManager.subscribe(serviceId, tier);
+    expect(tx).to.emit(subscriptionManager, "SubscriptionCreated");
+  });
+  
+  it("should prevent double subscription", async () => {
+    await subscriptionManager.subscribe(serviceId, tier);
+    await expect(
+      subscriptionManager.subscribe(serviceId, tier)
+    ).to.be.revertedWith("Already subscribed");
+  });
+  
+  it("should calculate pro-rata refund", async () => {
+    await subscriptionManager.subscribe(serviceId, tier);
+    await time.increase(15 * 24 * 60 * 60); // 15 days
+    
+    const refund = await subscriptionManager.calculateRefund(subscriptionId);
+    expect(refund).to.equal(monthlyPrice / 2n);
+  });
+});
+```
+
+**X402 Integration:**
+```typescript
+describe("x402 Payment Flow", () => {
+  it("should return 402 without payment", async () => {
+    const response = await fetch("/api/research");
+    expect(response.status).toBe(402);
+    expect(response.headers.get("payment-required")).toBeDefined();
+  });
+  
+  it("should accept valid payment", async () => {
+    const client = new x402Client();
+    const fetchWithPayment = wrapFetchWithPayment(fetch, client);
+    
+    const response = await fetchWithPayment("/api/research");
+    expect(response.status).toBe(200);
+    expect(response.headers.get("x402-transaction")).toBeDefined();
+  });
+  
+  it("should reject invalid payment signature", async () => {
+    const response = await fetch("/api/research", {
+      headers: {
+        "payment-signature": "invalid_signature"
+      }
+    });
+    
+    expect(response.status).toBe(403);
+  });
+});
+```
+
+### Integration Tests
+
+**Subscription Flow:**
+```typescript
+describe("Subscription Integration", () => {
+  it("should complete full subscription flow", async () => {
+    // 1. Create agent
+    const agent = new SubscriptionAgent(config);
+    await agent.initialize();
+    
+    // 2. Subscribe to service
+    await agent.subscribe(serviceId, "pro");
+    
+    // 3. Make API request
+    const response = await agent.makePayableRequest(
+      "https://api.paystream.xyz/research"
+    );
+    
+    expect(response.status).toBe(200);
+    
+    // 4. Check usage recorded
+    const usage = await agent.getUsageStats();
+    expect(usage.calls).toBe(1);
+    
+    // 5. Cancel subscription
+    await agent.cancelSubscription(serviceId);
+    
+    // 6. Verify refund
+    const refund = await getRefundAmount(agent.address);
+    expect(refund).toBeGreaterThan(0n);
+  });
+});
+```
+
+### E2E Tests
+
+**Full User Journey:**
+```typescript
+describe("E2E: Consumer Journey", () => {
+  it("should complete consumer journey", async () => {
+    // 1. Connect wallet
+    await page.click("#connect-wallet");
+    await page.click("#metamask");
+    
+    // 2. Browse services
+    await page.goto("/marketplace");
+    await page.click(".service-card:first-child");
+    
+    // 3. Subscribe
+    await page.click("#subscribe-pro");
+    await page.click("#confirm");
+    
+    // 4. Wait for transaction
+    await page.waitForSelector(".success-message");
+    
+    // 5. View dashboard
+    await page.goto("/dashboard");
+    expect(await page.textContent(".active-subscriptions")).toBe("1");
+    
+    // 6. Deploy agent
+    await page.click("#create-agent");
+    await page.fill("#agent-name", "Test Agent");
+    await page.click("#deploy");
+    
+    // 7. Verify agent active
+    await page.waitForSelector(".agent-status.active");
+  });
+});
+```
+
+---
+
+## 🔒 SECURITY CHECKLIST
+
+### Smart Contracts:
+- [ ] Reentrancy guards on all state-changing functions
+- [ ] Access control (Ownable, AccessControl)
+- [ ] Integer overflow protection (Solidity 0.8+)
+- [ ] Pausable contracts for emergency stops
+- [ ] Time-lock for critical operations
+- [ ] Input validation on all parameters
+- [ ] Events for all state changes
+- [ ] Slither security analysis passed
+- [ ] Gas optimization reviewed
+
+### X402 Integration:
+- [ ] Signature verification on every payment
+- [ ] Timestamp validation (validAfter, validBefore)
+- [ ] Nonce checking to prevent replay attacks
+- [ ] Amount verification matches requirements
+- [ ] Recipient address validation
+- [ ] Network ID validation
+- [ ] Token address whitelist
+- [ ] Rate limiting on endpoints
+
+### API Security:
+- [ ] API key authentication for facilitator
+- [ ] JWT tokens for user sessions
+- [ ] CORS configuration
+- [ ] Rate limiting per IP/agent
+- [ ] Input sanitization
+- [ ] SQL injection prevention (parameterized queries)
+- [ ] XSS protection
+- [ ] CSRF tokens
+- [ ] HTTPS only in production
+
+### Frontend Security:
+- [ ] Wallet connection security (RainbowKit)
+- [ ] Never expose private keys
+- [ ] Secure environment variable handling
+- [ ] Content Security Policy headers
+- [ ] Subresource Integrity for CDN assets
+- [ ] Regular dependency updates
+- [ ] Security audit of third-party packages
+
+---
+
+## 🚀 DEPLOYMENT GUIDE
+
+### Smart Contracts Deployment
+
+**Deploy to BSC Testnet:**
+```bash
+# Install dependencies
+cd contracts
+npm install
+
+# Configure Hardhat
+# Edit hardhat.config.ts with BSC testnet RPC and private key
+
+# Deploy contracts
+npx hardhat run scripts/deploy.ts --network bscTestnet
+
+# Verify contracts
+npx hardhat verify --network bscTestnet SUBSCRIPTION_MANAGER_ADDRESS
+npx hardhat verify --network bscTestnet PAYMENT_STREAM_ADDRESS
+npx hardhat verify --network bscTestnet METERING_ENGINE_ADDRESS
+```
+
+**Deploy to BSC Mainnet:**
+```bash
+# Same process but with mainnet network
+npx hardhat run scripts/deploy.ts --network bsc
+```
+
+### Backend Deployment
+
+**Using Docker:**
+```bash
+# Build image
+docker build -t paystream-backend .
+
+# Run container
+docker run -d \
+  --name paystream-backend \
+  -p 4021:4021 \
+  --env-file .env.production \
+  paystream-backend
+
+# Or use docker-compose
+docker-compose up -d
+```
+
+**Using Railway/Render:**
+```bash
+# Connect GitHub repo
+# Add environment variables
+# Deploy automatically on push to main
+```
+
+### Frontend Deployment
+
+**Using Vercel:**
+```bash
+# Install Vercel CLI
+npm i -g vercel
+
+# Deploy
+cd frontend
+vercel --prod
+
+# Or connect GitHub repo to Vercel dashboard
+```
+
+### Database Setup
+
+**PostgreSQL:**
+```bash
+# Create database
+createdb paystream
+
+# Run migrations
+npx prisma migrate deploy
+
+# Seed initial data (optional)
+npx prisma db seed
+```
+
+**Redis:**
+```bash
+# Start Redis
+redis-server
+
+# Or use managed Redis (Railway, Upstash)
+```
+
+---
+
+## 📚 DOCUMENTATION TEMPLATES
+
+### README.md Structure:
+```markdown
+# PayStream - AI-Native Subscription Platform
+
+[Demo Video] [Live Demo] [Documentation]
+
+## What is PayStream?
+
+The first subscription and streaming payment platform built on x402 protocol...
+
+## Features
+
+- 🔄 Recurring subscriptions for AI agents
+- 💰 Pay-per-second streaming payments
+- 📊 Real-time usage metering
+- 📄 Automated invoice generation
+- 💸 Revenue sharing for marketplaces
+
+## Quick Start
+
+[5-minute setup guide]
+
+## Architecture
+
+[Architecture diagram]
+
+## Tech Stack
+
+- AEON x402 Protocol
+- BNB Chain
+- Next.js + TypeScript
+- ...
+
+## Use Cases
+
+1. AI Research Services
+2. Content Generation APIs
+3. Data Analytics Platforms
+...
+
+## Contributing
+
+[How to contribute]
+
+## License
+
+MIT
+```
+
+### X402_INTEGRATION.md:
+```markdown
+# AEON x402 Integration Guide
+
+## Overview
+
+PayStream uses AEON's x402 protocol for...
+
+## Payment Flow
+
+[Detailed flow diagram]
+
+## Server Implementation
+
+```typescript
+// Code examples
+```
+
+## Client Implementation
+
+```typescript
+// Code examples
+```
+
+## Supported Networks
+
+- BSC (Chain ID: 56)
+- X Layer (Chain ID: 196)
+- Base (Chain ID: 8453)
+
+## Supported Tokens
+
+- USDT
+- USDC
+
+## Testing
+
+[How to test payments]
+
+## Troubleshooting
+
+Common issues and solutions...
+```
+
+---
+
+## 🏆 SUBMISSION CHECKLIST
+
+### X Post Requirements:
+```
+✅ 2-3 min demo video
+✅ Project description (subscription platform)
+✅ Hashtags: #VibingOnBNB
+✅ Mention: @AEON_Community @BNBCHAIN
+✅ GitHub link
+✅ Live demo link
+✅ X402 integration explanation
+```
+
+### GitHub Repository:
+```
+✅ Clean README with video
+✅ Complete documentation (7+ files)
+✅ Working code examples
+✅ Deployment instructions
+✅ Test coverage >80%
+✅ CI/CD setup
+✅ License (MIT)
+✅ Contributing guidelines
+```
+
+### Live Demo:
+```
+✅ Deployed to BSC mainnet
+✅ Frontend live on Vercel
+✅ Backend API accessible
+✅ Example agents running
+✅ All features working
+```
+
+---
+
+## 💻 CLAUDE CODE DEVELOPMENT INSTRUCTIONS
+
+**You (Claude Code) should:**
+
+1. **Act as a Senior Full-Stack + Web3 Developer:**
+   - 10+ years experience
+   - 50+ hackathon wins
+   - Expert in TypeScript, Solidity, React
+   - Deep knowledge of x402 protocol
+
+2. **Code Quality Standards:**
+   - Production-ready code
+   - Comprehensive error handling
+   - TypeScript strict mode
+   - Detailed comments
+   - Reusable components
+   - Performance optimized
+
+3. **x402 Expertise:**
+   - Deep understanding of AEON protocol
+   - Proper payment flow implementation
+   - Facilitator integration
+   - Multi-network support
+   - Security best practices
+
+4. **Implementation Approach:**
+   - Start with contracts
+   - Then x402 integration
+   - Then frontend + backend
+   - Test everything thoroughly
+   - Document as you build
+
+5. **Deliverables:**
+   - All smart contracts
+   - Full x402 server + client
+   - Complete frontend app
+   - Backend API
+   - Comprehensive docs
+   - Demo materials
+
+---
+
+## 🎯 SUCCESS METRICS
+
+**Technical Excellence:**
+- 100% x402 protocol implementation
+- Support for 3+ networks
+- <1 second payment processing
+- >90% test coverage
+- Zero critical vulnerabilities
+
+**Innovation Score:**
+- First subscription platform on x402
+- Payment streaming implementation
+- Automated invoicing system
+- Revenue sharing model
+- AI budget management
+
+**User Experience:**
+- <30 seconds to subscribe
+- Real-time dashboards
+- Mobile-responsive design
+- Clear documentation
+- Working live demo
+
+---
+
+## 🏆 WHY THIS WINS
+
+**Unique Value:**
+1. ✅ **Only subscription platform** - All others do one-time payments
+2. ✅ **B2C + B2B market** - Dual-sided value proposition
+3. ✅ **Real revenue model** - Demonstrates actual business viability
+4. ✅ **Production-ready** - Can be used immediately
+5. ✅ **Full x402 showcase** - Uses all AEON features
+
+**Technical Excellence:**
+1. ✅ Advanced smart contract system
+2. ✅ Payment streaming implementation
+3. ✅ Real-time metering
+4. ✅ Multi-network support
+5. ✅ Enterprise features (invoicing, compliance)
+
+**Market Impact:**
+1. ✅ Enables recurring AI services
+2. ✅ Creates marketplace economies
+3. ✅ Solves B2B compliance needs
+4. ✅ Scales to millions of agents
+5. ✅ Foundation for AI economy
+
+---
+
+## 📞 RESOURCES
+
+**AEON Documentation:**
+- x402 SDK: https://github.com/AEON-Project/bnb-x402
+- Facilitator: https://facilitator.aeon.xyz
+- Telegram: @AEON_Community
+
+**BNB Chain:**
+- Docs: https://docs.bnbchain.org/
+- Testnet Faucet: https://testnet.bnbchain.org/faucet-smart
+- Explorer: https://bscscan.com/
+
+---
+
+**LET'S BUILD THE FUTURE OF AI PAYMENTS! 🚀**
+   

@@ -36,7 +36,7 @@ export default function Home() {
                     {/* Badge */}
                     <motion.div variants={itemVariants} className="inline-flex items-center gap-2 px-4 py-2 bg-purple-500/10 border border-purple-500/20 rounded-full text-purple-300 text-sm backdrop-blur-sm">
                         <Sparkles className="w-4 h-4" />
-                        <span>Powered by AWE Network, ChainGPT & Unibase</span>
+                        <span>Powered by ChainGPT & Unibase</span>
                     </motion.div>
 
                     {/* Main Heading */}
@@ -76,12 +76,12 @@ export default function Home() {
                     {/* Stats */}
                     <motion.div variants={itemVariants} className="grid grid-cols-3 gap-8 pt-16 max-w-2xl mx-auto">
                         <div className="text-center">
-                            <div className="text-4xl font-bold bg-gradient-to-r from-purple-400 to-pink-600 bg-clip-text text-transparent">3</div>
+                            <div className="text-4xl font-bold bg-gradient-to-r from-purple-400 to-pink-600 bg-clip-text text-transparent">2</div>
                             <div className="text-slate-400 text-sm mt-1">Bounties Integrated</div>
                         </div>
                         <div className="text-center">
-                            <div className="text-4xl font-bold bg-gradient-to-r from-purple-400 to-pink-600 bg-clip-text text-transparent">2</div>
-                            <div className="text-slate-400 text-sm mt-1">Networks Supported</div>
+                            <div className="text-4xl font-bold bg-gradient-to-r from-purple-400 to-pink-600 bg-clip-text text-transparent">1</div>
+                            <div className="text-slate-400 text-sm mt-1">Network Supported</div>
                         </div>
                         <div className="text-center">
                             <div className="text-4xl font-bold bg-gradient-to-r from-purple-400 to-pink-600 bg-clip-text text-transparent">100%</div>
@@ -110,44 +110,6 @@ export default function Home() {
                     </motion.div>
 
                     <div className="grid md:grid-cols-3 gap-8 max-w-7xl mx-auto">
-                        {/* AWE Network Card */}
-                        <motion.div
-                            initial={{ opacity: 0, y: 20 }}
-                            whileInView={{ opacity: 1, y: 0 }}
-                            viewport={{ once: true }}
-                            transition={{ delay: 0.1, duration: 0.5 }}
-                            className="group bg-slate-800/50 backdrop-blur-lg border border-slate-700 rounded-2xl p-8 hover:border-blue-500 transition-all hover:shadow-xl hover:shadow-blue-500/20"
-                        >
-                            <div className="w-14 h-14 rounded-xl bg-gradient-to-br from-blue-500 to-cyan-500 flex items-center justify-center mb-6 group-hover:scale-110 transition-transform">
-                                <Shield className="w-7 h-7 text-white" />
-                            </div>
-
-                            <h3 className="text-2xl font-bold text-white mb-2">AWE Network</h3>
-                            <p className="text-purple-400 text-sm font-medium mb-4">Identity & Payments</p>
-                            <p className="text-slate-400 mb-6 leading-relaxed">
-                                ERC-8004 agent identity with x402 USDC payments on Base Sepolia
-                            </p>
-
-                            <ul className="space-y-3 mb-6">
-                                <li className="text-slate-300 flex items-start gap-2 text-sm">
-                                    <span className="text-blue-400 mt-0.5">✓</span>
-                                    <span>On-Chain Identity NFTs</span>
-                                </li>
-                                <li className="text-slate-300 flex items-start gap-2 text-sm">
-                                    <span className="text-blue-400 mt-0.5">✓</span>
-                                    <span>Real USDC Payments</span>
-                                </li>
-                                <li className="text-slate-300 flex items-start gap-2 text-sm">
-                                    <span className="text-blue-400 mt-0.5">✓</span>
-                                    <span>Reputation Tracking</span>
-                                </li>
-                            </ul>
-
-                            <div className="text-xs text-slate-500 border-t border-slate-700 pt-4 flex items-center gap-2">
-                                <div className="w-2 h-2 rounded-full bg-blue-500"></div>
-                                Base Sepolia Testnet
-                            </div>
-                        </motion.div>
 
                         {/* Quack × ChainGPT Card */}
                         <motion.div
@@ -249,7 +211,7 @@ export default function Home() {
 
                     <div className="grid md:grid-cols-3 gap-12 max-w-5xl mx-auto">
                         {[
-                            { num: '01', title: 'Create Agent', desc: 'Get on-chain identity with ERC-8004 NFT on Base Sepolia' },
+                            { num: '01', title: 'Fund Wallet', desc: 'Connect your wallet and get BNB/USDT on the BNB Testnet' },
                             { num: '02', title: 'Chat & Execute', desc: 'AI-powered research, contract generation, and DeFi actions' },
                             { num: '03', title: 'Never Forget', desc: 'Permanent memory storage in decentralized Membase' }
                         ].map((item, i) => (

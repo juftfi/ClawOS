@@ -10,6 +10,10 @@ An autonomous agent platform verifying identity on **Base**, orchestrating actio
 
 ## 🚀 Live Deployment
 - **Backend API:** `https://agentos-web3-production.up.railway.app`
+### 🌍 Production Infrastructure
+- **Live Dashboard**: [agentos.vercel.app](https://agentos.vercel.app) (Frontend)
+- **Production API**: [agentos-production.up.railway.app](https://agentos-production.up.railway.app) (Backend)
+- **Health Status**: [/api/health](https://agentos-production.up.railway.app/api/health)
 - **Smart Contract (ERC-8004):** `0xfba199c705761D98aD1cD98c34C0d544e39c1984` (Base Sepolia)
 
 ---
@@ -17,10 +21,6 @@ An autonomous agent platform verifying identity on **Base**, orchestrating actio
 ## 🏆 Implementations (100% Live)
 
 ### 🔵 1. AWE Network (Base)
-- **Feature:** ERC-8004 Agent Identity & x402 Service Payments.
-- **Integration:** Agents connect to Base Sepolia via Alchemy. Payment logic verified on-chain.
-- **Code:** `contracts/ERC8004AgentIdentity.sol`, `src/services/awe/`
-
 ### 🟡 2. Quack × ChainGPT (BNB Chain)
 - **Feature:** AI Research & Smart Contract Factory.
 - **Integration:** Uses ChainGPT API for LLM reasoning and solidity generation. Deploys to BNB Testnet.

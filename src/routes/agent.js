@@ -148,6 +148,34 @@ router.post('/execute-action', async (req, res) => {
 });
 
 /**
+ * @route   POST /api/agent/discover-and-negotiate
+ * @desc    Discover a service and negotiate terms autonomously
+ * @access  Public
+ */
+router.post('/discover-and-negotiate', async (req, res) => {
+    try {
+        const { query, category, userId = 'default' } = req.body;
+
+        if (!query) {
+            return res.status(400).json({
+                success: false,
+                error: 'Query is required'
+            });
+        }
+
+        const result = await agentOrchestrator.discoverAndNegotiate(query, category, userId);
+
+        res.json(result);
+    } catch (error) {
+        logger.error('Discovery and negotiation workflow error:', error.message);
+        res.status(500).json({
+            success: false,
+            error: error.message
+        });
+    }
+});
+
+/**
  * @route   POST /api/agent/workflow/execute
  * @desc    Execute generic workflow
  * @access  Public

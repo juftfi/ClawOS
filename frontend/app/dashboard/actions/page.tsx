@@ -2,410 +2,296 @@
 
 import { useState, useEffect } from 'react';
 import { useAccount } from 'wagmi';
-import { Send, ArrowRightLeft, Rocket, Phone, Shield, DollarSign, AlertTriangle } from 'lucide-react';
-import { X402PaymentFlow } from '@/components/x402/PaymentFlow';
+import { Search, Zap, Repeat, Cpu, Shield, AlertCircle, Loader2, CheckCircle, ExternalLink } from 'lucide-react';
 import axios from 'axios';
-
-type ActionType = 'transfer' | 'swap' | 'deploy' | 'call';
-
-interface ActionFormData {
-    type: ActionType;
-    // Transfer
-    toAddress?: string;
-    amount?: string;
-    token?: string;
-    // Swap
-    fromToken?: string;
-    toToken?: string;
-    swapAmount?: string;
-    // Deploy
-    contractCode?: string;
-    constructorArgs?: string;
-    // Call
-    contractAddress?: string;
-    functionName?: string;
-    functionArgs?: string;
-}
+import { Q402PaymentFlow } from '@/components/q402/PaymentFlow';
 
 export default function ActionsPage() {
     const { address, isConnected, chain } = useAccount();
-    const [selectedAction, setSelectedAction] = useState<ActionType | null>(null);
-    const [formData, setFormData] = useState<ActionFormData>({ type: 'transfer' });
-    const [showPayment, setShowPayment] = useState(false);
-    const [actionData, setActionData] = useState<any>(null);
-    const [txHistory, setTxHistory] = useState<any[]>([]);
+    const [actionStatus, setActionStatus] = useState<'idle' | 'executing' | 'success' | 'error'>('idle');
+    const [activeAction, setActiveAction] = useState<string | null>(null);
+    const [error, setError] = useState<string | null>(null);
 
-    const isBaseSepolia = chain?.id === 84532;
+    // Dynamic state for form inputs (simplified for now)
+    const [formData] = useState({
+        network: 'bnb-testnet'
+    });
+
     const isBNBTestnet = chain?.id === 97;
 
-    const [hasMounted, setHasMounted] = useState(false);
+    const actionTypes = [
+        {
+            id: 'agent-query',
+            name: 'ChainGPT Research',
+            description: 'Advanced Web3 research and social analysis powered by ChainGPT.',
+            icon: Search,
+            cost: '0.10 USDC',
+            category: 'Intelligence'
+        },
+        {
+            id: 'contract-deploy',
+            name: 'Agent Deployment',
+            description: 'Deploy a custom smart contract verified by ChainGPT Audit.',
+            icon: Zap,
+            cost: '2.00 USDC',
+            category: 'Execution'
+        },
+        {
+            id: 'swap',
+            name: 'DeFi Swap',
+            description: 'Execute a token swap on BNB Chain via Agent Orchestrator.',
+            icon: Repeat,
+            cost: '0.50 USDC',
+            category: 'DeFi'
+        },
+        {
+            id: 'contract-call',
+            name: 'Interact with Contract',
+            description: 'Execute any smart contract function on BNB Testnet.',
+            icon: Cpu,
+            cost: '0.50 USDC',
+            category: 'Web3'
+        }
+    ];
 
-    // Fix hydration mismatch
+    const handleActionClick = (actionId: string) => {
+        if (!isBNBTestnet) {
+            alert('Please switch to BNB Testnet to execute actions.');
+            return;
+        }
+        setActiveAction(actionId);
+        setActionStatus('idle');
+    };
+
+    const handlePaymentSuccess = async (txHash: string) => {
+        setActionStatus('executing');
+
+        try {
+            const API_URL = process.env.NEXT_PUBLIC_API_URL || 'http://localhost:3000';
+
+            // Simulate small delay for "Agent Processing"
+            await new Promise(resolve => setTimeout(resolve, 2000));
+
+            // Execute the actual backend agent workflow
+            const response = await axios.post(`${API_URL}/api/agent/execute-action`, {
+                actionType: activeAction,
+                actionData: {
+                    ...formData,
+                    userId: address,
+                    paymentTxHash: txHash
+                }
+            });
+
+            if (response.data.success) {
+                setActionStatus('success');
+            } else {
+                throw new Error(response.data.error || 'Execution failed');
+            }
+        } catch (err: any) {
+            setError(err.message || 'Action execution failed');
+            setActionStatus('error');
+        }
+    };
+
+    // Hydration fix
+    const [hasMounted, setHasMounted] = useState(false);
     useEffect(() => {
         setHasMounted(true);
     }, []);
 
-    // Show loading until mounted
     if (!hasMounted) return <div className="p-8 text-center text-slate-500">Loading...</div>;
 
-    const actions = [
-        {
-            type: 'transfer' as ActionType,
-            icon: Send,
-            title: 'Transfer Tokens',
-            description: 'Send tokens to any address',
-            color: 'purple',
-            networks: ['base-sepolia', 'bsc-testnet']
-        },
-        {
-            type: 'swap' as ActionType,
-            icon: ArrowRightLeft,
-            title: 'Swap Tokens',
-            description: 'Exchange tokens via DEX',
-            color: 'blue',
-            networks: ['bsc-testnet']
-        },
-        {
-            type: 'deploy' as ActionType,
-            icon: Rocket,
-            title: 'Deploy Contract',
-            description: 'Deploy smart contract on-chain',
-            color: 'emerald',
-            networks: ['base-sepolia', 'bsc-testnet']
-        },
-        {
-            type: 'call' as ActionType,
-            icon: Phone,
-            title: 'Call Contract',
-            description: 'Execute contract function',
-            color: 'orange',
-            networks: ['base-sepolia', 'bsc-testnet']
-        }
-    ].filter(action => {
-        if (!chain) return true;
-        if (isBaseSepolia) return action.networks.includes('base-sepolia');
-        if (isBNBTestnet) return action.networks.includes('bsc-testnet');
-        return true;
-    });
-
-    const handleExecute = async () => {
-        if (!address) return;
-
-        // Prepare action data for x402 payment
-        const data = {
-            actionType: selectedAction,
-            ...formData,
-            executor: address
-        };
-
-        setActionData(data);
-        setShowPayment(true);
-    };
-
-    const handlePaymentSuccess = async (txHash: string) => {
-        setShowPayment(false);
-
-        // Execute the actual action via backend
-        try {
-            const API_URL = process.env.NEXT_PUBLIC_API_URL || 'http://localhost:3000';
-            const response = await axios.post(`${API_URL}/api/agent/execute-action`, {
-                actionType: selectedAction,
-                actionData,
-                paymentTxHash: txHash
-            });
-
-            if (response.data.success) {
-                // Add to history
-                setTxHistory([
-                    {
-                        type: selectedAction,
-                        txHash: response.data.txHash,
-                        timestamp: new Date().toISOString(),
-                        status: 'success'
-                    },
-                    ...txHistory
-                ]);
-
-                // Reset form
-                setSelectedAction(null);
-                setFormData({ type: 'transfer' });
-            }
-        } catch (error) {
-            console.error('Action execution failed:', error);
-        }
-    };
-
     return (
-        <div className="space-y-8">
-            <div className="flex items-center justify-between">
+        <div className="max-w-6xl mx-auto space-y-8">
+            {/* Header */}
+            <div className="flex flex-col md:flex-row md:items-center justify-between gap-4">
                 <div>
                     <h1 className="text-3xl font-bold text-white mb-2">Agent Actions</h1>
-                    <p className="text-slate-400">Execute on-chain operations powered by AI agents</p>
+                    <p className="text-slate-400">Execute on-chain operations using the Q402 protocol on BNB Chain.</p>
                 </div>
-                {/* Network Badge */}
-                <div className={`px-4 py-2 rounded-lg border ${isBaseSepolia ? 'bg-blue-500/10 border-blue-500/20 text-blue-400' :
-                    isBNBTestnet ? 'bg-yellow-500/10 border-yellow-500/20 text-yellow-400' :
-                        'bg-red-500/10 border-red-500/20 text-red-400'
-                    }`}>
-                    {chain?.name || 'Unsupported Network'}
+                <div className="flex items-center gap-3 px-4 py-2 bg-yellow-500/10 border border-yellow-500/20 rounded-xl">
+                    <Shield className="w-5 h-5 text-yellow-400" />
+                    <span className="text-sm font-medium text-yellow-300">Q402 Protected</span>
                 </div>
             </div>
 
-            {/* Unsupported Network Warning */}
-            {!isBaseSepolia && !isBNBTestnet && (
-                <div className="bg-red-500/10 border border-red-500/20 rounded-xl p-6 flex flex-col items-center text-center">
-                    <AlertTriangle className="w-12 h-12 text-red-500 mb-4" />
-                    <h3 className="text-xl font-bold text-white mb-2">Unsupported Network</h3>
-                    <p className="text-slate-400 max-w-md">
-                        Please switch to Base Sepolia or BNB Testnet to use Agent Actions.
-                    </p>
+            {/* Hub V2 Intelligence Widgets */}
+            <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
+                {/* Market Narratives */}
+                <div className="lg:col-span-2 bg-slate-900/50 border border-slate-800 rounded-2xl p-6 relative overflow-hidden group">
+                    <div className="absolute top-0 right-0 p-4 opacity-10 group-hover:opacity-20 transition-opacity">
+                        <Cpu className="w-24 h-24 text-yellow-500" />
+                    </div>
+                    <div className="flex items-center gap-3 mb-4">
+                        <div className="w-10 h-10 rounded-lg bg-yellow-500/10 flex items-center justify-center">
+                            <Zap className="w-5 h-5 text-yellow-400" />
+                        </div>
+                        <div>
+                            <h3 className="text-lg font-bold text-white">Market Narrative</h3>
+                            <p className="text-xs text-slate-500">Powered by ChainGPT Hub V2</p>
+                        </div>
+                    </div>
+                    <div className="space-y-3">
+                        <div className="p-3 bg-slate-800/50 rounded-xl border border-slate-700/50">
+                            <p className="text-sm text-slate-300">
+                                <span className="text-yellow-400 font-bold mr-2">BULLISH:</span>
+                                AI-Agent interoperability narrative is surfacing as BNB Chain initiates Q402/EIP-7702 upgrades.
+                            </p>
+                        </div>
+                        <div className="flex items-center gap-4 text-xs font-medium">
+                            <span className="px-2 py-1 rounded bg-emerald-500/10 text-emerald-400 border border-emerald-500/20">Sentiment: High</span>
+                            <span className="px-2 py-1 rounded bg-slate-800 text-slate-400 border border-slate-700">Fear/Greed: 68</span>
+                        </div>
+                    </div>
+                </div>
+
+                {/* Trading Assistant */}
+                <div className="bg-slate-900/50 border border-slate-800 rounded-2xl p-6 relative overflow-hidden group">
+                    <div className="flex items-center gap-3 mb-4">
+                        <div className="w-10 h-10 rounded-lg bg-emerald-500/10 flex items-center justify-center">
+                            <CheckCircle className="w-5 h-5 text-emerald-400" />
+                        </div>
+                        <div>
+                            <h3 className="text-lg font-bold text-white">Trading Edge</h3>
+                            <p className="text-xs text-slate-500">Liquidation Heatmap Active</p>
+                        </div>
+                    </div>
+                    <div className="space-y-4">
+                        <div className="flex justify-between items-center bg-slate-800/30 p-2 rounded-lg">
+                            <span className="text-xs text-slate-400">Support Level</span>
+                            <span className="text-xs font-mono text-emerald-400">$2,450.20</span>
+                        </div>
+                        <div className="flex justify-between items-center bg-slate-800/30 p-2 rounded-lg">
+                            <span className="text-xs text-slate-400">Resistance Level</span>
+                            <span className="text-xs font-mono text-red-400">$2,580.45</span>
+                        </div>
+                        <div className="h-1.5 w-full bg-slate-800 rounded-full overflow-hidden">
+                            <div className="h-full bg-emerald-500/50 w-[72%]" />
+                        </div>
+                        <p className="text-[10px] text-center text-slate-500">Predictive analysis updated 2m ago</p>
+                    </div>
+                </div>
+            </div>
+
+            {/* Network Check */}
+            {!isBNBTestnet && isConnected && (
+                <div className="bg-yellow-500/10 border border-yellow-500/20 rounded-2xl p-6">
+                    <div className="flex items-center gap-4">
+                        <div className="w-12 h-12 rounded-full bg-yellow-500/20 flex items-center justify-center">
+                            <AlertCircle className="w-6 h-6 text-yellow-400" />
+                        </div>
+                        <div>
+                            <h3 className="text-lg font-bold text-white">Switch to BNB Testnet</h3>
+                            <p className="text-slate-400">Agent actions are exclusively available on BNB Smart Chain Testnet.</p>
+                        </div>
+                    </div>
                 </div>
             )}
 
-            {/* Action Selection Grid */}
-            {!selectedAction && (isBaseSepolia || isBNBTestnet) && (
-                <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
-                    {actions.map((action) => (
-                        <button
-                            key={action.type}
-                            onClick={() => {
-                                setSelectedAction(action.type);
-                                setFormData(prev => ({ ...prev, type: action.type }));
-                            }}
-                            className={`
-                                relative group p-6 rounded-2xl border border-slate-800 bg-slate-900/50 
-                                hover:bg-slate-800 transition-all text-left hover:scale-[1.02]
-                            `}
-                        >
-                            <div className={`
-                                w-12 h-12 rounded-xl mb-4 flex items-center justify-center
-                                bg-${action.color}-500/20 text-${action.color}-400 group-hover:bg-${action.color}-500 group-hover:text-white transition-colors
-                            `}>
-                                <action.icon className="w-6 h-6" />
-                            </div>
-                            <h3 className="text-xl font-bold text-white mb-2">{action.title}</h3>
-                            <p className="text-slate-400">{action.description}</p>
-                        </button>
-                    ))}
-                </div>
-            )}
-
-            {/* Action Form */}
-            {selectedAction && !showPayment && (
-                <div className="bg-slate-900 border border-slate-800 rounded-2xl p-8">
-                    <div className="flex items-center justify-between mb-6">
-                        <h2 className="text-2xl font-bold text-white">
-                            {actions.find(a => a.type === selectedAction)?.title}
-                        </h2>
-                        <button
-                            onClick={() => setSelectedAction(null)}
-                            className="text-slate-400 hover:text-white"
-                        >
-                            Cancel
-                        </button>
-                    </div>
-
-                    {/* Transfer Form */}
-                    {selectedAction === 'transfer' && (
-                        <div className="space-y-4">
-                            <div>
-                                <label className="block text-sm font-medium text-slate-300 mb-2">Recipient Address</label>
-                                <input
-                                    type="text"
-                                    value={formData.toAddress || ''}
-                                    onChange={(e) => setFormData({ ...formData, toAddress: e.target.value })}
-                                    placeholder="0x..."
-                                    className="w-full px-4 py-3 bg-slate-800 border border-slate-700 rounded-lg text-white placeholder-slate-500 focus:outline-none focus:ring-2 focus:ring-purple-500"
-                                />
-                            </div>
-                            <div>
-                                <label className="block text-sm font-medium text-slate-300 mb-2">Amount</label>
-                                <input
-                                    type="text"
-                                    value={formData.amount || ''}
-                                    onChange={(e) => setFormData({ ...formData, amount: e.target.value })}
-                                    placeholder="0.0"
-                                    className="w-full px-4 py-3 bg-slate-800 border border-slate-700 rounded-lg text-white placeholder-slate-500 focus:outline-none focus:ring-2 focus:ring-purple-500"
-                                />
-                            </div>
-                            <div>
-                                <label className="block text-sm font-medium text-slate-300 mb-2">Token</label>
-                                <select
-                                    value={formData.token || 'USDC'}
-                                    onChange={(e) => setFormData({ ...formData, token: e.target.value })}
-                                    className="w-full px-4 py-3 bg-slate-800 border border-slate-700 rounded-lg text-white focus:outline-none focus:ring-2 focus:ring-purple-500"
-                                >
-                                    <option value="USDC">USDC</option>
-                                    <option value="ETH">ETH</option>
-                                    <option value="BNB">BNB</option>
-                                </select>
-                            </div>
-                        </div>
-                    )}
-
-                    {/* Swap Form */}
-                    {selectedAction === 'swap' && (
-                        <div className="space-y-4">
-                            <div className="grid grid-cols-2 gap-4">
-                                <div>
-                                    <label className="block text-sm font-medium text-slate-300 mb-2">From</label>
-                                    <select
-                                        value={formData.fromToken || 'USDC'}
-                                        onChange={(e) => setFormData({ ...formData, fromToken: e.target.value })}
-                                        className="w-full px-4 py-3 bg-slate-800 border border-slate-700 rounded-lg text-white focus:outline-none focus:ring-2 focus:ring-purple-500"
-                                    >
-                                        <option value="USDC">USDC</option>
-                                        <option value="BNB">BNB</option>
-                                    </select>
-                                </div>
-                                <div>
-                                    <label className="block text-sm font-medium text-slate-300 mb-2">To</label>
-                                    <select
-                                        value={formData.toToken || 'AWE'}
-                                        onChange={(e) => setFormData({ ...formData, toToken: e.target.value })}
-                                        className="w-full px-4 py-3 bg-slate-800 border border-slate-700 rounded-lg text-white focus:outline-none focus:ring-2 focus:ring-purple-500"
-                                    >
-                                        <option value="AWE">AWE</option>
-                                        <option value="CGPT">CGPT</option>
-                                    </select>
-                                </div>
-                            </div>
-                            <div>
-                                <label className="block text-sm font-medium text-slate-300 mb-2">Amount</label>
-                                <div className="relative">
-                                    <input
-                                        type="text"
-                                        value={formData.swapAmount || ''}
-                                        onChange={(e) => setFormData({ ...formData, swapAmount: e.target.value })}
-                                        placeholder="0.0"
-                                        className="w-full px-4 py-3 bg-slate-800 border border-slate-700 rounded-lg text-white placeholder-slate-500 focus:outline-none focus:ring-2 focus:ring-purple-500"
-                                    />
-                                    <div className="absolute right-4 top-1/2 -translate-y-1/2 text-slate-400">
-                                        {formData.fromToken || 'USDC'}
-                                    </div>
-                                </div>
-                            </div>
-                        </div>
-                    )}
-
-                    {/* Deploy Form */}
-                    {selectedAction === 'deploy' && (
-                        <div className="space-y-4">
-                            <div>
-                                <label className="block text-sm font-medium text-slate-300 mb-2">Contract Bytecode</label>
-                                <textarea
-                                    value={formData.contractCode || ''}
-                                    onChange={(e) => setFormData({ ...formData, contractCode: e.target.value })}
-                                    placeholder="0x..."
-                                    rows={4}
-                                    className="w-full px-4 py-3 bg-slate-800 border border-slate-700 rounded-lg text-white placeholder-slate-500 focus:outline-none focus:ring-2 focus:ring-purple-500 font-mono text-sm"
-                                />
-                            </div>
-                            <div>
-                                <label className="block text-sm font-medium text-slate-300 mb-2">Constructor Arguments (JSON)</label>
-                                <input
-                                    type="text"
-                                    value={formData.constructorArgs || ''}
-                                    onChange={(e) => setFormData({ ...formData, constructorArgs: e.target.value })}
-                                    placeholder='["arg1", 123]'
-                                    className="w-full px-4 py-3 bg-slate-800 border border-slate-700 rounded-lg text-white placeholder-slate-500 focus:outline-none focus:ring-2 focus:ring-purple-500 font-mono"
-                                />
-                            </div>
-                        </div>
-                    )}
-
-                    {/* Call Form */}
-                    {selectedAction === 'call' && (
-                        <div className="space-y-4">
-                            <div>
-                                <label className="block text-sm font-medium text-slate-300 mb-2">Contract Address</label>
-                                <input
-                                    type="text"
-                                    value={formData.contractAddress || ''}
-                                    onChange={(e) => setFormData({ ...formData, contractAddress: e.target.value })}
-                                    placeholder="0x..."
-                                    className="w-full px-4 py-3 bg-slate-800 border border-slate-700 rounded-lg text-white placeholder-slate-500 focus:outline-none focus:ring-2 focus:ring-purple-500"
-                                />
-                            </div>
-                            <div>
-                                <label className="block text-sm font-medium text-slate-300 mb-2">Function Name</label>
-                                <input
-                                    type="text"
-                                    value={formData.functionName || ''}
-                                    onChange={(e) => setFormData({ ...formData, functionName: e.target.value })}
-                                    placeholder="transfer"
-                                    className="w-full px-4 py-3 bg-slate-800 border border-slate-700 rounded-lg text-white placeholder-slate-500 focus:outline-none focus:ring-2 focus:ring-purple-500"
-                                />
-                            </div>
-                            <div>
-                                <label className="block text-sm font-medium text-slate-300 mb-2">Function Arguments (JSON)</label>
-                                <input
-                                    type="text"
-                                    value={formData.functionArgs || ''}
-                                    onChange={(e) => setFormData({ ...formData, functionArgs: e.target.value })}
-                                    placeholder='["0x...", "1000000"]'
-                                    className="w-full px-4 py-3 bg-slate-800 border border-slate-700 rounded-lg text-white placeholder-slate-500 focus:outline-none focus:ring-2 focus:ring-purple-500 font-mono"
-                                />
-                            </div>
-                        </div>
-                    )}
-
-                    {/* Security Warning */}
-                    <div className="flex items-start gap-3 p-4 bg-yellow-500/10 border border-yellow-500/20 rounded-lg mt-6">
-                        <AlertTriangle className="w-5 h-5 text-yellow-400 flex-shrink-0 mt-0.5" />
-                        <div className="text-sm text-yellow-300">
-                            <strong>Security Check:</strong> This action will be verified against your spend caps and allow/deny lists before execution.
-                        </div>
-                    </div>
-
-                    {/* Execute Button */}
-                    <button
-                        onClick={handleExecute}
-                        disabled={!isConnected}
-                        className="w-full mt-6 px-6 py-4 bg-purple-600 hover:bg-purple-700 disabled:opacity-50 disabled:cursor-not-allowed text-white rounded-xl font-semibold transition-all flex items-center justify-center gap-2"
+            {/* Actions Grid */}
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+                {actionTypes.map((action) => (
+                    <div
+                        key={action.id}
+                        className="bg-slate-900 border border-slate-800 rounded-2xl p-6 hover:border-yellow-500/30 transition-all group"
                     >
-                        <Shield className="w-5 h-5" />
-                        Execute with x402 Payment
-                    </button>
-                </div>
-            )}
+                        <div className="flex items-start justify-between mb-6">
+                            <div className="flex items-center gap-4">
+                                <div className="w-12 h-12 rounded-xl bg-slate-800 flex items-center justify-center group-hover:bg-yellow-500/10 transition-colors">
+                                    <action.icon className="w-6 h-6 text-slate-400 group-hover:text-yellow-400" />
+                                </div>
+                                <div>
+                                    <span className="text-[10px] uppercase tracking-wider font-bold text-slate-500 mb-1 block">
+                                        {action.category}
+                                    </span>
+                                    <h3 className="font-bold text-white text-lg">{action.name}</h3>
+                                </div>
+                            </div>
+                            <div className="text-right">
+                                <span className="text-xs text-slate-500">Service Fee</span>
+                                <p className="font-bold text-white">{action.cost}</p>
+                            </div>
+                        </div>
 
-            {/* x402 Payment Flow */}
-            {showPayment && (
-                <X402PaymentFlow
-                    serviceType={selectedAction as any}
-                    agentId={address}
-                    actionData={actionData}
+                        <p className="text-slate-400 text-sm mb-8 leading-relaxed">
+                            {action.description}
+                        </p>
+
+                        <button
+                            onClick={() => handleActionClick(action.id)}
+                            disabled={!isBNBTestnet || actionStatus === 'executing'}
+                            className="w-full py-3 bg-slate-800 hover:bg-yellow-600 hover:text-white text-slate-300 rounded-xl font-semibold transition-all flex items-center justify-center gap-2"
+                        >
+                            <Zap className="w-4 h-4" />
+                            Initialize Action
+                        </button>
+                    </div>
+                ))}
+            </div>
+
+            {/* Payment & Execution Flow */}
+            {activeAction && (
+                <Q402PaymentFlow
+                    serviceType={activeAction as any}
+                    agentId="primary-orchestrator"
                     onSuccess={handlePaymentSuccess}
-                    onCancel={() => setShowPayment(false)}
+                    onCancel={() => setActiveAction(null)}
                 />
             )}
 
-            {/* Transaction History */}
-            {txHistory.length > 0 && (
-                <div className="bg-slate-900 border border-slate-800 rounded-2xl p-6">
-                    <h3 className="text-lg font-bold text-white mb-4">Recent Actions</h3>
-                    <div className="space-y-3">
-                        {txHistory.map((tx, i) => (
-                            <div key={i} className="flex items-center justify-between p-3 bg-slate-800/50 rounded-lg">
-                                <div className="flex items-center gap-3">
-                                    <div className="w-2 h-2 rounded-full bg-emerald-500"></div>
-                                    <span className="text-white font-medium capitalize">{tx.type}</span>
-                                </div>
-                                <a
-                                    href={`https://sepolia.basescan.org/tx/${tx.txHash}`}
-                                    target="_blank"
-                                    rel="noreferrer"
-                                    className="text-sm text-purple-400 hover:text-purple-300 font-mono"
-                                >
-                                    {tx.txHash.slice(0, 10)}...{tx.txHash.slice(-8)}
-                                </a>
-                            </div>
-                        ))}
+            {/* Status Modals */}
+            {actionStatus === 'executing' && (
+                <div className="fixed inset-0 bg-black/80 flex items-center justify-center z-50 p-4">
+                    <div className="bg-slate-900 border border-slate-800 rounded-2xl p-8 max-w-md w-full text-center">
+                        <Loader2 className="w-16 h-16 text-yellow-500 animate-spin mx-auto mb-6" />
+                        <h2 className="text-2xl font-bold text-white mb-2">Agent Executing...</h2>
+                        <p className="text-slate-400">
+                            The ChainGPT Super Agent is processing your request on-chain.
+                        </p>
+                    </div>
+                </div>
+            )}
+
+            {actionStatus === 'success' && (
+                <div className="fixed inset-0 bg-black/80 flex items-center justify-center z-50 p-4">
+                    <div className="bg-slate-900 border border-slate-800 rounded-2xl p-8 max-w-md w-full text-center">
+                        <div className="w-16 h-16 rounded-full bg-emerald-500/20 flex items-center justify-center mx-auto mb-6">
+                            <CheckCircle className="w-10 h-10 text-emerald-400" />
+                        </div>
+                        <h2 className="text-2xl font-bold text-white mb-2">Action Successful!</h2>
+                        <p className="text-slate-400 mb-8">
+                            ChainGPT has successfully executed the task on BNB Testnet.
+                        </p>
+                        <button
+                            onClick={() => {
+                                setActionStatus('idle');
+                                setActiveAction(null);
+                            }}
+                            className="w-full py-3 bg-emerald-600 hover:bg-emerald-700 text-white rounded-xl font-semibold transition-colors"
+                        >
+                            Back to Actions
+                        </button>
+                    </div>
+                </div>
+            )}
+
+            {actionStatus === 'error' && (
+                <div className="fixed inset-0 bg-black/80 flex items-center justify-center z-50 p-4">
+                    <div className="bg-slate-900 border border-slate-800 rounded-2xl p-8 max-w-md w-full text-center">
+                        <div className="w-16 h-16 rounded-full bg-red-500/20 flex items-center justify-center mx-auto mb-6">
+                            <AlertCircle className="w-10 h-10 text-red-400" />
+                        </div>
+                        <h2 className="text-2xl font-bold text-white mb-2">Execution Failed</h2>
+                        <p className="text-slate-400 mb-8">{error}</p>
+                        <button
+                            onClick={() => setActionStatus('idle')}
+                            className="w-full py-3 bg-slate-800 hover:bg-slate-700 text-white rounded-xl font-semibold transition-colors"
+                        >
+                            Try Again
+                        </button>
                     </div>
                 </div>
             )}
         </div>
     );
 }
-

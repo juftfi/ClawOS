@@ -71,15 +71,32 @@ router.get('/', asyncHandler(async (req, res) => {
 
     const responseTime = Date.now() - startTime;
 
+    // Services status
+    const membaseService = require('../services/memory/MembaseService');
+    const llmService = require('../services/chainGPT/LLMService');
+
+    const services = {
+        unibase: {
+            status: membaseService.isConnected ? 'online' : 'fallback',
+            hubConnected: membaseService.isConnected,
+            stats: membaseService.getStats()
+        },
+        chainGPT: {
+            status: process.env.CHAINGPT_API_KEY ? 'active' : 'inactive',
+            configured: !!process.env.CHAINGPT_API_KEY
+        }
+    };
+
     const healthData = {
         success: true,
-        status: blockchainStatus.connected ? 'healthy' : 'degraded',
+        status: (blockchainStatus.connected && services.unibase.status !== 'offline') ? 'healthy' : 'degraded',
         timestamp: new Date().toISOString(),
         uptime: process.uptime(),
         responseTime: `${responseTime}ms`,
         environment: process.env.NODE_ENV || 'development',
         version: '1.0.0',
         blockchain: blockchainStatus,
+        services,
         memory,
         system: {
             platform: process.platform,
@@ -88,8 +105,8 @@ router.get('/', asyncHandler(async (req, res) => {
         }
     };
 
-    // Return 503 if blockchain is not connected
-    const statusCode = blockchainStatus.connected ? 200 : 503;
+    // Return 503 if critical services are down
+    const statusCode = (blockchainStatus.connected) ? 200 : 503;
 
     res.status(statusCode).json(healthData);
 }));
