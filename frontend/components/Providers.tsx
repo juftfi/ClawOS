@@ -20,6 +20,7 @@ import {
 import { QueryClient, QueryClientProvider } from '@tanstack/react-query';
 import { WagmiProvider } from 'wagmi';
 import { ThemeProvider as NextThemesProvider } from 'next-themes';
+import { AuthProvider } from '@/lib/auth-context';
 import '@rainbow-me/rainbowkit/styles.css';
 
 const { wallets } = getDefaultWallets();
@@ -46,7 +47,9 @@ export function Providers({ children }: { children: React.ReactNode }) {
                     })}
                 >
                     <NextThemesProvider attribute="class" defaultTheme="dark" enableSystem={false}>
-                        {children}
+                        <AuthProvider>
+                            {children}
+                        </AuthProvider>
                     </NextThemesProvider>
                 </RainbowKitProvider>
             </QueryClientProvider>
