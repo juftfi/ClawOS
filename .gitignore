@@ -36,4 +36,5 @@ deployed_address.txt
 # Temp
 .gemini/
 .agent/
+.claude/
 tmp/

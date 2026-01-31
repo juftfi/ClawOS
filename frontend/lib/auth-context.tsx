@@ -2,7 +2,7 @@
 
 import React, { createContext, useContext, useEffect, useState } from 'react';
 import { User, Session } from '@supabase/supabase-js';
-import { supabase, auth, UserProfile, userProfile } from './supabase';
+import { supabase, auth, UserProfile, userProfile, isSupabaseConfigured } from './supabase';
 
 interface AuthContextType {
   user: User | null;
@@ -43,6 +43,12 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
 
   // Initialize auth state
   useEffect(() => {
+    // Skip if Supabase is not configured
+    if (!isSupabaseConfigured()) {
+      setLoading(false);
+      return;
+    }
+
     const initializeAuth = async () => {
       try {
         // Get current session

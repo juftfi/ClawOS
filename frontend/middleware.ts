@@ -2,8 +2,20 @@ import { NextResponse } from 'next/server';
 import type { NextRequest } from 'next/server';
 import { createClient } from '@supabase/supabase-js';
 
-const supabaseUrl = process.env.NEXT_PUBLIC_SUPABASE_URL!;
-const supabaseAnonKey = process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY!;
+const supabaseUrl = process.env.NEXT_PUBLIC_SUPABASE_URL || '';
+const supabaseAnonKey = process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY || '';
+
+// Check if we have valid Supabase credentials
+const isValidUrl = (url: string) => {
+  try {
+    new URL(url);
+    return url.startsWith('http://') || url.startsWith('https://');
+  } catch {
+    return false;
+  }
+};
+
+const hasValidCredentials = isValidUrl(supabaseUrl) && supabaseAnonKey.length > 0;
 
 export async function middleware(request: NextRequest) {
   const { pathname } = request.nextUrl;
@@ -21,6 +33,11 @@ export async function middleware(request: NextRequest) {
 
   // Protect dashboard routes
   if (pathname.startsWith('/dashboard')) {
+    // If Supabase is not configured, allow access (for development)
+    if (!hasValidCredentials) {
+      return NextResponse.next();
+    }
+
     try {
       // Check for Supabase session
       const supabase = createClient(supabaseUrl, supabaseAnonKey);

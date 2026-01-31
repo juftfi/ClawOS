@@ -131,7 +131,7 @@ Create `frontend/.env.local` and add:
 NEXT_PUBLIC_SUPABASE_URL=https://your-project.supabase.co
 NEXT_PUBLIC_SUPABASE_ANON_KEY=your-anon-key
 NEXT_PUBLIC_BACKEND_URL=http://localhost:3000
-NEXT_PUBLIC_WALLETCONNECT_PROJECT_ID=your-walletconnect-id
+NEXT_PUBLIC_WALLETCONNECT_PROJECT_ID=1f4739d580b8eb2d3144a983ed1d4323
 ```
 
 ## 4. Test the Authentication Flow
