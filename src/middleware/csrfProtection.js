@@ -88,7 +88,7 @@ const csrfProtection = (req, res, next) => {
   }
 
   // Get CSRF token from header or body
-  const token = req.headers['x-csrf-token'] || req.body._csrf;
+  const token = req.headers['x-csrf-token'] || req.body?._csrf;
 
   if (!token) {
     logger.warn(`CSRF token missing for ${req.method} ${req.path} from IP ${req.ip}`);
@@ -130,7 +130,7 @@ const csrfProtectionDev = (req, res, next) => {
     return next();
   }
 
-  const token = req.headers['x-csrf-token'] || req.body._csrf;
+  const token = req.headers['x-csrf-token'] || req.body?._csrf;
   if (!token) {
     logger.warn(`[DEV MODE] CSRF token missing for ${req.method} ${req.path}`);
   }
