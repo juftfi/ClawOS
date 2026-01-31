@@ -4,7 +4,10 @@ const helmet = require('helmet');
 const cors = require('cors');
 const morgan = require('morgan');
 const bodyParser = require('body-parser');
+const cookieParser = require('cookie-parser');
 const { errorHandler, notFoundHandler } = require('./middleware/errorHandler');
+const { apiLimiter, authLimiter } = require('./middleware/rateLimiter');
+const { csrfProtectionDev } = require('./middleware/csrfProtection');
 const healthRouter = require('./routes/health');
 const logger = require('./utils/logger');
 
@@ -56,6 +59,16 @@ app.use(bodyParser.urlencoded({ limit: '10mb', extended: true }));
 app.use(express.json());
 app.use(express.urlencoded({ extended: true }));
 
+// Cookie parser middleware
+app.use(cookieParser());
+
+// Rate limiting middleware (applied to all routes)
+app.use('/api/', apiLimiter);
+
+// CSRF protection (development mode - only logs warnings)
+// Switch to csrfProtection in production
+app.use(csrfProtectionDev);
+
 // Logging middleware
 app.use(morgan('combined', {
   stream: {
@@ -64,6 +77,7 @@ app.use(morgan('combined', {
 }));
 
 // Routes
+const authRouter = require('./routes/auth');
 const chainGPTRouter = require('./routes/chainGPT');
 const blockchainRouter = require('./routes/blockchain');
 const memoryRouter = require('./routes/memory');
@@ -75,6 +89,7 @@ const securityRouter = require('./routes/security');
 const quackRouter = require('./routes/quack');
 
 app.use('/api/health', healthRouter);
+app.use('/api/auth', authLimiter, authRouter); // Apply stricter rate limiting to auth routes
 app.use('/api/ai', chainGPTRouter);
 app.use('/api/blockchain', blockchainRouter);
 app.use('/api/memory', memoryRouter);
