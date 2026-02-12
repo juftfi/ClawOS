@@ -14,7 +14,6 @@ import {
     ledgerWallet,
 } from '@rainbow-me/rainbowkit/wallets';
 import {
-    baseSepolia,
     bscTestnet,
 } from 'wagmi/chains';
 import { QueryClient, QueryClientProvider } from '@tanstack/react-query';
@@ -27,7 +26,7 @@ const { wallets } = getDefaultWallets();
 const config = getDefaultConfig({
     appName: 'AgentOS Web3',
     projectId: process.env.NEXT_PUBLIC_WALLETCONNECT_PROJECT_ID || 'YOUR_PROJECT_ID', // Replace with valid ID for production
-    chains: [baseSepolia, bscTestnet],
+    chains: [bscTestnet],
     ssr: true, // If your dApp uses server side rendering (SSR)
 });
 
@@ -38,7 +37,7 @@ export function Providers({ children }: { children: React.ReactNode }) {
         <WagmiProvider config={config}>
             <QueryClientProvider client={queryClient}>
                 <RainbowKitProvider
-                    initialChain={baseSepolia}
+                    initialChain={bscTestnet}
                     theme={darkTheme({
                         accentColor: '#9333ea', // Purple-600
                         accentColorForeground: 'white',

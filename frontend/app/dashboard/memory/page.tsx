@@ -2,7 +2,7 @@
 
 import { useState, useEffect } from 'react';
 import { useAccount } from 'wagmi';
-import { Database, ShieldCheck, History, Search, RefreshCw, Cpu, Brain, Lock } from 'lucide-react';
+import { Database, ShieldCheck, History, Search, RefreshCw, Cpu, Brain, Lock, Loader2 } from 'lucide-react';
 import axios from 'axios';
 
 export default function MemoryPage() {
@@ -120,7 +120,7 @@ export default function MemoryPage() {
                                             )}
                                         </div>
                                     </div>
-                                    <Search className="w-5 h-5 text-slate-600 cursor-help" title="Inspect IPFS Content" />
+                                    <Search className="w-5 h-5 text-slate-600 cursor-help" />
                                 </div>
                             </div>
                         ))}

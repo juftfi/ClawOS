@@ -1,7 +1,7 @@
 'use client';
 
 import { useAccount, useSwitchChain } from 'wagmi';
-import { baseSepolia, bscTestnet } from 'wagmi/chains';
+import { bscTestnet } from 'wagmi/chains';
 import { Globe, AlertTriangle } from 'lucide-react';
 
 export function NetworkToggle() {

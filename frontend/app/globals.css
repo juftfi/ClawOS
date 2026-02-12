@@ -4,16 +4,128 @@
 
 @layer base {
   :root {
-    --background: 255 255 255;
+    --background: 248 250 252;
     --foreground: 15 23 42;
   }
-
   .dark {
-    --background: 2 6 23;
-    --foreground: 248 250 252;
+    --background: 6 10 20;
+    --foreground: 241 245 249;
+  }
+
+  html {
+    scroll-behavior: smooth;
+    -webkit-tap-highlight-color: transparent;
+  }
+
+  body {
+    @apply bg-white dark:bg-surface-950 text-slate-900 dark:text-slate-100 antialiased;
+    -webkit-font-smoothing: antialiased;
+    -moz-osx-font-smoothing: grayscale;
+  }
+
+  ::selection {
+    @apply bg-neon-cyan/20 text-white;
   }
 }
 
-body {
-  @apply bg-white dark:bg-slate-950 text-slate-900 dark:text-slate-50;
+@layer components {
+  /* Glass morphism cards */
+  .glass {
+    @apply bg-white/80 dark:bg-white/[0.04] backdrop-blur-xl border border-slate-200 dark:border-white/[0.06];
+  }
+  .glass-strong {
+    @apply bg-white/90 dark:bg-white/[0.07] backdrop-blur-2xl border border-slate-200 dark:border-white/[0.08];
+  }
+
+  /* Neon glow border effect */
+  .neon-border {
+    @apply relative;
+  }
+  .neon-border::before {
+    content: '';
+    @apply absolute -inset-px rounded-[inherit] pointer-events-none;
+    background: linear-gradient(135deg, rgba(0,240,255,0.25), rgba(185,79,255,0.25), rgba(255,45,123,0.25));
+    mask: linear-gradient(#fff 0 0) content-box, linear-gradient(#fff 0 0);
+    mask-composite: exclude;
+    -webkit-mask-composite: xor;
+    padding: 1px;
+  }
+
+  /* Neon text gradient */
+  .text-gradient {
+    @apply bg-clip-text text-transparent;
+    background-image: linear-gradient(135deg, #00f0ff, #b94fff, #ff2d7b);
+  }
+  .text-gradient-subtle {
+    @apply bg-clip-text text-transparent;
+    background-image: linear-gradient(135deg, #00f0ff 0%, #b94fff 100%);
+  }
+
+  /* Cyber grid background */
+  .cyber-grid {
+    background-image:
+      linear-gradient(rgba(0, 240, 255, 0.04) 1px, transparent 1px),
+      linear-gradient(90deg, rgba(0, 240, 255, 0.04) 1px, transparent 1px);
+    background-size: 48px 48px;
+  }
+
+  /* Scanline overlay for cyberpunk feel */
+  .scanlines {
+    @apply relative;
+  }
+  .scanlines::after {
+    content: '';
+    @apply absolute inset-0 pointer-events-none opacity-[0.02];
+    background: repeating-linear-gradient(
+      0deg,
+      transparent,
+      transparent 2px,
+      rgba(0, 240, 255, 0.4) 2px,
+      rgba(0, 240, 255, 0.4) 4px
+    );
+  }
+
+  /* Stat card for dashboard */
+  .stat-card {
+    @apply glass rounded-2xl p-5 transition-all duration-200 hover:shadow-glass;
+  }
+
+  /* Mobile bottom nav bar */
+  .mobile-nav {
+    @apply fixed bottom-0 inset-x-0 z-50 glass-strong;
+    padding-bottom: env(safe-area-inset-bottom);
+  }
+
+  /* Glow button */
+  .btn-glow {
+    @apply relative overflow-hidden font-semibold transition-all duration-300;
+  }
+  .btn-glow::after {
+    content: '';
+    @apply absolute inset-0 opacity-0 transition-opacity duration-300;
+    background: linear-gradient(135deg, rgba(0,240,255,0.1), rgba(185,79,255,0.1));
+  }
+  .btn-glow:hover::after {
+    @apply opacity-100;
+  }
+}
+
+@layer utilities {
+  .no-scrollbar::-webkit-scrollbar { display: none; }
+  .no-scrollbar { -ms-overflow-style: none; scrollbar-width: none; }
+
+  .scrollbar-thin::-webkit-scrollbar { width: 4px; }
+  .scrollbar-thin::-webkit-scrollbar-track { background: transparent; }
+  .scrollbar-thin::-webkit-scrollbar-thumb { @apply bg-slate-300 dark:bg-slate-700 rounded-full; }
+
+  .safe-top { padding-top: env(safe-area-inset-top); }
+  .safe-bottom { padding-bottom: env(safe-area-inset-bottom); }
+  .safe-left { padding-left: env(safe-area-inset-left); }
+  .safe-right { padding-right: env(safe-area-inset-right); }
+
+  /* Animate gradient backgrounds */
+  .animate-gradient {
+    background-size: 200% 200%;
+    animation: gradient-shift 8s ease infinite;
+  }
 }
