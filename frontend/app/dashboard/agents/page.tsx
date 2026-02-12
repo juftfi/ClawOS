@@ -10,7 +10,6 @@ interface Agent {
     id: string;
     name: string;
     description: string;
-    identityAddress?: string; // ERC-8004 address
     walletAddress?: string;
     reputation: number;
 }

@@ -1,6 +1,6 @@
 'use client';
 
-import { Home, Bot, Users, CreditCard, Database, BarChart, Settings, Zap, Shield, FileCode } from 'lucide-react';
+import { Home, Bot, Users, CreditCard, Database, BarChart3, Settings, Zap, Shield, FileCode, X, Terminal } from 'lucide-react';
 import Link from 'next/link';
 import { usePathname } from 'next/navigation';
 
@@ -13,65 +13,141 @@ const navItems = [
     { icon: Shield, label: 'Security', href: '/dashboard/security' },
     { icon: CreditCard, label: 'Payments', href: '/dashboard/payments' },
     { icon: Database, label: 'Memory', href: '/dashboard/memory' },
-    { icon: BarChart, label: 'Analytics', href: '/dashboard/analytics' },
+    { icon: BarChart3, label: 'Analytics', href: '/dashboard/analytics' },
 ];
 
-export function Sidebar() {
+// Mobile bottom nav - only show 5 most important
+const mobileNavItems = [
+    { icon: Home, label: 'Home', href: '/dashboard' },
+    { icon: Bot, label: 'Chat', href: '/dashboard/chat' },
+    { icon: Zap, label: 'Actions', href: '/dashboard/actions' },
+    { icon: Database, label: 'Memory', href: '/dashboard/memory' },
+    { icon: BarChart3, label: 'More', href: '/dashboard/analytics' },
+];
+
+interface SidebarProps {
+    mobileOpen?: boolean;
+    onClose?: () => void;
+}
+
+export function Sidebar({ mobileOpen, onClose }: SidebarProps) {
     const pathname = usePathname();
 
     return (
-        <div className="hidden md:flex w-64 bg-white dark:bg-slate-900 border-r border-slate-200 dark:border-slate-800 flex-col transition-colors duration-300">
-            {/* Logo */}
-            <div className="p-6 border-b border-slate-200 dark:border-slate-800">
-                <Link href="/">
-                    <h1 className="text-2xl font-bold bg-gradient-to-r from-purple-600 to-pink-600 bg-clip-text text-transparent">
-                        AgentOS
-                    </h1>
-                    <p className="text-xs text-slate-500 mt-1">Web3 AI Platform</p>
-                </Link>
+        <>
+            {/* Desktop sidebar */}
+            <div className="hidden lg:flex w-60 glass flex-col transition-all duration-300">
+                {/* Logo */}
+                <div className="p-5 border-b border-slate-200 dark:border-white/5">
+                    <Link href="/" className="flex items-center gap-2.5">
+                        <div className="w-8 h-8 rounded-lg bg-gradient-to-br from-neon-cyan to-neon-purple flex items-center justify-center">
+                            <Terminal className="w-4 h-4 text-white" />
+                        </div>
+                        <span className="text-base font-bold text-slate-900 dark:text-white">AgentOS</span>
+                    </Link>
+                </div>
+
+                {/* Nav */}
+                <nav className="flex-1 px-3 py-4 overflow-y-auto no-scrollbar">
+                    <div className="space-y-0.5">
+                        {navItems.map((item) => {
+                            const isActive = pathname === item.href;
+                            return (
+                                <Link
+                                    key={item.href}
+                                    href={item.href}
+                                    className={`
+                                        flex items-center gap-3 px-3 py-2.5 rounded-xl text-sm font-medium transition-all
+                                        ${isActive
+                                            ? 'bg-neon-cyan/10 text-neon-cyan dark:text-neon-cyan'
+                                            : 'text-slate-500 dark:text-slate-400 hover:text-slate-900 dark:hover:text-white hover:bg-slate-100 dark:hover:bg-white/5'
+                                        }
+                                    `}
+                                >
+                                    <item.icon className={`w-[18px] h-[18px] ${isActive ? 'text-neon-cyan' : ''}`} />
+                                    <span>{item.label}</span>
+                                </Link>
+                            );
+                        })}
+                    </div>
+                </nav>
+
+                {/* Settings */}
+                <div className="p-3 border-t border-slate-200 dark:border-white/5">
+                    <Link
+                        href="/dashboard/settings"
+                        className="flex items-center gap-3 px-3 py-2.5 rounded-xl text-sm font-medium text-slate-500 dark:text-slate-400 hover:text-slate-900 dark:hover:text-white hover:bg-slate-100 dark:hover:bg-white/5 transition-all"
+                    >
+                        <Settings className="w-[18px] h-[18px]" />
+                        <span>Settings</span>
+                    </Link>
+                </div>
             </div>
 
-            {/* Navigation */}
-            <nav className="flex-1 px-4 py-6">
-                <div className="space-y-1">
-                    {navItems.map((item) => {
+            {/* Mobile drawer overlay */}
+            {mobileOpen && (
+                <div className="lg:hidden fixed inset-0 z-50">
+                    <div className="absolute inset-0 bg-black/60 backdrop-blur-sm" onClick={onClose} />
+                    <div className="absolute left-0 top-0 bottom-0 w-72 glass-strong animate-slide-in-right">
+                        <div className="flex items-center justify-between p-4 border-b border-white/5">
+                            <Link href="/" className="flex items-center gap-2.5">
+                                <div className="w-8 h-8 rounded-lg bg-gradient-to-br from-neon-cyan to-neon-purple flex items-center justify-center">
+                                    <Terminal className="w-4 h-4 text-white" />
+                                </div>
+                                <span className="text-base font-bold">AgentOS</span>
+                            </Link>
+                            <button onClick={onClose} className="p-2 text-slate-400 hover:text-white">
+                                <X className="w-5 h-5" />
+                            </button>
+                        </div>
+                        <nav className="px-3 py-4">
+                            <div className="space-y-0.5">
+                                {navItems.map((item) => {
+                                    const isActive = pathname === item.href;
+                                    return (
+                                        <Link
+                                            key={item.href}
+                                            href={item.href}
+                                            onClick={onClose}
+                                            className={`
+                                                flex items-center gap-3 px-3 py-3 rounded-xl text-sm font-medium transition-all
+                                                ${isActive
+                                                    ? 'bg-neon-cyan/10 text-neon-cyan'
+                                                    : 'text-slate-400 hover:text-white hover:bg-white/5'
+                                                }
+                                            `}
+                                        >
+                                            <item.icon className={`w-[18px] h-[18px] ${isActive ? 'text-neon-cyan' : ''}`} />
+                                            <span>{item.label}</span>
+                                        </Link>
+                                    );
+                                })}
+                            </div>
+                        </nav>
+                    </div>
+                </div>
+            )}
+
+            {/* Mobile bottom nav */}
+            <div className="lg:hidden mobile-nav">
+                <div className="flex items-center justify-around px-2 py-1.5">
+                    {mobileNavItems.map((item) => {
                         const isActive = pathname === item.href;
                         return (
                             <Link
                                 key={item.href}
                                 href={item.href}
-                                className={`
-                  flex items-center gap-3 px-4 py-3 rounded-lg transition-all
-                  ${isActive
-                                        ? 'bg-purple-600 text-white'
-                                        : 'text-slate-600 dark:text-slate-400 hover:text-purple-600 dark:hover:text-white hover:bg-purple-50 dark:hover:bg-slate-800'
-                                    }
-                `}
+                                className={`flex flex-col items-center gap-0.5 px-3 py-1.5 rounded-lg transition-all ${
+                                    isActive ? 'text-neon-cyan' : 'text-slate-500'
+                                }`}
                             >
-                                <item.icon className={`w-5 h-5 ${isActive ? 'text-white' : ''}`} />
-                                <span className="font-medium">{item.label}</span>
+                                <item.icon className="w-5 h-5" />
+                                <span className="text-[10px] font-medium">{item.label}</span>
                             </Link>
                         );
                     })}
                 </div>
-            </nav>
-
-            {/* Settings */}
-            <div className="p-4 border-t border-slate-200 dark:border-slate-800 space-y-3">
-                <Link
-                    href="/dashboard/settings"
-                    className="flex items-center gap-3 px-4 py-3 text-slate-600 dark:text-slate-400 hover:text-purple-600 dark:hover:text-white hover:bg-purple-50 dark:hover:bg-slate-800 rounded-lg transition-all"
-                >
-                    <Settings className="w-5 h-5" />
-                    <span className="font-medium">Settings</span>
-                </Link>
-                <div className="px-4 text-[10px] text-slate-500 font-mono">
-                    <p className="mb-1 opacity-70">Contract Active:</p>
-                    <p className="break-all text-purple-600 dark:text-purple-400">
-                        {process.env.NEXT_PUBLIC_CONTRACT_ADDRESS || '0x...'}
-                    </p>
-                </div>
             </div>
-        </div>
+        </>
     );
 }

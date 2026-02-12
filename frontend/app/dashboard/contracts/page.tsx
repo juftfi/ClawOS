@@ -24,7 +24,7 @@ export default function ContractsPage() {
     const [showPayment, setShowPayment] = useState(false);
     const [deployData, setDeployData] = useState<any>(null);
 
-    const networkName = chain?.id === 84532 ? 'base-sepolia' : 'bsc-testnet';
+    const networkName = 'bnb-testnet';
 
     const [hasMounted, setHasMounted] = useState(false);
 

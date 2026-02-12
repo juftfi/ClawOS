@@ -3,18 +3,7 @@ const { createWalletClient, createPublicClient, http } = require('viem');
 const { privateKeyToAccount } = require('viem/accounts');
 const logger = require('../../utils/logger');
 
-// Define chain configurations manually
-const baseSepolia = {
-    id: 84532,
-    name: 'Base Sepolia',
-    network: 'base-sepolia',
-    nativeCurrency: { name: 'Ether', symbol: 'ETH', decimals: 18 },
-    rpcUrls: {
-        default: { http: ['https://sepolia.base.org'] },
-        public: { http: ['https://sepolia.base.org'] }
-    }
-};
-
+// Define chain configurations
 const bscTestnet = {
     id: 97,
     name: 'BNB Smart Chain Testnet',
@@ -29,14 +18,6 @@ const bscTestnet = {
 class MultiNetworkBlockchainService {
     constructor() {
         this.networks = {
-            'base-sepolia': {
-                name: 'Base Sepolia Testnet',
-                chainId: 84532,
-                rpc: process.env.BASE_TESTNET_RPC || 'https://sepolia.base.org',
-                chain: baseSepolia,
-                privateKey: process.env.BASE_PRIVATE_KEY,
-                walletAddress: process.env.BASE_WALLET_ADDRESS
-            },
             'bnb-testnet': {
                 name: 'BNB Smart Chain Testnet',
                 chainId: 97,
@@ -187,7 +168,7 @@ class MultiNetworkBlockchainService {
                 address,
                 balance_wei: balanceWei.toString(),
                 balance_eth: balanceEth,
-                balance_formatted: `${parseFloat(balanceEth).toFixed(6)} ${network === 'base-sepolia' ? 'ETH' : 'BNB'}`
+                balance_formatted: `${parseFloat(balanceEth).toFixed(6)} BNB`
             };
         } catch (error) {
             logger.error(`Get balance error on ${network}:`, error.message);

@@ -346,15 +346,7 @@ class AgentOrchestrator {
         try {
             const workflowId = this.createWorkflowId(actionType);
             const userId = actionData.executor || 'default';
-            // Default network if not specified (ActionsPage doesn't explicitly send network in actionData, but relies on connected wallet on frontend?)
-            // Frontend PaymentFlow handles payment on current network.
-            // Backend needs to specific network for execution or assumes same environment?
-            // ActionsPage uses "isBaseSepolia" checks but doesn't send "network" field in actionData implicitly, maybe explicitly?
-            // Checking ActionsPage: it sends { ...formData, executor: address }. formData doesn't have network.
-            // But AgentOrchestrator methods usually take 'network'.
-            // I'll default to 'base-sepolia' or infer?
-            // Let's assume passed in actionData or default.
-            const network = actionData.network || 'base-sepolia';
+            const network = actionData.network || 'bnb-testnet';
 
             this.updateWorkflowStatus(workflowId, 'running', {
                 step: 'executing',

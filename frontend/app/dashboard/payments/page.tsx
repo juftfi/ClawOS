@@ -32,7 +32,7 @@ export default function PaymentsPage() {
         try {
             setLoading(true);
             const API_URL = process.env.NEXT_PUBLIC_API_URL || 'http://localhost:3000';
-            const response = await axios.get(`${API_URL}/api/awe/payment/history`);
+            const response = await axios.get(`${API_URL}/api/quack/payment/history`);
 
             if (response.data && response.data.history) {
                 setPayments(response.data.history);
@@ -87,8 +87,8 @@ export default function PaymentsPage() {
             {/* Header */}
             <div className="flex items-center justify-between">
                 <div>
-                    <h1 className="text-3xl font-bold text-white mb-2">x402 Payments</h1>
-                    <p className="text-slate-400">Real-time value flow on Base Sepolia.</p>
+                    <h1 className="text-3xl font-bold text-white mb-2">Q402 Payments</h1>
+                    <p className="text-slate-400">Real-time value flow on BNB Testnet.</p>
                 </div>
                 <button
                     onClick={fetchHistory}
