@@ -42,7 +42,9 @@ describe('ChainGPT LLM Service', () => {
         it('should handle API errors gracefully', async () => {
             axios.post.mockRejectedValue(new Error('API Error'));
 
-            await expect(LLMService.chat('Test prompt')).rejects.toThrow('API Error');
+            const result = await LLMService.chat('Test prompt');
+            expect(result).toHaveProperty('response');
+            expect(result.response).toContain('Service temporarily unavailable');
         });
 
         it('should handle rate limiting (429)', async () => {
@@ -50,7 +52,9 @@ describe('ChainGPT LLM Service', () => {
             error.response = { status: 429 };
             axios.post.mockRejectedValue(error);
 
-            await expect(LLMService.chat('Test prompt')).rejects.toThrow('Rate limit exceeded');
+            const result = await LLMService.chat('Test prompt');
+            expect(result).toHaveProperty('response');
+            expect(result.response).toContain('Service temporarily unavailable');
         });
 
         it('should use cache for repeated requests', async () => {

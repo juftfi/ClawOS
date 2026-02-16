@@ -15,21 +15,19 @@ export function TopBar({ onMenuToggle }: TopBarProps) {
     const displayTitle = pageTitle.charAt(0).toUpperCase() + pageTitle.slice(1);
 
     return (
-        <div className="h-14 glass flex items-center justify-between px-4 lg:px-6 safe-top">
-            {/* Left: Mobile menu + Page title */}
+        <div className="h-14 md:h-16 bg-black/70 border-b border-white/10 flex items-center justify-between px-4 md:px-8 backdrop-blur-xl safe-top">
             <div className="flex items-center gap-3">
                 <button
                     onClick={onMenuToggle}
-                    className="lg:hidden p-2 -ml-2 text-slate-500 hover:text-slate-900 dark:hover:text-white rounded-lg hover:bg-slate-100 dark:hover:bg-white/5 transition-colors"
+                    className="lg:hidden p-2 -ml-2 text-white/70 hover:text-white rounded-lg hover:bg-white/10 transition-colors"
                 >
                     <Menu className="w-5 h-5" />
                 </button>
-                <h2 className="text-sm font-semibold text-slate-900 dark:text-white">
+                <h2 className="text-sm md:text-base font-semibold text-white">
                     {displayTitle === 'Dashboard' ? 'Overview' : displayTitle}
                 </h2>
             </div>
 
-            {/* Right: Wallet + Theme */}
             <div className="flex items-center gap-2">
                 <div className="hidden sm:block">
                     <ConnectButton showBalance={false} accountStatus="address" chainStatus="icon" />

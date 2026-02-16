@@ -12,16 +12,15 @@ export function NetworkToggle() {
         {
             chain: bscTestnet,
             name: 'BNB Testnet',
-            description: 'Quack × ChainGPT',
+            description: 'Quack x ChainGPT',
             token: 'USDT',
-            color: 'yellow'
-        }
+        },
     ];
 
     return (
-        <div className="bg-slate-900 border border-slate-800 rounded-xl p-4">
+        <div className="bg-white/5 border border-white/10 rounded-2xl p-4">
             <div className="flex items-center gap-2 mb-3">
-                <Globe className="w-5 h-5 text-purple-400" />
+                <Globe className="w-5 h-5 text-white/70" />
                 <h3 className="font-semibold text-white">Network</h3>
             </div>
 
@@ -34,22 +33,16 @@ export function NetworkToggle() {
                             key={network.chain.id}
                             onClick={() => switchChain?.({ chainId: network.chain.id })}
                             disabled={isPending || isActive}
-                            className={`
-                                p-3 rounded-lg border-2 transition-all text-left
-                                ${isActive
-                                    ? `border-${network.color}-500 bg-${network.color}-500/10`
-                                    : 'border-slate-700 hover:border-slate-600 bg-slate-800/50'
-                                }
-                                ${isPending ? 'opacity-50 cursor-not-allowed' : 'cursor-pointer'}
-                            `}
+                            className={`p-3 rounded-xl border transition-all text-left ${isActive
+                                ? 'border-amber-400/50 bg-amber-500/10'
+                                : 'border-white/10 hover:border-white/30 bg-black/40'
+                                } ${isPending ? 'opacity-50 cursor-not-allowed' : 'cursor-pointer'}`}
                         >
                             <div className="flex items-center justify-between mb-1">
-                                <span className={`font-semibold text-sm ${isActive ? `text-${network.color}-400` : 'text-white'}`}>
+                                <span className={`font-semibold text-sm ${isActive ? 'text-amber-300' : 'text-white'}`}>
                                     {network.name}
                                 </span>
-                                {isActive && (
-                                    <div className={`w-2 h-2 rounded-full bg-${network.color}-500`}></div>
-                                )}
+                                {isActive && <div className="w-2 h-2 rounded-full bg-amber-400"></div>}
                             </div>
                             <p className="text-xs text-slate-400 mb-1">{network.description}</p>
                             <p className="text-xs text-slate-500">Token: {network.token}</p>
@@ -59,8 +52,8 @@ export function NetworkToggle() {
             </div>
 
             <div className="flex items-start gap-2 p-2 bg-emerald-500/10 border border-emerald-500/20 rounded-lg">
-                <AlertTriangle className="w-4 h-4 text-emerald-400 flex-shrink-0 mt-0.5" />
-                <p className="text-xs text-emerald-300">
+                <AlertTriangle className="w-4 h-4 text-emerald-300 flex-shrink-0 mt-0.5" />
+                <p className="text-xs text-emerald-200">
                     <strong>TESTNET ONLY</strong> - Safe for demo. No real funds at risk.
                 </p>
             </div>

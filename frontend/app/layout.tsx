@@ -1,17 +1,12 @@
 import type { Metadata, Viewport } from "next";
-import { Inter, JetBrains_Mono } from 'next/font/google';
+import Script from "next/script";
+import { Outfit, Space_Grotesk } from "next/font/google";
 import "./globals.css";
 import { Providers } from "@/components/Providers";
+import { AnalyticsTracker } from "@/components/AnalyticsTracker";
 
-const inter = Inter({
-    subsets: ['latin'],
-    variable: '--font-inter',
-});
-
-const jetbrains = JetBrains_Mono({
-    subsets: ['latin'],
-    variable: '--font-mono',
-});
+const outfit = Outfit({ subsets: ["latin"], variable: "--font-display" });
+const spaceGrotesk = Space_Grotesk({ subsets: ["latin"], variable: "--font-sans" });
 
 export const viewport: Viewport = {
     width: 'device-width',
@@ -45,6 +40,9 @@ export default function RootLayout({
 }: Readonly<{
     children: React.ReactNode;
 }>) {
+    const plausibleDomain = process.env.NEXT_PUBLIC_PLAUSIBLE_DOMAIN;
+    const plausibleSrc = process.env.NEXT_PUBLIC_PLAUSIBLE_SRC || "https://plausible.io/js/script.js";
+
     return (
         <html lang="en" suppressHydrationWarning>
             <head>
@@ -52,8 +50,12 @@ export default function RootLayout({
                 <meta name="mobile-web-app-capable" content="yes" />
                 <link rel="apple-touch-icon" href="/icon-192.png" />
             </head>
-            <body className={`${inter.variable} ${jetbrains.variable} font-sans antialiased`}>
+            <body className={`${spaceGrotesk.variable} ${outfit.variable} bg-black text-white antialiased`}>
+                {plausibleDomain ? (
+                    <Script defer data-domain={plausibleDomain} src={plausibleSrc} />
+                ) : null}
                 <Providers>
+                    <AnalyticsTracker />
                     {children}
                 </Providers>
             </body>

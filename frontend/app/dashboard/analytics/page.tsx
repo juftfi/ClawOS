@@ -9,9 +9,32 @@ interface MetricCard {
     label: string;
     value: string;
     change: string;
-    icon: any;
-    color: string;
+    icon: typeof Brain;
+    tone: 'emerald' | 'blue' | 'purple' | 'cyan';
 }
+
+const toneStyles = {
+    emerald: {
+        bg: 'bg-emerald-500/10',
+        text: 'text-emerald-300',
+        ring: 'border-emerald-500/20',
+    },
+    blue: {
+        bg: 'bg-blue-500/10',
+        text: 'text-blue-300',
+        ring: 'border-blue-500/20',
+    },
+    purple: {
+        bg: 'bg-purple-500/10',
+        text: 'text-purple-300',
+        ring: 'border-purple-500/20',
+    },
+    cyan: {
+        bg: 'bg-cyan-500/10',
+        text: 'text-cyan-300',
+        ring: 'border-cyan-500/20',
+    },
+};
 
 export default function AnalyticsPage() {
     const { address } = useAccount();
@@ -56,76 +79,99 @@ export default function AnalyticsPage() {
     }, [hasMounted, address]);
 
     const metrics: MetricCard[] = [
-        { label: 'Total Q402 Volume', value: loading ? '...' : `$${totalVolume}`, change: 'USDC', icon: TrendingUp, color: 'emerald' },
-        { label: 'Transactions', value: loading ? '...' : txCount.toString(), change: 'All time', icon: Activity, color: 'blue' },
-        { label: 'Active Agents', value: '1', change: 'Orchestrator', icon: Brain, color: 'purple' },
-        { label: 'Memory Entries', value: '--', change: 'Unibase', icon: Database, color: 'emerald' },
+        {
+            label: 'Total Q402 Volume',
+            value: loading ? '...' : `$${totalVolume}`,
+            change: 'USDC',
+            icon: TrendingUp,
+            tone: 'emerald',
+        },
+        {
+            label: 'Transactions',
+            value: loading ? '...' : txCount.toString(),
+            change: 'All time',
+            icon: Activity,
+            tone: 'blue',
+        },
+        {
+            label: 'Active Agents',
+            value: '1',
+            change: 'Orchestrator',
+            icon: Brain,
+            tone: 'purple',
+        },
+        {
+            label: 'Memory Entries',
+            value: '--',
+            change: 'Unibase',
+            icon: Database,
+            tone: 'cyan',
+        },
     ];
 
     const integrationHealth = [
-        { name: 'ChainGPT Hub V2', status: 'Operational', latency: '~200ms', icon: Brain, color: 'purple' },
-        { name: 'Q402 Protocol', status: 'Operational', latency: '~150ms', icon: Shield, color: 'yellow' },
-        { name: 'Unibase AIP', status: 'Operational', latency: '~300ms', icon: Database, color: 'emerald' },
-        { name: 'BNB Testnet RPC', status: 'Operational', latency: '~100ms', icon: Zap, color: 'blue' },
+        { name: 'ChainGPT Hub V2', status: 'Operational', latency: '~200ms', icon: Brain, tone: 'purple' as const },
+        { name: 'Q402 Protocol', status: 'Operational', latency: '~150ms', icon: Shield, tone: 'emerald' as const },
+        { name: 'Unibase AIP', status: 'Operational', latency: '~300ms', icon: Database, tone: 'cyan' as const },
+        { name: 'BNB Testnet RPC', status: 'Operational', latency: '~100ms', icon: Zap, tone: 'blue' as const },
     ];
 
     const usageBreakdown = [
-        { service: 'ChainGPT Research', category: 'Intelligence', cost: '0.10 USDC', pct: 40 },
-        { service: 'Agent Deployment', category: 'Execution', cost: '2.00 USDC', pct: 25 },
-        { service: 'DeFi Swap', category: 'DeFi', cost: '0.50 USDC', pct: 20 },
-        { service: 'Contract Call', category: 'Web3', cost: '0.50 USDC', pct: 15 },
+        { service: 'ChainGPT Research', category: 'Intelligence', cost: '0.10 USDC', pct: 40, bar: 'from-cyan-500 to-blue-500' },
+        { service: 'Agent Deployment', category: 'Execution', cost: '2.00 USDC', pct: 25, bar: 'from-emerald-500 to-teal-500' },
+        { service: 'DeFi Swap', category: 'DeFi', cost: '0.50 USDC', pct: 20, bar: 'from-purple-500 to-pink-500' },
+        { service: 'Contract Call', category: 'Web3', cost: '0.50 USDC', pct: 15, bar: 'from-amber-500 to-orange-500' },
     ];
 
     return (
         <div className="max-w-7xl mx-auto space-y-8">
-            {/* Header */}
             <div className="flex items-center justify-between">
                 <div>
                     <h1 className="text-3xl font-bold text-white mb-1">Analytics</h1>
-                    <p className="text-slate-500 text-sm">Agent performance and usage metrics</p>
+                    <p className="text-slate-400 text-sm">Agent performance and usage metrics</p>
                 </div>
-                <div className="flex items-center gap-2 px-3 py-1.5 bg-slate-800 border border-slate-700 rounded-lg">
-                    <Clock className="w-4 h-4 text-slate-400" />
-                    <span className="text-xs text-slate-400">Real-time</span>
+                <div className="flex items-center gap-2 px-3 py-1.5 bg-white/5 border border-white/10 rounded-lg">
+                    <Clock className="w-4 h-4 text-white/60" />
+                    <span className="text-xs text-white/60">Real-time</span>
                 </div>
             </div>
 
-            {/* Metrics Grid */}
             <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
-                {metrics.map((m, i) => (
-                    <div key={i} className="bg-slate-900/80 border border-slate-800 rounded-xl p-5">
+                {metrics.map((m) => (
+                    <div key={m.label} className="bg-white/5 border border-white/10 rounded-xl p-5">
                         <div className="flex items-center justify-between mb-3">
-                            <div className={`p-2.5 rounded-lg bg-${m.color}-500/10`}>
-                                <m.icon className={`w-5 h-5 text-${m.color}-400`} />
+                            <div className={`p-2.5 rounded-lg ${toneStyles[m.tone].bg} ${toneStyles[m.tone].ring} border`}>
+                                <m.icon className={`w-5 h-5 ${toneStyles[m.tone].text}`} />
                             </div>
-                            <span className="text-[10px] text-slate-500 font-medium">{m.change}</span>
+                            <span className="text-[10px] text-white/50 font-medium uppercase tracking-[0.2em]">
+                                {m.change}
+                            </span>
                         </div>
                         <p className="text-2xl font-bold text-white mb-0.5">{m.value}</p>
-                        <p className="text-xs text-slate-500">{m.label}</p>
+                        <p className="text-xs text-slate-400">{m.label}</p>
                     </div>
                 ))}
             </div>
 
             <div className="grid lg:grid-cols-2 gap-6">
-                {/* Service Usage Breakdown */}
-                <div className="bg-slate-900/80 border border-slate-800 rounded-xl p-6">
+                <div className="bg-white/5 border border-white/10 rounded-xl p-6">
                     <div className="flex items-center gap-3 mb-6">
-                        <BarChart3 className="w-5 h-5 text-purple-400" />
+                        <BarChart3 className="w-5 h-5 text-cyan-300" />
                         <h2 className="text-lg font-semibold text-white">Service Usage</h2>
                     </div>
                     <div className="space-y-4">
-                        {usageBreakdown.map((item, i) => (
-                            <div key={i}>
+                        {usageBreakdown.map((item) => (
+                            <div key={item.service}>
                                 <div className="flex items-center justify-between mb-1.5">
                                     <div>
                                         <span className="text-sm text-white font-medium">{item.service}</span>
-                                        <span className="text-xs text-slate-600 ml-2">{item.category}</span>
+                                        <span className="text-xs text-slate-500 ml-2">{item.category}</span>
                                     </div>
                                     <span className="text-xs font-mono text-slate-400">{item.cost}</span>
                                 </div>
-                                <div className="h-2 bg-slate-800 rounded-full overflow-hidden">
+                                <div className="h-2 bg-white/10 rounded-full overflow-hidden">
                                     <div
-                                        className="h-full bg-gradient-to-r from-purple-500 to-pink-500 rounded-full transition-all duration-500"
+                                        className={`h-full bg-gradient-to-r ${item.bar} rounded-full transition-all duration-500`}
                                         style={{ width: `${item.pct}%` }}
                                     />
                                 </div>
@@ -134,27 +180,26 @@ export default function AnalyticsPage() {
                     </div>
                 </div>
 
-                {/* Integration Health */}
-                <div className="bg-slate-900/80 border border-slate-800 rounded-xl p-6">
+                <div className="bg-white/5 border border-white/10 rounded-xl p-6">
                     <div className="flex items-center gap-3 mb-6">
-                        <Activity className="w-5 h-5 text-emerald-400" />
+                        <Activity className="w-5 h-5 text-emerald-300" />
                         <h2 className="text-lg font-semibold text-white">Integration Health</h2>
                     </div>
                     <div className="space-y-4">
-                        {integrationHealth.map((item, i) => (
-                            <div key={i} className="flex items-center justify-between py-3 border-b border-slate-800/50 last:border-0">
+                        {integrationHealth.map((item) => (
+                            <div key={item.name} className="flex items-center justify-between py-3 border-b border-white/10 last:border-0">
                                 <div className="flex items-center gap-3">
-                                    <div className={`p-2 rounded-lg bg-${item.color}-500/10`}>
-                                        <item.icon className={`w-4 h-4 text-${item.color}-400`} />
+                                    <div className={`p-2 rounded-lg ${toneStyles[item.tone].bg} ${toneStyles[item.tone].ring} border`}>
+                                        <item.icon className={`w-4 h-4 ${toneStyles[item.tone].text}`} />
                                     </div>
                                     <div>
                                         <p className="text-sm font-medium text-white">{item.name}</p>
-                                        <p className="text-[10px] text-slate-600">Avg latency: {item.latency}</p>
+                                        <p className="text-[10px] text-slate-500">Avg latency: {item.latency}</p>
                                     </div>
                                 </div>
                                 <div className="flex items-center gap-2">
                                     <span className="w-2 h-2 rounded-full bg-emerald-400" />
-                                    <span className="text-xs text-emerald-400 font-medium">{item.status}</span>
+                                    <span className="text-xs text-emerald-300 font-medium">{item.status}</span>
                                 </div>
                             </div>
                         ))}
@@ -162,24 +207,23 @@ export default function AnalyticsPage() {
                 </div>
             </div>
 
-            {/* Network Info */}
-            <div className="bg-slate-900/80 border border-slate-800 rounded-xl p-6">
+            <div className="bg-white/5 border border-white/10 rounded-xl p-6">
                 <h2 className="text-lg font-semibold text-white mb-4">Network Configuration</h2>
                 <div className="grid grid-cols-1 sm:grid-cols-3 gap-4">
-                    <div className="bg-slate-800/50 rounded-lg p-4">
+                    <div className="bg-white/5 rounded-lg p-4 border border-white/10">
                         <p className="text-xs text-slate-500 mb-1">Chain</p>
                         <p className="text-sm font-semibold text-white">BNB Smart Chain Testnet</p>
-                        <p className="text-xs text-slate-600 font-mono mt-1">Chain ID: 97</p>
+                        <p className="text-xs text-slate-500 font-mono mt-1">Chain ID: 97</p>
                     </div>
-                    <div className="bg-slate-800/50 rounded-lg p-4">
+                    <div className="bg-white/5 rounded-lg p-4 border border-white/10">
                         <p className="text-xs text-slate-500 mb-1">RPC Endpoint</p>
-                        <p className="text-sm font-semibold text-white truncate">data-seed-prebsc-1-s1.binance.org</p>
-                        <p className="text-xs text-slate-600 font-mono mt-1">HTTPS</p>
+                        <p className="text-sm font-semibold text-white truncate">bsc-testnet-rpc.publicnode.com</p>
+                        <p className="text-xs text-slate-500 font-mono mt-1">HTTPS</p>
                     </div>
-                    <div className="bg-slate-800/50 rounded-lg p-4">
+                    <div className="bg-white/5 rounded-lg p-4 border border-white/10">
                         <p className="text-xs text-slate-500 mb-1">Memory Hub</p>
                         <p className="text-sm font-semibold text-white">testnet.hub.membase.io</p>
-                        <p className="text-xs text-slate-600 font-mono mt-1">Unibase AIP 2.0</p>
+                        <p className="text-xs text-slate-500 font-mono mt-1">Unibase AIP 2.0</p>
                     </div>
                 </div>
             </div>

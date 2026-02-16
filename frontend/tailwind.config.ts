@@ -81,6 +81,10 @@ const config: Config = {
             backgroundSize: {
                 'grid': '48px 48px',
             },
+            fontFamily: {
+                sans: ["var(--font-sans)"],
+                display: ["var(--font-display)"],
+            },
         },
     },
     plugins: [],
