@@ -70,12 +70,12 @@ export default function AgentsPage() {
         <div className="space-y-6">
             {/* Network Warning */}
             {!isBNBTestnet && isConnected && (
-                <div className="bg-yellow-500/10 border border-yellow-500/20 rounded-xl p-4">
+                <div className="bg-amber-500/10 border border-amber-500/20 rounded-xl p-4">
                     <div className="flex items-start gap-3">
-                        <AlertTriangle className="w-5 h-5 text-yellow-400 flex-shrink-0 mt-0.5" />
+                        <AlertTriangle className="w-5 h-5 text-amber-300 flex-shrink-0 mt-0.5" />
                         <div>
-                            <h3 className="font-semibold text-yellow-300 mb-1">Wrong Network</h3>
-                            <p className="text-sm text-yellow-200/80">
+                            <h3 className="font-semibold text-amber-200 mb-1">Wrong Network</h3>
+                            <p className="text-sm text-amber-100/80">
                                 Agent operations are optimized for <strong>BNB Smart Chain Testnet</strong>.
                                 Please switch networks in the top bar.
                             </p>
@@ -96,23 +96,23 @@ export default function AgentsPage() {
             {loading ? (
                 <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
                     {[1].map((i) => (
-                        <div key={i} className="h-64 bg-slate-900 border border-slate-800 rounded-2xl animate-pulse"></div>
+                        <div key={i} className="h-64 bg-white/5 border border-white/10 rounded-2xl animate-pulse"></div>
                     ))}
                 </div>
             ) : (
                 <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
                     {agents.map((agent) => (
-                        <div key={agent.id} className="bg-slate-900 border border-slate-800 rounded-2xl p-6 hover:border-purple-500/50 transition-all group">
+                        <div key={agent.id} className="bg-white/5 border border-white/10 rounded-2xl p-6 hover:border-white/20 transition-all group">
                             <div className="flex items-start justify-between mb-6">
                                 <div className="flex items-center gap-4">
-                                    <div className="w-14 h-14 rounded-xl bg-gradient-to-br from-yellow-500 to-purple-600 flex items-center justify-center shadow-lg">
+                                    <div className="w-14 h-14 rounded-xl bg-white/10 border border-white/10 flex items-center justify-center">
                                         <Bot className="w-8 h-8 text-white" />
                                     </div>
                                     <div>
                                         <h3 className="font-bold text-white text-lg">{agent.name}</h3>
                                         <div className="flex items-center gap-2 mt-1">
-                                            <span className="w-2 h-2 rounded-full bg-emerald-500"></span>
-                                            <span className="text-xs text-emerald-400 font-medium">Online</span>
+                                            <span className="w-2 h-2 rounded-full bg-emerald-400"></span>
+                                            <span className="text-xs text-emerald-300 font-medium">Online</span>
                                         </div>
                                     </div>
                                 </div>
@@ -123,26 +123,26 @@ export default function AgentsPage() {
                             </p>
 
                             <div className="space-y-3 mb-6">
-                                <div className="flex items-center justify-between text-sm p-3 bg-slate-800/50 rounded-lg">
-                                    <span className="text-slate-500 flex items-center gap-2">
+                                <div className="flex items-center justify-between text-sm p-3 bg-black/40 border border-white/10 rounded-lg">
+                                    <span className="text-slate-400 flex items-center gap-2">
                                         <Wallet className="w-4 h-4" /> Agent Wallet
                                     </span>
                                     <span className="text-slate-300 font-mono text-xs">
                                         {agent.walletAddress?.slice(0, 6)}...{agent.walletAddress?.slice(-4)}
                                     </span>
                                 </div>
-                                <div className="flex items-center justify-between text-sm p-3 bg-slate-800/50 rounded-lg">
-                                    <span className="text-slate-500 flex items-center gap-2">
+                                <div className="flex items-center justify-between text-sm p-3 bg-black/40 border border-white/10 rounded-lg">
+                                    <span className="text-slate-400 flex items-center gap-2">
                                         <Globe className="w-4 h-4" /> Active Network
                                     </span>
-                                    <span className="text-yellow-400 text-xs font-semibold">BNB Testnet</span>
+                                    <span className="text-amber-300 text-xs font-semibold">BNB Testnet</span>
                                 </div>
                             </div>
 
                             <div className="flex gap-3 pt-2 text-sm font-medium">
                                 <Link
                                     href={`/dashboard/chat?agentId=${agent.id}`}
-                                    className="flex-1 py-2.5 bg-slate-800 hover:bg-slate-700 text-white rounded-lg flex items-center justify-center gap-2 transition-colors"
+                                    className="flex-1 py-2.5 bg-white text-black rounded-lg flex items-center justify-center gap-2 transition-colors hover:bg-white/90"
                                 >
                                     <MessageSquare className="w-4 h-4" />
                                     Launch Interface
@@ -151,7 +151,7 @@ export default function AgentsPage() {
                                     href={`https://testnet.bscscan.com/address/${agent.walletAddress}`}
                                     target="_blank"
                                     rel="noreferrer"
-                                    className="px-3 py-2.5 border border-slate-700 hover:bg-slate-800 text-slate-400 hover:text-white rounded-lg transition-colors"
+                                    className="px-3 py-2.5 border border-white/10 hover:bg-white/10 text-white/70 hover:text-white rounded-lg transition-colors"
                                 >
                                     <ExternalLink className="w-4 h-4" />
                                 </a>

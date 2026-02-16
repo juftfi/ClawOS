@@ -421,9 +421,13 @@ class MembaseService {
      * @param {Object} transaction - Transaction data
      * @returns {Promise<Object>} Storage result
      */
-    async storeTransaction(transaction) {
+    async storeTransaction(txHashOrTransaction, txDetails) {
+        const transaction = txDetails
+            ? { ...txDetails, tx_hash: txHashOrTransaction }
+            : txHashOrTransaction;
+
         const data = {
-            ...transaction,
+            ...(transaction || {}),
             stored_at: new Date().toISOString()
         };
 
@@ -438,15 +442,15 @@ class MembaseService {
                 );
 
                 logger.info('Transaction stored', { tx_hash: transaction.tx_hash });
-                return { success: true, stored: true, tx_hash: transaction.tx_hash };
+                return { success: true, stored: true, tx_hash: transaction?.tx_hash };
             }
 
             // Fallback
-            return this.fallbackStore('transactions', transaction.tx_hash || `tx_${Date.now()}`, data);
+            return this.fallbackStore('transactions', transaction?.tx_hash || `tx_${Date.now()}`, data);
 
         } catch (error) {
             logger.error('Store transaction error:', error.message);
-            return this.fallbackStore('transactions', transaction.tx_hash || `tx_${Date.now()}`, data);
+            return this.fallbackStore('transactions', transaction?.tx_hash || `tx_${Date.now()}`, data);
         }
     }
 
@@ -838,7 +842,13 @@ class MembaseService {
         this.saveToDisk();
         this.usesFallback = true;
         logger.debug('Data stored in fallback', { collection, key });
-        return data;
+        const payload = (data && typeof data === 'object') ? data : { value: data };
+        return {
+            success: true,
+            fallback: true,
+            stored: true,
+            ...payload
+        };
     }
 
     /**
