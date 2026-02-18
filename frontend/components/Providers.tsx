@@ -7,6 +7,14 @@ import {
     darkTheme,
 } from '@rainbow-me/rainbowkit';
 import {
+<<<<<<< HEAD
+=======
+    argentWallet,
+    trustWallet,
+    ledgerWallet,
+} from '@rainbow-me/rainbowkit/wallets';
+import {
+>>>>>>> feature/landing-dashboard
     bscTestnet,
 } from 'wagmi/chains';
 import { QueryClient, QueryClientProvider } from '@tanstack/react-query';
