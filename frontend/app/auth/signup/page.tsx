@@ -8,7 +8,7 @@ import { ConnectButton } from '@rainbow-me/rainbowkit';
 import { useAuth } from '@/lib/auth-context';
 import { auth } from '@/lib/supabase';
 import { signInWithWallet } from '@/lib/siwe';
-import { Mail, Lock, User, Wallet, ArrowRight, AlertCircle, CheckCircle } from 'lucide-react';
+import { Mail, Lock, Wallet, ArrowRight, AlertCircle, CheckCircle } from 'lucide-react';
 
 export default function SignupPage() {
   const router = useRouter();

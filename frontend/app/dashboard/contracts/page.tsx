@@ -56,7 +56,7 @@ const severityStyles = {
 };
 
 export default function ContractsPage() {
-    const { address, isConnected, chain } = useAccount();
+    const { address, isConnected } = useAccount();
     const [mode, setMode] = useState<'generate' | 'audit'>('generate');
     const [description, setDescription] = useState('');
     const [contractCode, setContractCode] = useState('');

@@ -1,8 +1,7 @@
 'use client';
 
 import { useEffect, useState } from 'react';
-import { Plus, Bot, ExternalLink, MessageSquare, Wallet, Globe, X, Loader2, AlertTriangle } from 'lucide-react';
-import axios from 'axios';
+import { Bot, ExternalLink, MessageSquare, Wallet, Globe, AlertTriangle } from 'lucide-react';
 import Link from 'next/link';
 import { useAccount } from 'wagmi';
 
@@ -18,13 +17,6 @@ export default function AgentsPage() {
     const { address, isConnected, chain } = useAccount();
     const [agents, setAgents] = useState<Agent[]>([]);
     const [loading, setLoading] = useState(true);
-    const [showCreateModal, setShowCreateModal] = useState(false);
-    const [creating, setCreating] = useState(false);
-    const [formData, setFormData] = useState({
-        name: '',
-        description: ''
-    });
-
     useEffect(() => {
         if (isConnected && address) {
             fetchAgents();
@@ -47,11 +39,6 @@ export default function AgentsPage() {
         } finally {
             setLoading(false);
         }
-    };
-
-    const handleCreateAgent = async () => {
-        alert('Custom agent creation on BNB is coming in Phase 1. Use the primary Super Agent for now.');
-        setShowCreateModal(false);
     };
 
     const isBNBTestnet = chain?.id === 97;

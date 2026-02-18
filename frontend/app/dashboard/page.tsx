@@ -1,6 +1,6 @@
 'use client';
 
-import { useEffect, useState } from 'react';
+import { useCallback, useEffect, useState } from 'react';
 import {
     Activity,
     AlertTriangle,
@@ -57,7 +57,7 @@ export default function DashboardOverview() {
         setHasMounted(true);
     }, []);
 
-    const fetchStats = async () => {
+    const fetchStats = useCallback(async () => {
         if (!hasMounted) return;
 
         try {
@@ -93,11 +93,11 @@ export default function DashboardOverview() {
         } finally {
             setLoading(false);
         }
-    };
+    }, [hasMounted]);
 
     useEffect(() => {
         fetchStats();
-    }, [address, hasMounted]);
+    }, [address, fetchStats]);
 
     const statCards = [
         {

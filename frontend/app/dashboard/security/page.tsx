@@ -1,6 +1,6 @@
 'use client';
 
-import { useState, useEffect } from 'react';
+import { useCallback, useEffect, useState } from 'react';
 import { useAccount } from 'wagmi';
 import {
     Shield,
@@ -35,13 +35,7 @@ export default function SecurityPage() {
     const [newListEntry, setNewListEntry] = useState({ address: '', type: 'allow', reason: '' });
     const [loading, setLoading] = useState(true);
 
-    useEffect(() => {
-        if (isConnected && address) {
-            loadSecuritySettings();
-        }
-    }, [address, isConnected]);
-
-    const loadSecuritySettings = async () => {
+    const loadSecuritySettings = useCallback(async () => {
         try {
             const API_URL = process.env.NEXT_PUBLIC_API_URL || 'http://localhost:3000';
 
@@ -59,7 +53,13 @@ export default function SecurityPage() {
         } finally {
             setLoading(false);
         }
-    };
+    }, [address]);
+
+    useEffect(() => {
+        if (isConnected && address) {
+            loadSecuritySettings();
+        }
+    }, [address, isConnected, loadSecuritySettings]);
 
     const addSpendCap = async () => {
         if (!newCap.limit || !address) return;

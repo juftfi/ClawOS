@@ -3,16 +3,9 @@
 import * as React from 'react';
 import {
     RainbowKitProvider,
-    getDefaultWallets,
     getDefaultConfig,
     darkTheme,
-    lightTheme,
 } from '@rainbow-me/rainbowkit';
-import {
-    argentWallet,
-    trustWallet,
-    ledgerWallet,
-} from '@rainbow-me/rainbowkit/wallets';
 import {
     bscTestnet,
 } from 'wagmi/chains';
@@ -21,8 +14,6 @@ import { WagmiProvider } from 'wagmi';
 import { ThemeProvider as NextThemesProvider } from 'next-themes';
 import { AuthProvider } from '@/lib/auth-context';
 import '@rainbow-me/rainbowkit/styles.css';
-
-const { wallets } = getDefaultWallets();
 
 const config = getDefaultConfig({
     appName: 'AgentOS Web3',

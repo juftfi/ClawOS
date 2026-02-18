@@ -19,7 +19,6 @@ export function ChatInterface() {
     const [messages, setMessages] = useState<Message[]>([]);
     const [input, setInput] = useState('');
     const [loading, setLoading] = useState(false);
-    const [loadingHistory, setLoadingHistory] = useState(true);
     const messagesEndRef = useRef<HTMLDivElement>(null);
 
     const [hasMounted, setHasMounted] = useState(false);
@@ -49,7 +48,6 @@ export function ChatInterface() {
                         timestamp: new Date(),
                     },
                 ]);
-                setLoadingHistory(false);
                 return;
             }
 
@@ -86,8 +84,6 @@ export function ChatInterface() {
                         timestamp: new Date(),
                     },
                 ]);
-            } finally {
-                setLoadingHistory(false);
             }
         };
 

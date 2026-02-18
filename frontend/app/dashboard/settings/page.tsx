@@ -415,7 +415,7 @@ export default function SettingsPage() {
         <div className="bg-red-500/5 border border-red-500/20 rounded-xl p-6">
           <h3 className="text-lg font-bold text-red-400 mb-4">Danger Zone</h3>
           <p className="text-slate-400 text-sm mb-4">
-            Once you sign out, you'll need to sign in again to access your account.
+            Once you sign out, you&apos;ll need to sign in again to access your account.
           </p>
           <button
             onClick={() => signOut()}
