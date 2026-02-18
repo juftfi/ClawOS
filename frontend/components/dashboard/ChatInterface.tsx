@@ -48,10 +48,6 @@ export function ChatInterface() {
                         timestamp: new Date(),
                     },
                 ]);
-<<<<<<< HEAD
-=======
-                setLoadingHistory(false);
->>>>>>> feature/landing-dashboard
                 return;
             }
 
@@ -88,11 +84,6 @@ export function ChatInterface() {
                         timestamp: new Date(),
                     },
                 ]);
-<<<<<<< HEAD
-=======
-            } finally {
-                setLoadingHistory(false);
->>>>>>> feature/landing-dashboard
             }
         };
 

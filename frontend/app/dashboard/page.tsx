@@ -1,10 +1,6 @@
 'use client';
 
-<<<<<<< HEAD
 import { useCallback, useEffect, useState } from 'react';
-=======
-import { useEffect, useState } from 'react';
->>>>>>> feature/landing-dashboard
 import {
     Activity,
     AlertTriangle,
@@ -61,11 +57,7 @@ export default function DashboardOverview() {
         setHasMounted(true);
     }, []);
 
-<<<<<<< HEAD
     const fetchStats = useCallback(async () => {
-=======
-    const fetchStats = async () => {
->>>>>>> feature/landing-dashboard
         if (!hasMounted) return;
 
         try {
@@ -105,11 +97,7 @@ export default function DashboardOverview() {
 
     useEffect(() => {
         fetchStats();
-<<<<<<< HEAD
     }, [address, fetchStats]);
-=======
-    }, [address, hasMounted]);
->>>>>>> feature/landing-dashboard
 
     const statCards = [
         {

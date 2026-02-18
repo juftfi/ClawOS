@@ -29,12 +29,8 @@ const config: Config = {
                 },
             },
             fontFamily: {
-<<<<<<< HEAD
                 sans: ['var(--font-sans)', 'Inter', 'system-ui', 'sans-serif'],
                 display: ['var(--font-display)', 'Inter', 'system-ui', 'sans-serif'],
-=======
-                sans: ['Inter', 'system-ui', 'sans-serif'],
->>>>>>> feature/landing-dashboard
                 mono: ['JetBrains Mono', 'Fira Code', 'monospace'],
             },
             boxShadow: {
@@ -85,13 +81,6 @@ const config: Config = {
             },
             backgroundSize: {
                 'grid': '48px 48px',
-<<<<<<< HEAD
-=======
-            },
-            fontFamily: {
-                sans: ["var(--font-sans)"],
-                display: ["var(--font-display)"],
->>>>>>> feature/landing-dashboard
             },
         },
     },

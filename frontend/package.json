@@ -21,6 +21,8 @@
         "react": "^19.0.0",
         "react-dom": "^19.0.0",
         "react-markdown": "^10.1.0",
+        "siwe": "^2.1.4",
+        "@supabase/supabase-js": "^2.49.1",
         "viem": "^2.41.2",
         "wagmi": "^2.19.5",
         "zod": "^4.1.13"

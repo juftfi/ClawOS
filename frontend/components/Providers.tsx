@@ -6,17 +6,7 @@ import {
     getDefaultConfig,
     darkTheme,
 } from '@rainbow-me/rainbowkit';
-import {
-<<<<<<< HEAD
-=======
-    argentWallet,
-    trustWallet,
-    ledgerWallet,
-} from '@rainbow-me/rainbowkit/wallets';
-import {
->>>>>>> feature/landing-dashboard
-    bscTestnet,
-} from 'wagmi/chains';
+import { bscTestnet } from 'wagmi/chains';
 import { QueryClient, QueryClientProvider } from '@tanstack/react-query';
 import { WagmiProvider } from 'wagmi';
 import { ThemeProvider as NextThemesProvider } from 'next-themes';
