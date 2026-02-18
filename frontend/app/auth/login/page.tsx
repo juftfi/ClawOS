@@ -6,7 +6,7 @@ import Link from 'next/link';
 import { useAccount, useSignMessage } from 'wagmi';
 import { ConnectButton } from '@rainbow-me/rainbowkit';
 import { useAuth } from '@/lib/auth-context';
-import { auth } from '@/lib/supabase';
+import { auth, isSupabaseConfigured } from '@/lib/supabase';
 import { signInWithWallet } from '@/lib/siwe';
 import Hls from 'hls.js';
 import { Mail, Lock, Wallet, ArrowRight, AlertCircle, Sparkles, ShieldCheck, Layers } from 'lucide-react';
@@ -60,9 +60,24 @@ export default function LoginPage() {
     const [loading, setLoading] = useState(false);
     const [error, setError] = useState<string | null>(null);
     const [success, setSuccess] = useState<string | null>(null);
+    const supabaseReady = isSupabaseConfigured();
+
+    useEffect(() => {
+        if (!supabaseReady && loginMethod !== 'wallet') {
+            setLoginMethod('wallet');
+        }
+        if (!supabaseReady) {
+            setError(null);
+            setSuccess(null);
+        }
+    }, [loginMethod, supabaseReady]);
 
     const handleEmailLogin = async (e: React.FormEvent) => {
         e.preventDefault();
+        if (!supabaseReady) {
+            setError(null);
+            return;
+        }
         setLoading(true);
         setError(null);
 
@@ -112,6 +127,10 @@ export default function LoginPage() {
     };
 
     const handleSocialLogin = async (provider: 'google' | 'twitter') => {
+        if (!supabaseReady) {
+            setError(null);
+            return;
+        }
         setLoading(true);
         setError(null);
 
@@ -197,6 +216,12 @@ export default function LoginPage() {
                                 </div>
                             )}
 
+                            {!supabaseReady && (
+                                <div className="mb-6 p-4 bg-white/5 border border-white/10 rounded-lg text-white/70 text-sm">
+                                    Email and social sign-in are disabled until Supabase environment variables are configured.
+                                </div>
+                            )}
+
                             {success && (
                                 <div className="mb-6 p-4 bg-emerald-500/10 border border-emerald-500/40 rounded-lg text-emerald-200 text-sm">
                                     {success}
@@ -205,12 +230,13 @@ export default function LoginPage() {
 
                             <div className="flex gap-2 mb-6 p-1 bg-black/60 rounded-lg">
                                 <button
-                                    onClick={() => setLoginMethod('email')}
+                                    onClick={() => supabaseReady && setLoginMethod('email')}
+                                    disabled={!supabaseReady}
                                     className={`flex-1 py-2 px-4 rounded-md text-sm font-medium transition-all ${
                                         loginMethod === 'email'
                                             ? 'bg-white text-black'
                                             : 'text-white/50 hover:text-white'
-                                    }`}
+                                    } ${!supabaseReady ? 'cursor-not-allowed opacity-40' : ''}`}
                                 >
                                     Email
                                 </button>
@@ -225,18 +251,19 @@ export default function LoginPage() {
                                     Wallet
                                 </button>
                                 <button
-                                    onClick={() => setLoginMethod('social')}
+                                    onClick={() => supabaseReady && setLoginMethod('social')}
+                                    disabled={!supabaseReady}
                                     className={`flex-1 py-2 px-4 rounded-md text-sm font-medium transition-all ${
                                         loginMethod === 'social'
                                             ? 'bg-white text-black'
                                             : 'text-white/50 hover:text-white'
-                                    }`}
+                                    } ${!supabaseReady ? 'cursor-not-allowed opacity-40' : ''}`}
                                 >
                                     Social
                                 </button>
                             </div>
 
-                            {loginMethod === 'email' && (
+                            {loginMethod === 'email' && supabaseReady && (
                                 <form onSubmit={handleEmailLogin} className="space-y-4">
                                     <div>
                                         <label className="block text-xs font-medium text-white/70 mb-2 uppercase tracking-[0.2em]">
@@ -319,7 +346,7 @@ export default function LoginPage() {
                                 </div>
                             )}
 
-                            {loginMethod === 'social' && (
+                            {loginMethod === 'social' && supabaseReady && (
                                 <div className="space-y-4">
                                     <button
                                         onClick={() => handleSocialLogin('google')}
