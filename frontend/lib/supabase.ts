@@ -31,6 +31,11 @@ export const supabase: SupabaseClient = hasValidCredentials
 // Helper to check if Supabase is configured
 export const isSupabaseConfigured = () => hasValidCredentials && supabase !== null;
 
+const supabaseNotConfiguredError = (action: string) => ({
+  data: null,
+  error: { message: `Supabase not configured: ${action}` },
+});
+
 // Database types
 export interface UserProfile {
   id: string;
@@ -48,6 +53,9 @@ export interface UserProfile {
 export const auth = {
   // Sign up with email and password
   async signUpWithEmail(email: string, password: string) {
+    if (!isSupabaseConfigured()) {
+      return supabaseNotConfiguredError('signUpWithEmail');
+    }
     const { data, error } = await supabase.auth.signUp({
       email,
       password,
@@ -57,6 +65,9 @@ export const auth = {
 
   // Sign in with email and password
   async signInWithEmail(email: string, password: string) {
+    if (!isSupabaseConfigured()) {
+      return supabaseNotConfiguredError('signInWithEmail');
+    }
     const { data, error } = await supabase.auth.signInWithPassword({
       email,
       password,
@@ -66,6 +77,9 @@ export const auth = {
 
   // Sign in with Google
   async signInWithGoogle() {
+    if (!isSupabaseConfigured()) {
+      return supabaseNotConfiguredError('signInWithGoogle');
+    }
     const { data, error } = await supabase.auth.signInWithOAuth({
       provider: 'google',
       options: {
@@ -77,6 +91,9 @@ export const auth = {
 
   // Sign in with Twitter
   async signInWithTwitter() {
+    if (!isSupabaseConfigured()) {
+      return supabaseNotConfiguredError('signInWithTwitter');
+    }
     const { data, error } = await supabase.auth.signInWithOAuth({
       provider: 'twitter',
       options: {
@@ -88,24 +105,36 @@ export const auth = {
 
   // Sign out
   async signOut() {
+    if (!isSupabaseConfigured()) {
+      return supabaseNotConfiguredError('signOut');
+    }
     const { error } = await supabase.auth.signOut();
     return { error };
   },
 
   // Get current session
   async getSession() {
+    if (!isSupabaseConfigured()) {
+      return { session: null, error: { message: 'Supabase not configured: getSession' } };
+    }
     const { data: { session }, error } = await supabase.auth.getSession();
     return { session, error };
   },
 
   // Get current user
   async getUser() {
+    if (!isSupabaseConfigured()) {
+      return { user: null, error: { message: 'Supabase not configured: getUser' } };
+    }
     const { data: { user }, error } = await supabase.auth.getUser();
     return { user, error };
   },
 
   // Reset password
   async resetPassword(email: string) {
+    if (!isSupabaseConfigured()) {
+      return supabaseNotConfiguredError('resetPassword');
+    }
     const { data, error } = await supabase.auth.resetPasswordForEmail(email, {
       redirectTo: `${window.location.origin}/auth/reset-password`,
     });
@@ -114,6 +143,9 @@ export const auth = {
 
   // Update password
   async updatePassword(newPassword: string) {
+    if (!isSupabaseConfigured()) {
+      return supabaseNotConfiguredError('updatePassword');
+    }
     const { data, error } = await supabase.auth.updateUser({
       password: newPassword,
     });
@@ -125,6 +157,9 @@ export const auth = {
 export const userProfile = {
   // Get user profile
   async getProfile(userId: string): Promise<{ data: UserProfile | null; error: any }> {
+    if (!isSupabaseConfigured()) {
+      return { data: null, error: { message: 'Supabase not configured: getProfile' } };
+    }
     const { data, error } = await supabase
       .from('user_profiles')
       .select('*')
@@ -135,6 +170,9 @@ export const userProfile = {
 
   // Create user profile
   async createProfile(userId: string, email: string | null): Promise<{ data: UserProfile | null; error: any }> {
+    if (!isSupabaseConfigured()) {
+      return { data: null, error: { message: 'Supabase not configured: createProfile' } };
+    }
     const { data, error } = await supabase
       .from('user_profiles')
       .insert({
@@ -150,6 +188,9 @@ export const userProfile = {
 
   // Update user profile
   async updateProfile(userId: string, updates: Partial<UserProfile>) {
+    if (!isSupabaseConfigured()) {
+      return { data: null, error: { message: 'Supabase not configured: updateProfile' } };
+    }
     const { data, error } = await supabase
       .from('user_profiles')
       .update({ ...updates, updated_at: new Date().toISOString() })
