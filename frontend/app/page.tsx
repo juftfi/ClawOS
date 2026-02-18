@@ -97,14 +97,14 @@ export default function Home() {
                     </div>
                     <div className="flex items-center gap-3">
                         <Link
-                            href="/dashboard"
+                            href="/auth/login?redirect=/dashboard"
                             onClick={() => trackEvent('cta_nav_get_started')}
                             className="hidden rounded-full bg-gradient-to-r from-white to-zinc-200 px-4 py-2 text-xs font-semibold text-black transition hover:from-zinc-100 hover:to-white md:inline-flex"
                         >
                             Get Started for Free
                         </Link>
                         <Link
-                            href="/dashboard"
+                            href="/auth/login?redirect=/dashboard"
                             onClick={() => trackEvent('cta_nav_launch_app')}
                             className="inline-flex items-center gap-2 text-xs font-semibold text-white/80 transition hover:text-white md:hidden"
                         >
@@ -160,7 +160,7 @@ export default function Home() {
 
                         <motion.div variants={fadeUp} className="mt-10 flex flex-wrap justify-center gap-4">
                             <Link
-                                href="/dashboard"
+                                href="/auth/login?redirect=/dashboard"
                                 onClick={() => trackEvent('cta_hero_launch_app')}
                                 className="inline-flex items-center gap-2 rounded-full border border-white/70 bg-black px-6 py-3 text-sm font-semibold text-white transition hover:border-white hover:bg-white hover:text-black"
                             >
