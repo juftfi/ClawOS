@@ -1,6 +1,6 @@
 {
-  "name": "AgentOS - Autonomous AI Agents",
-  "short_name": "AgentOS",
+  "name": "ClawOS - Autonomous AI Agents",
+  "short_name": "ClawOS",
   "description": "AI agents that think, pay, and remember on-chain",
   "start_url": "/dashboard",
   "display": "standalone",

@@ -289,7 +289,7 @@ class SignatureService {
      * @param {string} domain - Domain name
      * @returns {Promise<Object>} EIP-712 signature
      */
-    async createEIP712Signature(data, domain = 'AgentOS') {
+    async createEIP712Signature(data, domain = 'ClawOS') {
         try {
             const account = blockchainService.getAccount();
 

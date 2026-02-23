@@ -1,9 +1,9 @@
-# AgentOS Project Summary for Claude Code CLI
+# ClawOS Project Summary for Claude Code CLI
 
 **Last Updated**: January 29, 2026
 
 ## Project Overview
-AgentOS is an AI-native Web3 operating system that enables autonomous agents to research, transact, and remember. It integrates ChainGPT (AI), Quack Q402 (Payments on BNB Testnet), and Unibase AIP (Verifiable Memory).
+ClawOS is an AI-native Web3 operating system that enables autonomous agents to research, transact, and remember. It integrates ChainGPT (AI), Quack Q402 (Payments on BNB Testnet), and Unibase AIP (Verifiable Memory).
 
 ## Tech Stack
 - **Backend**: Express.js (Node.js), runs on port 3000
@@ -15,7 +15,7 @@ AgentOS is an AI-native Web3 operating system that enables autonomous agents to 
 
 ## Repo Structure
 ```
-AgentOS-web3/
+ClawOS-web3/
 ├── src/                  # Backend
 │   ├── index.js          # Express entry, port 3000
 │   ├── routes/           # API routes (agent.js, awe.js, etc.)

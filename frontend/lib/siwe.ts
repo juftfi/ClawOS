@@ -18,7 +18,7 @@ export function createSiweMessage(address: string, chainId: number): SiweMessage
   return new SiweMessage({
     domain,
     address,
-    statement: 'Sign in with Ethereum to AgentOS',
+    statement: 'Sign in with Ethereum to ClawOS',
     uri: origin,
     version: '1',
     chainId,

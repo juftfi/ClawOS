@@ -125,7 +125,7 @@ export default function SignupPage() {
       <div className="max-w-md w-full">
         {/* Logo and Header */}
         <div className="text-center mb-8">
-          <h1 className="text-4xl font-bold text-white mb-2">Join AgentOS</h1>
+          <h1 className="text-4xl font-bold text-white mb-2">Join ClawOS</h1>
           <p className="text-gray-400">Create your account and start building</p>
         </div>
 

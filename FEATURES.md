@@ -1,4 +1,4 @@
-# AgentOS-web3 Features Documentation
+# ClawOS-web3 Features Documentation
 
 ## Table of Contents
 - [Overview](#overview)
@@ -11,7 +11,7 @@
 
 ## Overview
 
-**AgentOS-web3** is a Node.js backend service that provides blockchain integration, AI-powered agent capabilities, payment processing, and smart contract interaction on the BNB Smart Chain (BSC).
+**ClawOS-web3** is a Node.js backend service that provides blockchain integration, AI-powered agent capabilities, payment processing, and smart contract interaction on the BNB Smart Chain (BSC).
 
 **Key Capabilities:**
 - 🔐 X402 Payment Protocol Implementation
@@ -463,8 +463,8 @@ ISC
 
 ## Contact & Support
 
-- **Repository:** https://github.com/RicheySon/AgentOS-web3
-- **Issues:** https://github.com/RicheySon/AgentOS-web3/issues
+- **Repository:** https://github.com/RicheySon/ClawOS-web3
+- **Issues:** https://github.com/RicheySon/ClawOS-web3/issues
 
 ---
 

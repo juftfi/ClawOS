@@ -1,5 +1,5 @@
 /**
- * AgentOS Authentication & Security Test Suite
+ * ClawOS Authentication & Security Test Suite
  *
  * Tests the following features:
  * 1. User Authentication System (SIWE, JWT, Cookies)
@@ -39,7 +39,7 @@ const generateTestToken = (payload = {}) => {
 const createMockSiweMessage = (address, nonce = 'test-nonce') => {
   const domain = 'localhost:3001';
   const origin = 'http://localhost:3001';
-  const statement = 'Sign in to AgentOS';
+  const statement = 'Sign in to ClawOS';
   const issuedAt = new Date().toISOString();
 
   return `${domain} wants you to sign in with your Ethereum account:
@@ -68,7 +68,7 @@ const expectStatusOrRateLimited = (res, expectedStatus, testName = '') => {
   return false;
 };
 
-describe('AgentOS Authentication & Security Tests', () => {
+describe('ClawOS Authentication & Security Tests', () => {
 
   // =====================================================
   // 1. USER AUTHENTICATION SYSTEM TESTS
@@ -567,7 +567,7 @@ describe('AgentOS Authentication & Security Tests', () => {
           .expect(200);
 
         expect(res.body.success).toBe(true);
-        expect(res.body.message).toContain('AgentOS');
+        expect(res.body.message).toContain('ClawOS');
         expect(res.body.version).toBeDefined();
       });
     });
@@ -655,7 +655,7 @@ describe('AgentOS Authentication & Security Tests', () => {
 // Summary report
 afterAll(() => {
   console.log('\n' + '='.repeat(60));
-  console.log('  AgentOS Authentication Test Suite Complete');
+  console.log('  ClawOS Authentication Test Suite Complete');
   console.log('='.repeat(60));
   console.log('\nFeatures Verified:');
   console.log('  [x] SIWE Wallet Authentication (Sign-In with Ethereum)');

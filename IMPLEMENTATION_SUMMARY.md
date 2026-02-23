@@ -1,7 +1,7 @@
-# AgentOS Authentication & Security Implementation Summary
+# ClawOS Authentication & Security Implementation Summary
 
 ## Overview
-Complete authentication and security layer has been implemented for the AgentOS project, including wallet authentication (SIWE), email/password authentication, social login (Google, Twitter), user profile management, and comprehensive security features.
+Complete authentication and security layer has been implemented for the ClawOS project, including wallet authentication (SIWE), email/password authentication, social login (Google, Twitter), user profile management, and comprehensive security features.
 
 ## What Has Been Implemented
 

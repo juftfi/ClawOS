@@ -33,7 +33,7 @@ export default function DashboardLayout({ children }: { children: ReactNode }) {
                     </div>
                     <h2 className="text-xl font-bold text-white mb-1">Connect Wallet</h2>
                     <p className="text-sm text-slate-400 mb-6">
-                        Connect your wallet to access AgentOS.
+                        Connect your wallet to access ClawOS.
                     </p>
                     <div className="scale-105">
                         <ConnectButton />

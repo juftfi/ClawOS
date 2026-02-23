@@ -78,7 +78,7 @@ describe('Phase 2: Advanced Features Live Verification (V7 - Final Sweep)', () =
                 .post('/api/memory/aip/store')
                 .send({
                     agentId: liveAgentId,
-                    content: 'AgentOS: 100% Live Verification Proof.',
+                    content: 'ClawOS: 100% Live Verification Proof.',
                     metadata: { stage: 'final' }
                 });
 

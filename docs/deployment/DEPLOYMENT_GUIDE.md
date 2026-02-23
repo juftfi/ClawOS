@@ -1,4 +1,4 @@
-# 🚀 AgentOS-Web3 Deployment Guide
+# 🚀 ClawOS-Web3 Deployment Guide
 
 This guide covers how to deploy the full stack (Frontend + Backend) for live access.
 
@@ -16,7 +16,7 @@ This guide covers how to deploy the full stack (Frontend + Backend) for live acc
 ### Option A: Railway (Recommended - Fastest)
 1.  Login to [Railway Dashboard](https://railway.app).
 2.  Click **"New Project"** -> **"Deploy from GitHub repo"**.
-3.  Select `AgentOS-web3`.
+3.  Select `ClawOS-web3`.
 4.  **Configure Service:**
     - **Root Directory:** `/` (default is fine)
     - **Build Command:** `npm install`
@@ -37,7 +37,7 @@ This guide covers how to deploy the full stack (Frontend + Backend) for live acc
 
 1.  Login to [Vercel Dashboard](https://vercel.com).
 2.  Click **"Add New..."** -> **"Project"**.
-3.  Import `AgentOS-web3`.
+3.  Import `ClawOS-web3`.
 4.  **Framework Preset:** `Next.js`.
 5.  **Root Directory:** ⚠️ **IMPORTANT:** Click "Edit" and select `frontend`.
 6.  **Environment Variables:**

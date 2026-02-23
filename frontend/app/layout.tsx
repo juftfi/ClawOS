@@ -20,16 +20,16 @@ export const viewport: Viewport = {
 };
 
 export const metadata: Metadata = {
-    title: "AgentOS | Autonomous AI Agents on Chain",
+    title: "ClawOS | Autonomous AI Agents on Chain",
     description: "AI agents that think, pay, and remember on-chain. Built on BNB Smart Chain with ChainGPT, Q402, and Unibase.",
     manifest: '/manifest.json',
     appleWebApp: {
         capable: true,
         statusBarStyle: 'black-translucent',
-        title: 'AgentOS',
+        title: 'ClawOS',
     },
     openGraph: {
-        title: 'AgentOS | Autonomous AI Agents on Chain',
+        title: 'ClawOS | Autonomous AI Agents on Chain',
         description: 'AI agents that think, pay, and remember on-chain',
         type: 'website',
     },

@@ -17,11 +17,11 @@ class XBotService {
 
         const systemPrompt = `
         You are a Web3 Social Media Strategist. Your goal is to draft a "Vibe-heavy" X (Twitter) post about a successful AI agent action.
-        The project is "AgentOS" - an AI-native OS on BNB Chain.
+        The project is "ClawOS" - an AI-native OS on BNB Chain.
         
         Key elements to include:
         - The specific result (e.g., negotiated a discount, deployed a safe contract).
-        - Hashtags: #VibingOnBNB #AgentOS #Web3AI
+        - Hashtags: #VibingOnBNB #ClawOS #Web3AI
         - Tone: Sleek, futuristic, and results-oriented.
         - Mentions: @BNBChain, @Unibase_AI (if memory used), @ChainGPT (if AI used).
         

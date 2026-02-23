@@ -77,7 +77,7 @@ export function Sidebar({ mobileOpen, onClose }: SidebarProps) {
                             <Terminal className="w-4 h-4 text-white" />
                         </div>
                         <div>
-                            <h1 className="text-lg font-semibold text-white">AgentOS</h1>
+                            <h1 className="text-lg font-semibold text-white">ClawOS</h1>
                             <p className="text-xs text-white/50">Web3 AI Platform</p>
                         </div>
                     </Link>
@@ -113,7 +113,7 @@ export function Sidebar({ mobileOpen, onClose }: SidebarProps) {
                                 <div className="w-8 h-8 rounded-lg bg-gradient-to-br from-cyan-400 to-violet-500 flex items-center justify-center">
                                     <Terminal className="w-4 h-4 text-white" />
                                 </div>
-                                <span className="text-base font-bold">AgentOS</span>
+                                <span className="text-base font-bold">ClawOS</span>
                             </Link>
                             <button
                                 onClick={onClose}

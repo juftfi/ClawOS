@@ -1,6 +1,6 @@
-# AgentOS Authentication Setup Guide
+# ClawOS Authentication Setup Guide
 
-This guide will help you set up the authentication system for AgentOS, which includes wallet authentication (SIWE), email/password authentication, and social login (Google, Twitter).
+This guide will help you set up the authentication system for ClawOS, which includes wallet authentication (SIWE), email/password authentication, and social login (Google, Twitter).
 
 ## Prerequisites
 

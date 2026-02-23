@@ -155,7 +155,7 @@ export default function LoginPage() {
                 <div className="mx-auto flex h-16 max-w-6xl items-center justify-between px-6">
                     <div className="flex items-center gap-6">
                         <Link href="/" className="text-sm font-medium tracking-tight text-white">
-                            AgentOS
+                            ClawOS
                         </Link>
                         <div className="hidden items-center gap-4 text-xs uppercase tracking-[0.2em] text-white/70 md:flex">
                             <Link href="/#features" className="transition hover:text-white">
@@ -202,7 +202,7 @@ export default function LoginPage() {
                         </div>
 
                         <h1 className="mt-10 font-display text-4xl font-semibold tracking-tight text-white md:text-5xl">
-                            Sign in to AgentOS
+                            Sign in to ClawOS
                         </h1>
                         <p className="mt-4 max-w-2xl text-sm leading-relaxed text-slate-300 md:text-base">
                             Authenticate to orchestrate autonomous agents, execute payments, and track verifiable memory.

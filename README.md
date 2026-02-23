@@ -1,4 +1,4 @@
-# AgentOS Web3
+# ClawOS Web3
 **The Gateway to Decentralized AI Agents**
 
 [![Live Demo](https://img.shields.io/badge/Live-Demo-brightgreen)](https://agent-os-web3.vercel.app/)
@@ -37,7 +37,7 @@ An autonomous agent platform orchestrating AI actions on **BNB Chain** and persi
 
 ## Project Structure
 ```bash
-AgentOS-web3/
+ClawOS-web3/
 ├── frontend/           # Next.js 15 Dashboard (Vercel)
 ├── src/               # Express Backend (Railway)
 │   ├── services/
@@ -53,7 +53,7 @@ AgentOS-web3/
 ## Quick Start (Local)
 1. **Clone & Install:**
    ```bash
-   git clone https://github.com/RicheySon/AgentOS-web3.git
+   git clone https://github.com/RicheySon/ClawOS-web3.git
    npm install      # Backend
    cd frontend && npm install # Frontend
    ```

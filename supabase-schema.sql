@@ -1,4 +1,4 @@
--- AgentOS User Profiles Table
+-- ClawOS User Profiles Table
 -- This schema should be executed in your Supabase SQL Editor
 
 -- Enable UUID extension if not already enabled
@@ -100,7 +100,7 @@ FROM public.user_profiles p
 LEFT JOIN auth.users u ON p.id = u.id;
 
 -- Comments for documentation
-COMMENT ON TABLE public.user_profiles IS 'User profile information for AgentOS';
+COMMENT ON TABLE public.user_profiles IS 'User profile information for ClawOS';
 COMMENT ON COLUMN public.user_profiles.id IS 'Foreign key to auth.users';
 COMMENT ON COLUMN public.user_profiles.email IS 'User email address';
 COMMENT ON COLUMN public.user_profiles.wallet_address IS 'Linked Ethereum wallet address';

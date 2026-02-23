@@ -44,7 +44,7 @@ export function ChatInterface() {
                     {
                         role: 'assistant',
                         content:
-                            "Hello! I'm your AgentOS AI assistant. Connect your wallet to access your conversation history and start chatting!",
+                            "Hello! I'm your ClawOS AI assistant. Connect your wallet to access your conversation history and start chatting!",
                         timestamp: new Date(),
                     },
                 ]);
@@ -69,7 +69,7 @@ export function ChatInterface() {
                         {
                             role: 'assistant',
                             content:
-                                "Hello! I'm your AgentOS AI assistant. I can help you research Web3 topics, analyze tokens, or explain complex protocols using ChainGPT. What's on your mind?",
+                                "Hello! I'm your ClawOS AI assistant. I can help you research Web3 topics, analyze tokens, or explain complex protocols using ChainGPT. What's on your mind?",
                             timestamp: new Date(),
                         },
                     ]);
@@ -80,7 +80,7 @@ export function ChatInterface() {
                     {
                         role: 'assistant',
                         content:
-                            "Hello! I'm your AgentOS AI assistant. I can help you research Web3 topics, analyze tokens, or explain complex protocols using ChainGPT. What's on your mind?",
+                            "Hello! I'm your ClawOS AI assistant. I can help you research Web3 topics, analyze tokens, or explain complex protocols using ChainGPT. What's on your mind?",
                         timestamp: new Date(),
                     },
                 ]);
@@ -140,7 +140,7 @@ export function ChatInterface() {
                 {
                     role: 'assistant',
                     content:
-                        '**Error:** I encountered an issue connecting to the AgentOS brain. Please ensure the backend is running.',
+                        '**Error:** I encountered an issue connecting to the ClawOS brain. Please ensure the backend is running.',
                     timestamp: new Date(),
                 },
             ]);
@@ -164,7 +164,7 @@ export function ChatInterface() {
                         <Bot className="w-6 h-6 text-white" />
                     </div>
                     <div>
-                        <h3 className="font-semibold text-white">AgentOS Brain</h3>
+                        <h3 className="font-semibold text-white">ClawOS Brain</h3>
                         <div className="flex items-center gap-2">
                             <span className="w-2 h-2 rounded-full bg-emerald-400 animate-pulse"></span>
                             <span className="text-xs text-slate-400">Online - ChainGPT-4</span>

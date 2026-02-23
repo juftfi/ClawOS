@@ -14,7 +14,7 @@ import { AuthProvider } from '@/lib/auth-context';
 import '@rainbow-me/rainbowkit/styles.css';
 
 const config = getDefaultConfig({
-    appName: 'AgentOS Web3',
+    appName: 'ClawOS Web3',
     projectId: process.env.NEXT_PUBLIC_WALLETCONNECT_PROJECT_ID || 'YOUR_PROJECT_ID', // Replace with valid ID for production
     chains: [bscTestnet],
     ssr: true, // If your dApp uses server side rendering (SSR)

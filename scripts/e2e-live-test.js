@@ -121,7 +121,7 @@ async function runTests() {
     log.section('3️⃣  CONTRACT GENERATION (ERC20)');
     try {
       const gen = await request('POST', '/ai/generate/erc20', {
-        name: 'AgentOSToken',
+        name: 'ClawOSToken',
         symbol: 'AGENT',
         totalSupply: '1000000',
         decimals: 18,
@@ -147,7 +147,7 @@ async function runTests() {
     log.section('4️⃣  CONTRACT GENERATION (ERC721/NFT)');
     try {
       const gen = await request('POST', '/ai/generate/erc721', {
-        name: 'AgentOSNFT',
+        name: 'ClawOSNFT',
         symbol: 'ANFT',
         baseURI: 'ipfs://QmExample/',
         maxSupply: '10000',

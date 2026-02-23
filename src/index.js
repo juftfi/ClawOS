@@ -106,7 +106,7 @@ app.use('/api/quack', quackRouter);
 app.get('/', (req, res) => {
   res.json({
     success: true,
-    message: 'AgentOS Web3 API - Three Bounty Integration',
+    message: 'ClawOS Web3 API - Three Bounty Integration',
     version: '1.0.0',
     bounties: [
       'Quack × ChainGPT (Super Web3 Agent on BNB Testnet)',
@@ -153,7 +153,7 @@ const gracefulShutdown = (signal) => {
 // Start server only when this file is run directly (avoid launching server during tests that `require` the app)
 if (require.main === module) {
   server = app.listen(PORT, async () => {
-    logger.info(`🚀 AgentOS Web3 API server running on port ${PORT}`);
+    logger.info(`🚀 ClawOS Web3 API server running on port ${PORT}`);
     logger.info(`Environment: ${process.env.NODE_ENV || 'development'}`);
     logger.info(`\n📡 Network Configuration:`);
     logger.info(`  - BNB Testnet: ${process.env.BNB_TESTNET_RPC}`);
