@@ -388,7 +388,7 @@ export default function Home() {
                     </div>
                     <div className="flex flex-wrap items-center gap-6 text-xs uppercase tracking-[0.3em] text-white/50">
                         <a
-                            href="https://github.com/RicheySon/ClawOS-web3"
+                            href="https://github.com/"
                             className="transition hover:text-white"
                         >
                             Docs

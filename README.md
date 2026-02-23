@@ -53,7 +53,7 @@ ClawOS-web3/
 ## Quick Start (Local)
 1. **Clone & Install:**
    ```bash
-   git clone https://github.com/RicheySon/ClawOS-web3.git
+   git clone https://github.com/.git
    npm install      # Backend
    cd frontend && npm install # Frontend
    ```

@@ -463,8 +463,8 @@ ISC
 
 ## Contact & Support
 
-- **Repository:** https://github.com/RicheySon/ClawOS-web3
-- **Issues:** https://github.com/RicheySon/ClawOS-web3/issues
+- **Repository:** https://github.com/
+- **Issues:** https://github.com//issues
 
 ---
 
