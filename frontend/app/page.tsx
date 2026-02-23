@@ -72,7 +72,7 @@ export default function Home() {
                 <div className="mx-auto flex h-16 max-w-6xl items-center justify-between px-6">
                     <div className="flex items-center gap-8">
                         <Link href="/" className="text-sm font-medium tracking-tight text-white">
-                            ClawOS
+                            🦞 ClawOS
                         </Link>
                         <div className="hidden items-center gap-6 text-xs uppercase tracking-[0.2em] text-white/70 md:flex">
                             <Link
@@ -381,7 +381,7 @@ export default function Home() {
             <footer id="contact" className="border-t border-white/5 bg-black py-12">
                 <div className="mx-auto flex max-w-6xl flex-col items-start justify-between gap-8 px-6 md:flex-row md:items-center">
                     <div>
-                        <h3 className="font-display text-2xl font-semibold text-white">ClawOS</h3>
+                        <h3 className="font-display text-2xl font-semibold text-white">🦞 ClawOS</h3>
                         <p className="mt-2 text-sm text-white/60">
                             The operating system for autonomous agents.
                         </p>
