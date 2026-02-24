@@ -396,10 +396,10 @@ export default function Home() {
                         >
                             Docs
                         </a>
-                        <a href="https://x.com" className="transition hover:text-white">
+                        <a href="https://x.com/ClawOS_CTO" target="_blank" className="transition hover:text-white">
                             X
                         </a>
-                        <a href="https://t.me" className="transition hover:text-white">
+                        <a href="https://t.me/ClawOS_CTO" className="transition hover:text-white">
                             Telegram
                         </a>
                     </div>
