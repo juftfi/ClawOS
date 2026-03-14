@@ -93,7 +93,7 @@ export default function Home() {
                             <Link href="#contact" className="transition hover:text-white">
                                 Contact
                             </Link>
-                            <Link href="https://four.meme/token/0xc86cae7a7da4e2addb58aec9b2ea50f0d7904444" target="_blank" className="transition hover:text-white">
+                            <Link href="https://flap.sh/" target="_blank" className="transition hover:text-white">
                                 $ClawOS
                             </Link>
                         </div>
